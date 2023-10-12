@@ -63,8 +63,9 @@ const register = ({ navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         value={password}
         onChangeText={(text) => setPassword(text)}
+        secureTextEntry={true}
       ></TextInput>
-      <TextInput style={styles.textinput} placeholder="Powtórz hasło" placeholderTextColor="rgb(145, 145, 145)"></TextInput>
+      <TextInput secureTextEntry={true} style={styles.textinput} placeholder="Powtórz hasło" placeholderTextColor="rgb(145, 145, 145)"></TextInput>
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={{ color: "white" }}>Zarejestruj się</Text>
       </TouchableOpacity>
