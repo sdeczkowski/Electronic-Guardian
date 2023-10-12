@@ -8,30 +8,52 @@ const register = ({ navigation }) => {
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordrepeat, setPasswordRepeat] = useState("");
+  const [check, setCheck] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
 
   const handleSignUp = async () => {
-    const username = firstname+lastname;
-    try {
+    if(firstname == "" || lastname == "" || email == "" || password == ""){
+      setCheck("Wypełnij wszystkie pola!")
+    }
+    else if(password != passwordrepeat){
+      setCheckPassword("Hasła nie są identyczne!");
+    }
+    else{
+      try {
+        setCheckPassword("");
+        setCheck("");
         const url = "http://localhost:3001/api/signup";
         await axios.post(url, {
-            username:username,
-            password: password,
-            email: email,
-            firstname: firstname,
-            lastname: lastname,
-            isActive: true,
+          password: password,
+          email: email,
+          firstname: firstname,
+          lastname: lastname,
+          isActive: true,
         });
-        navigation.replace('Login');
-    } catch (error) {
-        if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-            setError(error.response.data.message);
+        navigation.replace("Login");
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status >= 400 &&
+          error.response.status <= 500
+        ) {
+          if(error.response.status == 409){
+            setCheck(error.response.data.message);
+          }
+          setError(error.response.data.message);
         }
+      }
     }
-  }
+  };
 
   return (
     <View style={{ alignItems: "center", justifyContent: "center" }}>
-      <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
+      <Image
+        style={[styles.img, { width: 200, height: 200 }]}
+        source={require("../assets/uni.png")}
+      />
+      <Text style={{color: 'red'}}>{check}</Text>
       <TextInput
         style={styles.textinput}
         label="firstname"
@@ -65,7 +87,16 @@ const register = ({ navigation }) => {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry={true}
       ></TextInput>
-      <TextInput secureTextEntry={true} style={styles.textinput} placeholder="Powtórz hasło" placeholderTextColor="rgb(145, 145, 145)"></TextInput>
+      <TextInput
+        style={styles.textinput}
+        placeholder="Powtórz hasło"
+        placeholderTextColor="rgb(145, 145, 145)"
+        value={passwordrepeat}
+        onChangeText={(text) => setPasswordRepeat(text)}
+        secureTextEntry={true}
+      >
+      </TextInput>
+      <Text style={{color: 'red'}}>{checkPassword}</Text>
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={{ color: "white" }}>Zarejestruj się</Text>
       </TouchableOpacity>

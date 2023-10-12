@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
     },
     
     button: {
-        backgroundColor: '#28ACE2',
+        backgroundColor: '#2699c7',
         borderRadius: 20,
         padding: 10,
         height: 40,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     textinput: {
-        backgroundColor: `#dcdcdc`,
+        backgroundColor: `#dbdada`,
         textAlign: 'center',
         borderRadius: 20,
         height: 30,
