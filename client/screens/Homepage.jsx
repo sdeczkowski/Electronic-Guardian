@@ -2,12 +2,17 @@ import React, { useState } from 'react'
 import { View, Image, Text, TextInput } from 'react-native'
 import { TouchableOpacity } from "react-native-gesture-handler";
 import styles from "../styles/styles"
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { Logout } from '../store/actions';
 
-const mainpage = ({navigation}) => {
+const mainpage = () => {
+  const dispatch = useDispatch();
+  const LogOut = () => {
+    dispatch(Logout())
+  }
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={() => {AsyncStorage.setItem("token", ""); navigation.replace('Login')}}>
+      <TouchableOpacity style={styles.button} onPress={LogOut}>
         <Text style={{color: 'white'}}>Wyloguj się</Text>
       </TouchableOpacity>
     </View>

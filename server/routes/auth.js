@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
         // walidacja emaila
         const user = await User.findOne({ email: req.body.email })
         if (!user) 
-            return res.status(401).send({ message: "Invalid Email or Password" })
+            return res.status(401).send({ message: "Błędny email" })
         
         // walidacja hasła
         const validPassword = await bcrypt.compare(
@@ -38,7 +38,7 @@ router.post("/", async (req, res) => {
             user.password
         )
         if (!validPassword)
-            return res.status(401).send({ message: "Invalid Email or Password" })
+            return res.status(401).send({ message: "Błędne hasło" })
         
         // generowanie tokenu
         const token = generateAuthToken();
