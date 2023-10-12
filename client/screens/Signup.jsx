@@ -85,6 +85,7 @@ const register = ({ navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         value={password}
         onChangeText={(text) => setPassword(text)}
+        secureTextEntry={true}
       ></TextInput>
       <TextInput
         style={styles.textinput}
@@ -92,6 +93,7 @@ const register = ({ navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         value={passwordrepeat}
         onChangeText={(text) => setPasswordRepeat(text)}
+        secureTextEntry={true}
       >
       </TextInput>
       <Text style={{color: 'red'}}>{checkPassword}</Text>

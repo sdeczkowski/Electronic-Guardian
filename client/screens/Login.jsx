@@ -38,7 +38,7 @@ const login = ({ navigation,}) => {
       <Image style={[styles.img, {width: 200, height: 200}]} source={require("../assets/uni.png")} />
       <Text style={{color: 'red'}}>{check}</Text>
       <TextInput style={styles.textinput} placeholder="Email" placeholderTextColor="rgb(145, 145, 145)" label="email" value={email} onChangeText={(text) => setEmail(text)}></TextInput>
-      <TextInput style={styles.textinput} placeholder="Hasło" placeholderTextColor="rgb(145, 145, 145)" label="password" value={password} onChangeText={(text) => setPassword(text)}></TextInput>
+      <TextInput style={styles.textinput} secureTextEntry={true} placeholder="Hasło" placeholderTextColor="rgb(145, 145, 145)" label="password" value={password} onChangeText={(text) => setPassword(text)}></TextInput>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={{color: 'white'}}>Zaloguj się</Text>
       </TouchableOpacity>
