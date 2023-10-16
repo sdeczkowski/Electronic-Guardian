@@ -28,7 +28,7 @@ export const Login = (token) => {
 
 export const Logout = () => {
   return async (dispatch) => {
-    await AsyncStorage.clear();
+    await AsyncStorage.removeItem("token");
     dispatch({
       type: "LOGOUT",
     });

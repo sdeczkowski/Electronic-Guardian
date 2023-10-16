@@ -7,7 +7,7 @@ const passwordComplexity = require("joi-password-complexity");
 // walidacja dla nowych danych (używana przy rejestracji)
 const validateSingUp = (data) => {
   const schema = Joi.object({
-    password: passwordComplexity().string().required(),
+    password: Joi.string().required(),
     email: Joi.string().email().required(),
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),

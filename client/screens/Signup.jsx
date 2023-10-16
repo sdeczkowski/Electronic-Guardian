@@ -1,4 +1,5 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import {NetworkInfo} from 'react-native-network-info';
 import React, { useState } from "react";
 import styles from "../styles/styles";
 import axios from "axios";
@@ -11,6 +12,7 @@ const register = ({ navigation }) => {
   const [passwordrepeat, setPasswordRepeat] = useState("");
   const [check, setCheck] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
+  const [ip, setIp] = useState("");
 
   const handleSignUp = async () => {
     if(firstname == "" || lastname == "" || email == "" || password == ""){
@@ -31,7 +33,7 @@ const register = ({ navigation }) => {
           lastname: lastname,
           isActive: true,
         });
-        navigation.replace("Login");
+        navigation.navigate("Login");
       } catch (error) {
         if (
           error.response &&
