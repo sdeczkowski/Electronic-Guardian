@@ -7,6 +7,7 @@ const signup = require("./routes/createaccount.js")
 const connectDB = require('./database/DB.js')
 
 const port = process.env.PORT || '3001';
+console.log(process.env.PORT)
 
 // Łączenie z bazą
 connectDB();
