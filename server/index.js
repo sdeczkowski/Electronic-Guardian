@@ -7,7 +7,6 @@ const signup = require("./routes/createaccount.js")
 const connectDB = require('./database/DB.js')
 
 const port = process.env.PORT || '3001';
-console.log(process.env.PORT)
 
 // Łączenie z bazą
 connectDB();
@@ -20,4 +19,4 @@ app.use(cors())
 app.use("/api/signup", signup)
 app.use("/api/auth", auth)
 
-app.listen(port, () => console.log(`Nasłuchiwanie na porcie ${port}`))
+app.listen(port, () => console.log(`Serwer: Nasłuchiwanie na porcie ${port} 👌`))

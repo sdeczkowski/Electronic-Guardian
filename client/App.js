@@ -15,7 +15,7 @@ const Stack = createSharedElementStackNavigator()
 
 const AppStack = () => {
   return (
-    <Stack.Navigator headerMode="none">
+    <Stack.Navigator headerMode="none" screenOptions={{headerShown:false}}>
       <Stack.Screen name="Homepage" component={Homepage} />
     </Stack.Navigator>
   );

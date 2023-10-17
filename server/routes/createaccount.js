@@ -22,7 +22,9 @@ router.post("/", async (req, res) => {
     // walidacja requesta
     const { error } = validateSingUp(req.body);
     if (error) return res.status(400).send({ message: error.details[0].message });
-    // walidacja użytkownika w bazie
+    
+    let complexityHandler = passwordComplexity().validate(req.body.password);
+    if (complexityHandler.error) return res.status(409).send({ message: "Hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol" });
     
     // walidacja emaila w bazie
     const email = await User.findOne({ email: req.body.email });
@@ -35,7 +37,7 @@ router.post("/", async (req, res) => {
     // zapisanie danych w bazie
     await new User({ ...req.body, password: hashPassword }).save();
     res.status(201).send({ message: "User created successfully" });
-    console.log("Dodano użytkownika 😋")
+    console.log("Baza: Dodano użytkownika 😋")
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
   }
