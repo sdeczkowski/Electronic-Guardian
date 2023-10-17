@@ -1,23 +1,65 @@
 import React, { useEffect, useState } from "react";
 import { NavigationContainer, DarkTheme,} from "@react-navigation/native";
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider, useDispatch, useSelector } from 'react-redux';
-import { Text, View, ActivityIndicator } from "react-native";
+import  Ionicons  from 'react-native-vector-icons/Ionicons';
+import { View, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { store } from './store';
 import { Init } from './store/actions';
-import Homepage from "./screens/Homepage";
+import styles from "./styles/styles";
+
+//importy widoków
+//autoryzacja
+import Register from "./screens/Signup";
 import LoginScreen from "./screens/Login";
-import register from "./screens/Signup";
+//aplikacja
+import MapScreen from './screens/MapScreen';
+import ProfileScreen from './screens/UserProfile';
+import AreaScreen from './screens/AreaScreen';
+import ChatScreen from './screens/ContactsScreen';
+
+//nazwy widoków
+const ChatName = "Chat";
+const LocationName = "LocationList";
+const MapName = "Map";
+const ProfileName = "Settings";
 
 
-const Stack = createSharedElementStackNavigator()
+const Stack = createSharedElementStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const AppStack = () => {
+const AppNavigator = () => {
   return (
-    <Stack.Navigator headerMode="none" screenOptions={{headerShown:false}}>
-      <Stack.Screen name="Homepage" component={Homepage} />
-    </Stack.Navigator>
+    <Tab.Navigator
+        initialRouteName={MapName}
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            let rn = route.name;
+            if (rn === MapName) {
+              iconName = focused ? "map" : "map-outline";
+            } else if (rn === ProfileName) {
+              iconName = focused ? "person" : "person-outline";
+            } else if (rn === ChatName) {
+              iconName = focused ? "chatbox" : "chatbox-outline";
+            } else if (rn === LocationName) {
+              iconName = focused ? "location" : "location-outline";
+            }
+            return <Ionicons name={iconName} size={size} color={color}/>;
+          },
+          headerShown: false,
+          tabBarShowLabel: false,
+          tabBarStyle: styles.tab,
+        })}
+      >
+        {/* Linki do widoków */}
+        <Tab.Screen name={ChatName} component={ChatScreen} />
+        <Tab.Screen name={LocationName} component={AreaScreen} />
+        <Tab.Screen name={MapName} component={MapScreen} />
+        <Tab.Screen name={ProfileName} component={ProfileScreen} />
+      </Tab.Navigator>
   );
 };
 
@@ -25,19 +67,11 @@ const AuthStack = () => {
   return (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={register} />
+      <Stack.Screen name="Register" component={Register} />
     </Stack.Navigator>
   );
 };
 
-function SplashScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Getting token...</Text>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
 
 const RootNavigation = () => {
   const token = useSelector(state => state.Reducers.authToken);
@@ -63,7 +97,7 @@ const RootNavigation = () => {
   return (
     <NavigationContainer theme={DarkTheme}>
       <StatusBar backgroundColor='black' barStyle="light-content" />
-        {token === null ? <AuthStack/> : <AppStack/>}
+        {token === null ? <AuthStack/> : <AppNavigator/>}
     </NavigationContainer>
   );
 };
