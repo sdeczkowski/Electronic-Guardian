@@ -1,10 +1,10 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
-import {NetworkInfo} from 'react-native-network-info';
 import React, { useState } from "react";
 import styles from "../styles/styles";
 import axios from "axios";
 
-const register = ({ navigation }) => {
+// rejestracja
+const Register = ({ navigation }) => {
   const [firstname, setFirst] = useState("");
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
@@ -105,4 +105,4 @@ const register = ({ navigation }) => {
     </View>
   );
 };
-export default register;
+export default Register;
