@@ -4,8 +4,8 @@
   ✔ Web \
   ❌ Moblika - Android blokuje fetchowanie dla http 
 * 18.10 - Wszystkie widoki z nawigacją \
-  ❌ Web \
-  ❌ Moblika
+  ✔ Web \
+  ✔ Moblika
 * 25.10 - Chat \
   ❌ Web \
   ❌ Moblika
