@@ -9,13 +9,13 @@
 * 25.10 - Chat \
   ❌ Web \
   ❌ Moblika
-* 8.11 - Grupy \
+* 8.11 - Mapy - wyświetlanie/lokalizacja \
   ❌ Web \
   ❌ Moblika
-* 1.11 - Mapy - wyświetlanie/lokalizacja \
+* 1.11 - Zaznaczanie obszaru \
   ❌ Web \
   ❌ Moblika
-* 15.11 - Zaznaczanie obszaru \
+* 15.11 - Lokalizowanie użytkowników
   ❌ Web \
   ❌ Moblika
 * 22.11 - Oddanie całości 😳😬
