@@ -15,7 +15,7 @@
 * 1.11 - Zaznaczanie obszaru \
   ❌ Web \
   ❌ Moblika
-* 15.11 - Lokalizowanie użytkowników
+* 15.11 - Lokalizowanie użytkowników \
   ❌ Web \
   ❌ Moblika
 * 22.11 - Oddanie całości 😳😬
