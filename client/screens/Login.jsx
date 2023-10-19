@@ -16,13 +16,12 @@ const login = ({ navigation,}) => {
   const handleLogin = async () => {
     try {
       setCheck("");
-      const url = "http://localhost:3001/api/auth";
+      const url = "http://10.0.2.2:3001/api/auth";
       const { data: res } = await axios.post(url, {
         email: email,
         password: password,
       });
-      console.log(res.data)
-      dispatch(Login(res.data.token))
+      dispatch(Login(res.data))
     } catch (error) {
       if (error.response && error.response.status >= 400 && error.response.status <= 500) {
         if(error.response.status == 401){

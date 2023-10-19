@@ -29,9 +29,9 @@ export default function ChatScreen() {
     );
 
     return (
-      <View style={{ alignItems: "center", height: "100%" }}>
+      <View style={{ alignItems: "center", height: "100%", paddingTop: 25}}>
         <View style={[styles.index, {justifyContent: "center"}]}>
-          <Text style={{ textAlign: "center" }}>Osoby</Text>
+          <Text style={{ textAlign: "center", margin: 5 }}>Osoby</Text>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
           <TextInput placeholder="Search" style={styles.box} />
@@ -46,7 +46,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <Stack.Navigator headerMode="none" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Contacs" component={Contacts} />
     </Stack.Navigator>
   );

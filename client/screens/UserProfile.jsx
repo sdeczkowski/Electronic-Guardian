@@ -38,9 +38,9 @@ export default function ProfileScreen() {
     }, [navigation]);
 
     return (
-      <View style={styles.container}>
+      <View style={{alignItems: "center", height: "100%" , paddingTop: 25}}>
         <View style={styles.index}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity  style={{ margin: 5 }} onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Zmiana hasła</Text>
@@ -83,7 +83,7 @@ export default function ProfileScreen() {
     }, [navigation]);
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: 25}]}>
         <View style={styles.index}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
@@ -117,10 +117,10 @@ export default function ProfileScreen() {
   // ustawienia użytkownika
   const User = ({navigation}) => {
     return (
-      <View>
+      <View style={{ paddingTop: 25}}>
         <View style={[styles.index]}>
           <Text>Nazwa uzytkownika</Text>
-          <TouchableOpacity>
+          <TouchableOpacity  style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
@@ -237,10 +237,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Stack.Navigator
-      headerMode="none"
-      screenOptions={{ headerShown: false}}
-    >
+    <Stack.Navigator screenOptions={{ headerShown: false}}>
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="ChangePassword" component={ChangePass} />
       <Stack.Screen name="ChangeEmail" component={ChangeEmail} />

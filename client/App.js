@@ -65,7 +65,7 @@ const AppNavigator = () => {
 
 const AuthStack = () => {
   return (
-    <Stack.Navigator headerMode="none">
+    <Stack.Navigator screenOptions={{headerMode: false}}>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={Register} />
     </Stack.Navigator>
@@ -95,8 +95,8 @@ const RootNavigation = () => {
     )
   }
   return (
-    <NavigationContainer theme={DarkTheme}>
-      <StatusBar backgroundColor='black' barStyle="light-content" />
+    <NavigationContainer>
+      <StatusBar translucent backgroundColor="white" barStyle="light-content" />
         {token === null ? <AuthStack/> : <AppNavigator/>}
     </NavigationContainer>
   );
