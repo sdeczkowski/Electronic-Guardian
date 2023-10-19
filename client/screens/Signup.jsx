@@ -25,7 +25,7 @@ const Register = ({ navigation }) => {
       try {
         setCheckPassword("");
         setCheck("");
-        const url = "http://localhost:3001/api/signup";
+        const url = "http://10.0.2.2:3001/api/signup";
         await axios.post(url, {
           password: password,
           email: email,

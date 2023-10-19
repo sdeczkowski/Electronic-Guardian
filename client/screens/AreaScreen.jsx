@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Image, Picker, TextInput } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import DateTimePicker from '@react-native-community/datetimepicker';
+//import DateTimePicker from '@react-native-community/datetimepicker';
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
@@ -52,7 +52,7 @@ export default function AreaScreen() {
     };
 
     return (
-      <View style={{ alignItems: "center", height: "100%" }}>
+      <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity>
             <AntDesignIcon
@@ -67,7 +67,9 @@ export default function AreaScreen() {
             <AntDesignIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        {showPicker && (
+        
+        {
+        /* {showPicker && (
           <DateTimePicker
             mode="date"
             display="spinner"
@@ -80,7 +82,9 @@ export default function AreaScreen() {
             style={styles.textinput}
             onPress={toggleDatePicker}
           ></TouchableOpacity>
-        )}
+        )} */
+        }
+
         <View style={{ margin: 10 }}>
           <Text>Cykliczność:</Text>
           {opcje.map((opcja) => (
@@ -125,7 +129,7 @@ export default function AreaScreen() {
     const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
 
     return (
-      <View style={{ alignItems: "center", height: "100%" }}>
+      <View style={{ alignItems: "center", height: "100%" , paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity>
             <AntDesignIcon
@@ -201,6 +205,7 @@ export default function AreaScreen() {
           borderRadius: 20,
           padding: 10,
           margin: 10,
+          paddingTop: 25
         }}
       >
         <View
@@ -221,10 +226,10 @@ export default function AreaScreen() {
     );
 
     return (
-      <View style={{ alignItems: "center", height: "100%" }}>
+      <View style={{ alignItems: "center", height: "100%" , paddingTop: 25 }}>
         <View style={styles.index}>
           <View></View>
-          <Text style={{ textAlign: "center" }}>Obszary</Text>
+          <Text style={{ textAlign: "center" }}>       Obszary</Text>
           <TouchableOpacity
             style={{ margin: 5 }}
             onPress={() => {
@@ -246,7 +251,7 @@ export default function AreaScreen() {
   };
 
   return (
-    <Stack.Navigator headerMode="none" screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AreaSelect" component={AreaSelect} />
       <Stack.Screen name="CreateArea" component={CreateArea} />
       <Stack.Screen name="AreaTime" component={AreaTime} />
