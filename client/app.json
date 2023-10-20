@@ -22,11 +22,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.client"
+      "package": "com.anonymous.client",
+      "config":{
+        "googleMaps": {
+          "apiKey" : "AIzaSyAJTFP30xg7Z1teGii9AQva8stFYEGLWNk"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/uni.png"
     }
+    
   }
 }
