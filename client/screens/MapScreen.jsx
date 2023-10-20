@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, SafeAreaView, Dimensions } from "react-native";
+import { View, Text, FlatList, SafeAreaView, StyleSheet, Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
 const Stack = createStackNavigator();
-
 
 export default function MapScreen() {
   // powiadomienia
@@ -51,8 +50,7 @@ export default function MapScreen() {
           borderRadius: 20,
           padding: 10,
           margin: 10,
-        }}
-      >
+        }}>
         <View style={{}}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View
@@ -61,8 +59,7 @@ export default function MapScreen() {
                 width: 25,
                 height: 25,
                 borderRadius: 5,
-              }}
-            ></View>
+              }}></View>
             <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>
               {item.title}
             </Text>
@@ -79,14 +76,13 @@ export default function MapScreen() {
               height: 40,
               borderRadius: 5,
               marginTop: 10,
-            }}
-          ></View>
+            }}></View>
         </View>
       </View>
     );
 
     return (
-      <View style={{ alignItems: "center", height: "100%" , paddingTop: 25}}>
+      <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
@@ -117,57 +113,51 @@ export default function MapScreen() {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const[mapRegion, setMapRegion] = useState({
+    const [mapRegion, setMapRegion] = useState({
       latitude: 51.2352796,
       longitude: 22.5862783,
-      latitudeDelta:0.0522,
-      longitudeDelta:0.0421,
-    })
-    ;
+      latitudeDelta: 0.0522,
+      longitudeDelta: 0.0421,
+    });
     return (
-      <View style={{ height: "88%", paddingTop: 25 }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={styles.leftbar}>
-              <Ionicons name="person-circle-sharp" size={50} color="grey" />
-              <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
-              <TouchableOpacity style={{ margin: 10 }}>
-                <Ionicons name="chevron-down-outline" size={32} color="grey" />
-              </TouchableOpacity>
-            </View>
-            <View style={{ height: 65 }}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: "white",
-                    height: 65,
-                    width: 65,
-                    borderRadius: 50,
-                  },
-                ]}
-                onPress={() => navigation.navigate("Notifications")}
-              >
-                <Ionicons name="notifications-outline" size={32} color="grey" />
-              </TouchableOpacity>
-            </View>
+      <View style={{ height: "100%", paddingTop: 25 }}>
+        <MapView
+          style={{
+            ...StyleSheet.absoluteFillObject
+          }}
+          provider={PROVIDER_GOOGLE}
+          showsUserLocation={true}
+          region={mapRegion}></MapView>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}>
+          <View style={styles.leftbar}>
+            <Ionicons name="person-circle-sharp" size={50} color="grey" />
+            <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
+            <TouchableOpacity style={{ margin: 10 }}>
+              <Ionicons name="chevron-down-outline" size={32} color="grey" />
+            </TouchableOpacity>
           </View>
-          <MapView style={{
-                width:Dimensions.get('screen').width*0.89,
-                height:Dimensions.get('screen').height*0.23,
-                }}
-                provider={PROVIDER_GOOGLE}
-                showsUserLocation={true}
-                region={mapRegion}>
-           
-               
-            </MapView>
-        <View>
+          <View style={{ height: 65 }}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {
+                  backgroundColor: "white",
+                  height: 65,
+                  width: 65,
+                  borderRadius: 50,
+                },
+              ]}
+              onPress={() => navigation.navigate("Notifications")}>
+              <Ionicons name="notifications-outline" size={32} color="grey" />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={{paddingBottom: 100}}>
           <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
             <TouchableOpacity
               style={[
@@ -179,8 +169,7 @@ export default function MapScreen() {
                   borderRadius: 50,
                   alignSelf: "flex-end",
                 },
-              ]}
-            >
+              ]}>
               <Ionicons name="qr-code-outline" size={32} color="grey" />
             </TouchableOpacity>
           </View>
