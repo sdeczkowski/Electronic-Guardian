@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, SafeAreaView } from "react-native";
+import { View, Text, FlatList, SafeAreaView,Dimension } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 const Stack = createStackNavigator();
+
 
 export default function MapScreen() {
   // powiadomienia
@@ -112,6 +114,16 @@ export default function MapScreen() {
 
   // ekran mapy
   const Map = ({ navigation }) => {
+    const window = Dimensions.get("window");
+    const screenHeight = window.height;
+    const screenWidth = window.width;
+    const[mapRegion, setMapRegion] = useState({
+      latitude: 51.2352796,
+      longitude: 22.5862783,
+      latitudeDelta:0.0522,
+      longitudeDelta:0.0421,
+    })
+    ;
     return (
       <View style={{ height: "88%", paddingTop: 25 }}>
           <View
@@ -128,6 +140,16 @@ export default function MapScreen() {
                 <Ionicons name="chevron-down-outline" size={32} color="grey" />
               </TouchableOpacity>
             </View>
+            <MapView style={{
+                width:Dimensions.get('screen').width*0.89,
+                height:Dimensions.get('screen').height*0.23,
+                }}
+                provider={PROVIDER_GOOGLE}
+                showsUserLocation={true}
+                region={mapRegion}>
+           
+               
+            </MapView>
             <View style={{ height: 65 }}>
               <TouchableOpacity
                 style={[
