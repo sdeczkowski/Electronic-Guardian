@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, SafeAreaView,Dimension } from "react-native";
+import { View, Text, FlatList, SafeAreaView, Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -140,16 +140,6 @@ export default function MapScreen() {
                 <Ionicons name="chevron-down-outline" size={32} color="grey" />
               </TouchableOpacity>
             </View>
-            <MapView style={{
-                width:Dimensions.get('screen').width*0.89,
-                height:Dimensions.get('screen').height*0.23,
-                }}
-                provider={PROVIDER_GOOGLE}
-                showsUserLocation={true}
-                region={mapRegion}>
-           
-               
-            </MapView>
             <View style={{ height: 65 }}>
               <TouchableOpacity
                 style={[
@@ -167,7 +157,16 @@ export default function MapScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
+          <MapView style={{
+                width:Dimensions.get('screen').width*0.89,
+                height:Dimensions.get('screen').height*0.23,
+                }}
+                provider={PROVIDER_GOOGLE}
+                showsUserLocation={true}
+                region={mapRegion}>
+           
+               
+            </MapView>
         <View>
           <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
             <TouchableOpacity
