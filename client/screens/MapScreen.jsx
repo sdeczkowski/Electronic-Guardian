@@ -5,9 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+
 
 const Stack = createStackNavigator();
+
 
 export default function MapScreen() {
   // powiadomienia
