@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, SafeAreaView, StyleSheet, Dimensions } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
-
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import * as Location from "expo-location";
 
 const Stack = createStackNavigator();
-
 
 export default function MapScreen() {
   // powiadomienia
@@ -115,21 +121,53 @@ export default function MapScreen() {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const [mapRegion, setMapRegion] = useState({
-      latitude: 51.2352796,
-      longitude: 22.5862783,
-      latitudeDelta: 0.0522,
-      longitudeDelta: 0.0421,
-    });
+    const [mapRegion, setMapRegion] = useState();
+    const [location, setLocation] = useState();
+
+    const userLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+      let location = await Location.getCurrentPositionAsync({});
+      console.log(
+        "\nx: " + location.coords.latitude + "\ny: " + location.coords.longitude
+      );
+      setLocation(location);
+      setMapRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0522,
+        longitudeDelta: 0.0421,
+      });
+    };
+
+    useEffect(() => {
+      userLocation();
+    }, []);
+
     return (
       <View style={{ height: "100%", paddingTop: 25 }}>
         <MapView
           style={{
-            ...StyleSheet.absoluteFillObject
+            ...StyleSheet.absoluteFillObject,
           }}
           provider={PROVIDER_GOOGLE}
+          showsMyLocationButton={false}
+          showsCompass={false}
           showsUserLocation={true}
-          region={mapRegion}></MapView>
+          region={mapRegion}
+          //onRegionChange={mapRegion}
+        >
+          <Marker
+            coordinate={{
+              latitude: 51,
+              longitude: 22,
+              latitudeDelta: 0.0522,
+              longitudeDelta: 0.0421,
+            }}></Marker>
+        </MapView>
         <View
           style={{
             flex: 1,
@@ -159,7 +197,7 @@ export default function MapScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{paddingBottom: 100}}>
+        <View style={{ paddingBottom: 100 }}>
           <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
             <TouchableOpacity
               style={[
