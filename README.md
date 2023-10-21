@@ -2,13 +2,13 @@
 ## Harmonogram
 * 11.10 - Logowanie/Rejestracja \
   ✔ Web \
-  ❌ Moblika - Android blokuje fetchowanie dla http 
+  ✔ Moblika
 * 18.10 - Wszystkie widoki z nawigacją \
   ✔ Web \
   ✔ Moblika
 * 25.10 - Mapy - wyświetlanie/lokalizacja \
   ❌ Web \
-  ❌ Moblika
+  ✔ Moblika
 * 8.11 - Zaznaczanie obszaru \
   ❌ Web \
   ❌ Moblika
