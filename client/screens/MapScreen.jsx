@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, FlatList, SafeAreaView, StyleSheet, Dimensions } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -6,6 +6,10 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
+
+
+
 
 
 const Stack = createStackNavigator();
@@ -115,21 +119,49 @@ export default function MapScreen() {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const [mapRegion, setMapRegion] = useState({
-      latitude: 51.2352796,
-      longitude: 22.5862783,
-      latitudeDelta: 0.0522,
-      longitudeDelta: 0.0421,
-    });
+    const [mapRegion, setMapRegion] = useState([]);
+    const [location, setLocation] = useState();
+   
+    useEffect(() => {
+      (async () => {
+
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      })();
+    }, []);
+
+    useEffect(()=>{
+      if(location){
+        setMapRegion({
+          latitude:location.coords.latitude,
+          longitude:location.coords.longitude,
+          laititudeDelta:0.0522,
+          longitudeDelta:0.0421,
+        })
+      }
+    },[])
+  
     return (
+      
       <View style={{ height: "100%", paddingTop: 25 }}>
         <MapView
           style={{
             ...StyleSheet.absoluteFillObject
           }}
+          showsMyLocationButton={true}
           provider={PROVIDER_GOOGLE}
           showsUserLocation={true}
-          region={mapRegion}></MapView>
+          region={mapRegion}>
+
+
+
+        </MapView>
         <View
           style={{
             flex: 1,
@@ -159,7 +191,7 @@ export default function MapScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{paddingBottom: 100}}>
+        <View style={{ paddingBottom: 100 }}>
           <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
             <TouchableOpacity
               style={[

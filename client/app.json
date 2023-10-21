@@ -32,7 +32,15 @@
     "web": {
       "bundler": "metro",
       "favicon": "./assets/uni.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Explore Place to use your location."
+        }
+      ]
+    ]
     
   }
 }
