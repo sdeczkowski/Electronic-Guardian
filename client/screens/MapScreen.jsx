@@ -119,7 +119,7 @@ export default function MapScreen() {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const [mapRegion, setMapRegion] = useState([]);
+    const [mapRegion, setMapRegion] = useState();
     const [location, setLocation] = useState();
    
     useEffect(() => {
@@ -132,21 +132,17 @@ export default function MapScreen() {
         }
 
         let location = await Location.getCurrentPositionAsync({});
+        console.log(location.coords.latitude)
         setLocation(location);
-      })();
-    }, []);
-
-    useEffect(()=>{
-      if(location){
         setMapRegion({
           latitude:location.coords.latitude,
           longitude:location.coords.longitude,
-          laititudeDelta:0.0522,
+          latitudeDelta:0.0522,
           longitudeDelta:0.0421,
         })
-      }
-    },[])
-  
+      })();
+    }, []);
+
     return (
       
       <View style={{ height: "100%", paddingTop: 25 }}>
@@ -154,12 +150,14 @@ export default function MapScreen() {
           style={{
             ...StyleSheet.absoluteFillObject
           }}
-          showsMyLocationButton={true}
           provider={PROVIDER_GOOGLE}
+          showsMyLocationButton={false}
           showsUserLocation={true}
-          region={mapRegion}>
+          region={mapRegion}
+          //onRegionChange={mapRegion}
+          >
 
-
+          
 
         </MapView>
         <View
