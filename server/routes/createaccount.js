@@ -23,13 +23,14 @@ router.post("/", async (req, res) => {
     const { error } = validateSingUp(req.body);
     if (error) return res.status(400).send({ message: error.details[0].message });
     
-    let complexityHandler = passwordComplexity().validate(req.body.password);
-    if (complexityHandler.error) return res.status(409).send({ message: "Hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol" });
-    
     // walidacja emaila w bazie
     const email = await User.findOne({ email: req.body.email });
     if (email) return res.status(409).send({ message: "Konto z podanym emailem już istnieje" });
-
+    
+    // walidacja hasła
+    let complexityHandler = passwordComplexity().validate(req.body.password);
+    if (complexityHandler.error) return res.status(409).send({ message: "Hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol" });
+    
     // hashowanie hasła
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(req.body.password, salt);

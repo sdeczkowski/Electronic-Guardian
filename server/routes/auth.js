@@ -23,15 +23,13 @@ const generateAuthToken = function () {
 // autoryzacja
 router.post("/", async (req, res) => {
     try {
-        // walidacja zawartości requesta
-        //const { error } = validateLogin(req.body)
-        //if (error)
-            ///return res.status(400).send({ message: error.details[0].message })
-        // walidacja emaila
         const user = await User.findOne({ email: req.body.email })
+        // walidacja emaila
         if (!user) 
             return res.status(401).send({ message: "Błędny email" })
-        
+        // walidacja aktywacji konta
+        if (!user.isActive)
+        return res.status(401).send({ message: "Konto zostało zdezaktywowane" })
         // walidacja hasła
         const validPassword = await bcrypt.compare(
             req.body.password,
