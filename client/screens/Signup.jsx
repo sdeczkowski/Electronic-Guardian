@@ -5,26 +5,50 @@ import axios from "axios";
 
 // rejestracja
 const Register = ({ navigation }) => {
+  // zmienne
   const [firstname, setFirst] = useState("");
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordrepeat, setPasswordRepeat] = useState("");
-  const [check, setCheck] = useState("");
-  const [checkPassword, setCheckPassword] = useState("");
-  const [ip, setIp] = useState("");
-
+  
+  // walidatory
+  const [check, setCheck] = useState(null);
+  const [errFname, setErrFname] = useState(false);
+  const [errLname, setErrLname] = useState(false);
+  const [errEmail, setErrEmail] = useState(false);
+  const [errPass, setErrPass] = useState(false);
+  const [errRPass, setErrRPass] = useState(false);
+  
   const handleSignUp = async () => {
-    if(firstname == "" || lastname == "" || email == "" || password == ""){
-      setCheck("Wypełnij wszystkie pola!")
+    setCheck(null);
+    setErrFname(false); setErrLname(false); setErrEmail(false); setErrPass(false); setErrRPass(false);
+    const namesRegex = /^[a-z ,.'-]+$/i;
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+    if(!namesRegex.test(firstname)){
+      setErrFname(true);
+      setCheck("Niepoprawne imie!");
+    }
+    else if(!namesRegex.test(lastname)){
+      setErrLname(true);
+      setCheck("Niepoprawne nazwisko!");
+    }
+    else if(!emailRegex.test(email)){
+      setErrEmail(true);
+      setCheck("Niepoprawny email!");
+    }
+    else if(password == ""){
+      setCheck("Wpisz hasło!");
+      setErrPass(true);
     }
     else if(password != passwordrepeat){
-      setCheckPassword("Hasła nie są identyczne!");
+      setCheck("Hasła nie są identyczne!");
+      setErrPass(true);
+      setErrRPass(true);
     }
-    else{
+    else {
       try {
-        setCheckPassword("");
-        setCheck("");
         const url = "http://10.0.2.2:3001/api/signup";
         await axios.post(url, {
           password: password,
@@ -41,23 +65,28 @@ const Register = ({ navigation }) => {
           error.response.status <= 500
         ) {
           if(error.response.status == 409){
+            if(error.response.data.message == "Konto z podanym emailem już istnieje"){
+              setErrEmail(true);
+            } else {
+              setErrPass(true);
+              setErrRPass(true);
+            }
             setCheck(error.response.data.message);
           }
-          setError(error.response.data.message);
         }
       }
     }
   };
 
   return (
-    <View style={{ alignItems: "center", justifyContent: "center" }}>
+    <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 25 }}>
       <Image
         style={[styles.img, { width: 200, height: 200 }]}
         source={require("../assets/uni.png")}
       />
       <Text style={{color: 'red'}}>{check}</Text>
       <TextInput
-        style={styles.textinput}
+        style={[styles.textinput, errFname ? {borderColor: "red", borderWidth: 1}:{borderWidth: 0}]}
         label="firstname"
         placeholder="Imię"
         placeholderTextColor="rgb(145, 145, 145)"
@@ -65,7 +94,7 @@ const Register = ({ navigation }) => {
         onChangeText={(text) => setFirst(text)}
       ></TextInput>
       <TextInput
-        style={styles.textinput}
+        style={[styles.textinput, errLname ? {borderColor: "red", borderWidth: 1}:{borderWidth: 0}]}
         label="lastname"
         placeholder="Nazwisko"
         placeholderTextColor="rgb(145, 145, 145)"
@@ -73,7 +102,7 @@ const Register = ({ navigation }) => {
         onChangeText={(text) => setLast(text)}
       ></TextInput>
       <TextInput
-        style={styles.textinput}
+        style={[styles.textinput, errEmail ? {borderColor: "red", borderWidth: 1}:{borderWidth: 0}]}
         label="email"
         placeholder="E-mail"
         placeholderTextColor="rgb(145, 145, 145)"
@@ -81,7 +110,7 @@ const Register = ({ navigation }) => {
         onChangeText={(text) => setEmail(text)}
       ></TextInput>
       <TextInput
-        style={styles.textinput}
+        style={[styles.textinput, errPass ? {borderColor: "red", borderWidth: 1}:{borderWidth: 0}]}
         label="password"
         placeholder="Hasło"
         placeholderTextColor="rgb(145, 145, 145)"
@@ -90,7 +119,7 @@ const Register = ({ navigation }) => {
         secureTextEntry={true}
       ></TextInput>
       <TextInput
-        style={styles.textinput}
+        style={[styles.textinput, errRPass ? {borderColor: "red", borderWidth: 1}:{borderWidth: 0}]}
         placeholder="Powtórz hasło"
         placeholderTextColor="rgb(145, 145, 145)"
         value={passwordrepeat}
@@ -98,7 +127,6 @@ const Register = ({ navigation }) => {
         secureTextEntry={true}
       >
       </TextInput>
-      <Text style={{color: 'red'}}>{checkPassword}</Text>
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={{ color: "white" }}>Zarejestruj się</Text>
       </TouchableOpacity>

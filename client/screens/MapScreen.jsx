@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  ActivityIndicator
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -121,10 +122,12 @@ export default function MapScreen() {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const [mapRegion, setMapRegion] = useState();
+    const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
+    const [loading, setLoading] = useState(true);
 
     const userLocation = async () => {
+      
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
@@ -141,12 +144,23 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
+      setLoading(false);
     };
 
     useEffect(() => {
+      if(mapRegion != {}){
+        setLoading(false);
+      }
       userLocation();
     }, []);
 
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    } else {
     return (
       <View style={{ height: "100%", paddingTop: 25 }}>
         <MapView
@@ -162,7 +176,7 @@ export default function MapScreen() {
         >
           <Marker
             coordinate={{
-              latitude: 51,
+              latitude: 11,
               longitude: 22,
               latitudeDelta: 0.0522,
               longitudeDelta: 0.0421,
@@ -216,6 +230,7 @@ export default function MapScreen() {
         </View>
       </View>
     );
+  }
   };
 
   return (
