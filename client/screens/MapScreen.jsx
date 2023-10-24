@@ -13,7 +13,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import * as Location from "expo-location";
 
 const Stack = createStackNavigator();
@@ -174,13 +174,47 @@ export default function MapScreen() {
           region={mapRegion}
           //onRegionChange={mapRegion}
         >
+
+            
+
           <Marker
             coordinate={{
               latitude: 11,
               longitude: 22,
               latitudeDelta: 0.0522,
               longitudeDelta: 0.0421,
-            }}></Marker>
+            }}>
+              
+            </Marker>
+            <Polygon 
+              strokeColor="red"
+              fillColor="black"
+              strokeWidth={2}
+              holes={[[{
+                latitude:51.236508,
+                longitude:22.576638
+              },
+              {
+                latitude:51.239571,
+                longitude:22.583225
+              },
+              {
+                latitude:51.236964,
+                longitude:22.590070
+              },
+              {
+                latitude:51.234640,
+                longitude:22.588654
+              },
+              {
+                latitude:51.235634,
+                longitude:22.580028
+              }]]}
+               coordinates={[{
+                latitude: 51,
+                longitude: 22,
+              }]}
+            />
         </MapView>
         <View
           style={{
