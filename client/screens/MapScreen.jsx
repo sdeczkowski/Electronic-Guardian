@@ -187,10 +187,11 @@ export default function MapScreen() {
               
             </Marker>
             <Polygon 
-              strokeColor="red"
-              fillColor="black"
+              strokeColor="blue"
               strokeWidth={2}
-              holes={[[{
+              fillColor="rgba(109, 147, 253, 0.4)"
+              zIndex={2}
+               coordinates={[{
                 latitude:51.236508,
                 longitude:22.576638
               },
@@ -209,10 +210,6 @@ export default function MapScreen() {
               {
                 latitude:51.235634,
                 longitude:22.580028
-              }]]}
-               coordinates={[{
-                latitude: 51,
-                longitude: 22,
               }]}
             />
         </MapView>
