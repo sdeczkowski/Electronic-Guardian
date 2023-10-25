@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   firstname: { type: String, required: true },
   lastname: { type: String, required: true },
   isActive: { type: Boolean, required: true },
+  type: {type: Number, required: true},
 })
 const User = mongoose.model("User", userSchema);
 
