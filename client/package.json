@@ -18,6 +18,7 @@
     "@react-navigation/native-stack": "^6.9.14",
     "@react-navigation/stack": "^6.3.18",
     "@reduxjs/toolkit": "^1.9.7",
+    "@siposdani87/expo-maps-polygon-editor": "^1.0.4",
     "axios": "^1.5.1",
     "expo": "~49.0.13",
     "expo-location": "^16.3.0",

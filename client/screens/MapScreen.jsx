@@ -5,7 +5,8 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
+  Dimensions, 
+  Button,
   ActivityIndicator
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -14,12 +15,13 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
+
 import * as Location from "expo-location";
+
 
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
-  // powiadomienia
   const Notifications = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -117,13 +119,13 @@ export default function MapScreen() {
     );
   };
 
-  // ekran mapy
   const Map = ({ navigation }) => {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
+    const [coordinates, setCoordinates] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const userLocation = async () => {
@@ -153,6 +155,15 @@ export default function MapScreen() {
       }
       userLocation();
     }, []);
+    const handleMapPress = (event) => {
+      const { coordinate } = event.nativeEvent;
+      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+    }
+  
+    const resetCoordinates = () => {
+      setCoordinates([]);
+    }
+
 
     if (loading) {
       return (
@@ -172,47 +183,20 @@ export default function MapScreen() {
           showsCompass={false}
           showsUserLocation={true}
           region={mapRegion}
-          //onRegionChange={mapRegion}
+          onPress={handleMapPress}
         >
-
-            
-
-          <Marker
-            coordinate={{
-              latitude: 11,
-              longitude: 22,
-              latitudeDelta: 0.0522,
-              longitudeDelta: 0.0421,
-            }}>
-              
-            </Marker>
-            <Polygon 
-              strokeColor="blue"
-              strokeWidth={2}
-              fillColor="rgba(109, 147, 253, 0.4)"
-              zIndex={2}
-               coordinates={[{
-                latitude:51.236508,
-                longitude:22.576638
-              },
-              {
-                latitude:51.239571,
-                longitude:22.583225
-              },
-              {
-                latitude:51.236964,
-                longitude:22.590070
-              },
-              {
-                latitude:51.234640,
-                longitude:22.588654
-              },
-              {
-                latitude:51.235634,
-                longitude:22.580028
-              }]}
-            />
-        </MapView>
+          {coordinates.map((coordinate, index) => (
+          <Marker key={index} coordinate={coordinate} />
+        ))}
+        {coordinates.length > 2 && (
+        <Polygon
+          strokeColor="blue"
+          fillColor="rgba(109, 147, 253, 0.4)"
+          strokeWidth={2}
+          coordinates={coordinates}
+        />
+        )}
+      </MapView>
         <View
           style={{
             flex: 1,
@@ -225,6 +209,10 @@ export default function MapScreen() {
             <TouchableOpacity style={{ margin: 10 }}>
               <Ionicons name="chevron-down-outline" size={32} color="grey" />
             </TouchableOpacity>
+            
+          </View>
+          <View >
+          <Button title="Resetuj obszar" onPress={resetCoordinates} />
           </View>
           <View style={{ height: 65 }}>
             <TouchableOpacity
@@ -237,7 +225,9 @@ export default function MapScreen() {
                   borderRadius: 50,
                 },
               ]}
-              onPress={() => navigation.navigate("Notifications")}>
+              onPress={() => {
+                setLoading(true);
+                navigation.navigate("Notifications");}}>
               <Ionicons name="notifications-outline" size={32} color="grey" />
             </TouchableOpacity>
           </View>

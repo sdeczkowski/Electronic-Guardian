@@ -94,7 +94,7 @@ const login = ({ navigation }) => {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("Register");
+          navigation.navigate("Role");
         }}>
         <Text style={{ color: "#28ACE2" }}>Nie masz konta?</Text>
       </TouchableOpacity>

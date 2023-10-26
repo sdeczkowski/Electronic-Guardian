@@ -1,6 +1,5 @@
 const mongoose = require("mongoose")
 
-//podłączenie do bazy z użyciem connection stringa
 const connectDB = async () => {
     try{
         const DB_OPTIONS = {
