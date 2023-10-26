@@ -12,8 +12,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE,Polygon } from "react-native-maps";
 import * as Location from "expo-location";
+
 
 const Stack = createStackNavigator();
 
@@ -147,6 +148,7 @@ export default function MapScreen() {
       userLocation();
     }, []);
 
+
     return (
       <View style={{ height: "100%", paddingTop: 25 }}>
         <MapView
@@ -167,6 +169,36 @@ export default function MapScreen() {
               latitudeDelta: 0.0522,
               longitudeDelta: 0.0421,
             }}></Marker>
+            <Polygon
+            strokeColor="blue"
+            fillColor="#EBf5FB"
+            strokeWidth={2}
+            coordinates={[
+              {
+                latitude:51.236508,
+                longitude:22.576638
+              },
+              {
+                latitude:51.239571,
+                longitude:22.583225
+              },
+              {
+                latitude:51.236964,
+                longitude:22.590070
+              },
+              {
+                latitude:51.234640,
+                longitude:22.588654
+              },
+              {
+                latitude:51.235634,
+                longitude:22.580028
+              },
+            ]}
+            >
+              
+            </Polygon>
+             
         </MapView>
         <View
           style={{
