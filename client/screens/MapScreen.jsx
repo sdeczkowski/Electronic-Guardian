@@ -5,7 +5,7 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
+  Dimensions,Button,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -124,6 +124,8 @@ export default function MapScreen() {
     const screenWidth = window.width;
     const [mapRegion, setMapRegion] = useState();
     const [location, setLocation] = useState();
+    const [coordinates, setCoordinates] = useState([]);
+
 
     const userLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -147,6 +149,14 @@ export default function MapScreen() {
     useEffect(() => {
       userLocation();
     }, []);
+    const handleMapPress = (event) => {
+      const { coordinate } = event.nativeEvent;
+      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+    }
+  
+    const resetCoordinates = () => {
+      setCoordinates([]);
+    }
 
 
     return (
@@ -161,45 +171,21 @@ export default function MapScreen() {
           showsUserLocation={true}
           region={mapRegion}
           //onRegionChange={mapRegion}
+          onPress={handleMapPress}
+
         >
-          <Marker
-            coordinate={{
-              latitude: 51,
-              longitude: 22,
-              latitudeDelta: 0.0522,
-              longitudeDelta: 0.0421,
-            }}></Marker>
-            <Polygon
-            strokeColor="blue"
-            fillColor="#EBf5FB"
-            strokeWidth={2}
-            coordinates={[
-              {
-                latitude:51.236508,
-                longitude:22.576638
-              },
-              {
-                latitude:51.239571,
-                longitude:22.583225
-              },
-              {
-                latitude:51.236964,
-                longitude:22.590070
-              },
-              {
-                latitude:51.234640,
-                longitude:22.588654
-              },
-              {
-                latitude:51.235634,
-                longitude:22.580028
-              },
-            ]}
-            >
-              
-            </Polygon>
-             
-        </MapView>
+          {coordinates.map((coordinate, index) => (
+          <Marker key={index} coordinate={coordinate} />
+        ))}
+        {coordinates.length > 2 && (
+        <Polygon
+          strokeColor="blue"
+          fillColor="#EBf5FB"
+          strokeWidth={2}
+          coordinates={coordinates}
+        />
+        )}
+      </MapView>
         <View
           style={{
             flex: 1,
@@ -212,6 +198,10 @@ export default function MapScreen() {
             <TouchableOpacity style={{ margin: 10 }}>
               <Ionicons name="chevron-down-outline" size={32} color="grey" />
             </TouchableOpacity>
+            
+          </View>
+          <View >
+          <Button title="Resetuj obszar" onPress={resetCoordinates} />
           </View>
           <View style={{ height: 65 }}>
             <TouchableOpacity

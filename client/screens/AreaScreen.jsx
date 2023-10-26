@@ -82,7 +82,7 @@ export default function AreaScreen() {
             style={styles.textinput}
             onPress={toggleDatePicker}
           ></TouchableOpacity>
-        )} */
+        )}*/ 
         }
 
         <View style={{ margin: 10 }}>
