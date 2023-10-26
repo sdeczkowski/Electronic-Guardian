@@ -19,7 +19,6 @@ import * as Location from "expo-location";
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
-  // powiadomienia
   const Notifications = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -117,7 +116,6 @@ export default function MapScreen() {
     );
   };
 
-  // ekran mapy
   const Map = ({ navigation }) => {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
@@ -237,7 +235,9 @@ export default function MapScreen() {
                   borderRadius: 50,
                 },
               ]}
-              onPress={() => navigation.navigate("Notifications")}>
+              onPress={() => {
+                setLoading(true);
+                navigation.navigate("Notifications");}}>
               <Ionicons name="notifications-outline" size={32} color="grey" />
             </TouchableOpacity>
           </View>

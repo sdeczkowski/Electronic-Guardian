@@ -12,7 +12,7 @@ import styles from "./styles/styles";
 
 //importy widoków
 //autoryzacja
-import Register from "./screens/Signup";
+import {Register, Role} from "./screens/Signup";
 import LoginScreen from "./screens/Login";
 //aplikacja
 import MapScreen from "./screens/MapScreen";
@@ -52,7 +52,6 @@ const AppNavigator = () => {
         tabBarShowLabel: false,
         tabBarStyle: styles.tab,
       })}>
-      {/* Linki do widoków */}
       <Tab.Screen name={ChatName} component={ChatScreen} />
       <Tab.Screen name={LocationName} component={AreaScreen} />
       <Tab.Screen name={MapName} component={MapScreen} />
@@ -65,6 +64,7 @@ const AuthStack = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Role" component={Role} />
       <Stack.Screen name="Register" component={Register} />
     </Stack.Navigator>
   );
@@ -75,6 +75,7 @@ const RootNavigation = () => {
   const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
+  
   const init = async () => {
     await dispatch(Init());
     setLoading(false);
