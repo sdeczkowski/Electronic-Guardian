@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, Picker, TextInput } from "react-native";
+import { View, Text, FlatList, Image, TextInput,Pressable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-//import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
+import {Picker} from '@react-native-picker/picker';
 
 const Stack = createStackNavigator();
 
@@ -49,7 +50,7 @@ export default function AreaScreen() {
     const selectOptions = (optionId) => {
       setOption(optionId);
     };
-
+    
     return (
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
@@ -67,23 +68,21 @@ export default function AreaScreen() {
           </TouchableOpacity>
         </View>
         
-        {
-        /* {showPicker && (
-          <DateTimePicker
-            mode="date"
-            display="spinner"
-            value={date}
-            onChange={onChange}
-          />
+        {showPicker && (
+          <DateTimePicker 
+          mode="date"
+          display="spinner"
+          value={date}
+          onChange={onChange}
+        />
         )}
-        {!showPicker && (
-          <TouchableOpacity
-            style={styles.textinput}
-            onPress={toggleDatePicker}
-          ></TouchableOpacity>
-        )}*/ 
-        }
-
+      {!showPicker &&(
+        <TouchableOpacity 
+          style={styles.textinput} 
+          onPress={togglueDatePicker}
+        >
+        </TouchableOpacity>
+      )}
         <View style={{ margin: 10 }}>
           <Text>Cykliczność:</Text>
           {opcje.map((opcja) => (
