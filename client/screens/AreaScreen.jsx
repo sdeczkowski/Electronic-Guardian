@@ -11,7 +11,6 @@ import styles from "../styles/styles";
 const Stack = createStackNavigator();
 
 export default function AreaScreen() {
-  // czas obszaru
   const AreaTime = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -112,7 +111,6 @@ export default function AreaScreen() {
     );
   };
 
-  // tworzenie nowego obszaru
   const CreateArea = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -190,7 +188,6 @@ export default function AreaScreen() {
 
   const AreaDetail = () => {};
 
-  // lista obszarów
   const AreaSelect = ({ navigation }) => {
     const data = [
       { id: 1, title: "Obszar1" },
