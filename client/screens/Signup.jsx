@@ -1,18 +1,42 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import styles from "../styles/styles";
 import axios from "axios";
 
-// rejestracja
-const Register = ({ navigation }) => {
-  // zmienne
+const Role = ({navigation}) => {
+  return (
+    <View style={styles.container}>
+      <Image
+        style={[styles.img, { width: 200, height: 200 }]}
+        source={require("../assets/uni.png")}
+      />
+      <Text>Wybierz role</Text>
+      <TouchableOpacity style={styles.button}
+        onPress={async () => {
+          navigation.navigate("Register", {type: "op"});
+        }}>
+        <Text style={{ color: "white"  }}>Opiekun</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button}
+        onPress={async () => {
+          dispatch(Type(2));
+          navigation.navigate("Register", {type: "pod"});
+        }}>
+        <Text style={{ color: "white"  }}>Podopieczny</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const Register = ({ route, navigation }) => {
   const [firstname, setFirst] = useState("");
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordrepeat, setPasswordRepeat] = useState("");
+  const { type } = route.params;
   
-  // walidatory
   const [check, setCheck] = useState(null);
   const [errFname, setErrFname] = useState(false);
   const [errLname, setErrLname] = useState(false);
@@ -49,6 +73,7 @@ const Register = ({ navigation }) => {
     }
     else {
       try {
+        console.log(type)
         const url = "http://10.0.2.2:3001/api/signup";
         await axios.post(url, {
           password: password,
@@ -56,6 +81,7 @@ const Register = ({ navigation }) => {
           firstname: firstname,
           lastname: lastname,
           isActive: true,
+          type: type,
         });
         navigation.navigate("Login");
       } catch (error) {
@@ -133,4 +159,4 @@ const Register = ({ navigation }) => {
     </View>
   );
 };
-export default Register;
+export {Register, Role};
