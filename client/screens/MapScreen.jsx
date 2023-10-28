@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
+import { MultipleSelectList } from 'react-native-dropdown-select-list'
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
@@ -127,6 +128,11 @@ export default function MapScreen() {
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [loading, setLoading] = useState(true);
+    const data = [
+      {key:'1', value:'Mobiles'},
+      {key:'2', value:'Appliances'},
+      {key:'3', value:'Cameras'}
+    ]
 
     const userLocation = async () => {
       
@@ -155,6 +161,7 @@ export default function MapScreen() {
       }
       userLocation();
     }, []);
+
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
       setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
@@ -163,7 +170,6 @@ export default function MapScreen() {
     const resetCoordinates = () => {
       setCoordinates([]);
     }
-
 
     if (loading) {
       return (
