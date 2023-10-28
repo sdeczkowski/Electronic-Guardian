@@ -12,6 +12,7 @@ import {Picker} from '@react-native-picker/picker';
 const Stack = createStackNavigator();
 
 export default function AreaScreen() {
+  // czas obszaru
   const AreaTime = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -28,6 +29,15 @@ export default function AreaScreen() {
     const [date, setDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [option, setOption] = useState(null);
+    const [dateArea,setDateArea]=useState("");
+    const [dateReady, setDateReady] = useState(Date());
+
+    useEffect(()=>{
+      setDateReady(dateArea);
+      return()=>{
+        setDateReady(true);
+      }
+    },[dateArea]);
 
     const toggleDatePicker = () => {
       setShowPicker(!showPicker);
@@ -36,6 +46,9 @@ export default function AreaScreen() {
       if (type == "set") {
         const currentDate = selectedDate;
         setDate(currentDate);
+        toggleDatePicker();
+        setDateArea(currentDate.toDateString());
+        console.log(date);
       } else {
         toggleDatePicker();
       }
@@ -67,7 +80,7 @@ export default function AreaScreen() {
             <AntDesignIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        
+        <View>
         {showPicker && (
           <DateTimePicker 
           mode="date"
@@ -77,12 +90,21 @@ export default function AreaScreen() {
         />
         )}
       {!showPicker &&(
-        <TouchableOpacity 
-          style={styles.textinput} 
-          onPress={togglueDatePicker}
+        <Pressable
+          onPress={toggleDatePicker}
         >
-        </TouchableOpacity>
+          <TextInput 
+            style={[styles.textinput,{color:"black"}]} 
+            onPress={toggleDatePicker}
+            onChangeText={setDateArea}
+            value={dateReady}
+            placeholder="Chose the date"
+            editable={false}
+          >
+          </TextInput>
+        </Pressable>
       )}
+      </View>
         <View style={{ margin: 10 }}>
           <Text>Cykliczność:</Text>
           {opcje.map((opcja) => (
@@ -110,6 +132,7 @@ export default function AreaScreen() {
     );
   };
 
+  // tworzenie nowego obszaru
   const CreateArea = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -187,6 +210,7 @@ export default function AreaScreen() {
 
   const AreaDetail = () => {};
 
+  // lista obszarów
   const AreaSelect = ({ navigation }) => {
     const data = [
       { id: 1, title: "Obszar1" },
