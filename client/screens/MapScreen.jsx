@@ -149,9 +149,56 @@ export default function MapScreen() {
     useEffect(() => {
       userLocation();
     }, []);
+
+    const checkForIntersections = (newCoordinate) => {
+      
+      if (coordinates.length < 3) return false;
+  
+      
+      for (let i = 0; i < coordinates.length; i++) {
+        const point1 = coordinates[i];
+        const point2 = coordinates[(i + 1) % coordinates.length];
+  
+        
+        if (
+          linesIntersect(
+            newCoordinate.latitude,
+            newCoordinate.longitude,
+            location.coords.latitude,
+            location.coords.longitude,
+            point1.latitude,
+            point1.longitude,
+            point2.latitude,
+            point2.longitude
+          )
+        ) {
+          return true; 
+        }
+      }
+  
+      return false; 
+    };
+  
+    const linesIntersect = (
+      x1, y1, x2, y2, x3, y3, x4, y4
+    ) => {
+      const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+      const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
+      const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
+      const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
+  
+      return a * b < 0 && c * d < 0;
+    };
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
-      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+      const hasIntersections = checkForIntersections(coordinate);
+  
+      if (!hasIntersections) {
+        setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+      } else {
+        console.log("Przecięcie! Wyczyszczam obszar.");
+        resetCoordinates(); 
+      }
     }
   
     const resetCoordinates = () => {
