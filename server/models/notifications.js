@@ -1,7 +1,10 @@
 const mongoose = require("mongoose")
 
 const notiData = new mongoose.Schema({
-    name: String,
+    title: String,
+    podemail: String,
+    firstname: String,
+    lastname: String,
     details: String,
     date: String
 })
