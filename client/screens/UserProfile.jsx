@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Switch, TextInput } from "react-native";
+import { View, Text, Image, Switch, TextInput, ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
@@ -117,19 +117,19 @@ export default function ProfileScreen() {
   // ustawienia użytkownika
   const User = ({navigation}) => {
     return (
-      <View style={{ paddingTop: 25}}>
+      <ScrollView style={{ paddingTop: 25}}>
         <View style={[styles.index]}>
           <Text>Nazwa uzytkownika</Text>
-          <TouchableOpacity  style={{ margin: 5 }}>
+          <TouchableOpacity  style={{ margin: 20 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity style={{ alignItems: "center" }}>
-            <Ionicons name="user" size={200} color="black" />
+          <TouchableOpacity style={{ alignItems: "center", margin:10}}>
+            <Ionicons name="arrow-left" size={150} color="black" />
           </TouchableOpacity>
           <Divider />
-          <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>
+          <Text style={[styles.acc_titles, { marginLeft: 10, marginTop:10 }]}>
             Profile
           </Text>
           <Divider />
@@ -232,7 +232,7 @@ export default function ProfileScreen() {
             <Text style={{ color: "white" }}>Wyloguj się</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     );
   };
 
