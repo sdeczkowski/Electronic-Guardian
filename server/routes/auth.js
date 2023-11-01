@@ -2,6 +2,7 @@ const router = require("express").Router()
 const User = require("../models/user.js")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
+const Joi = require("joi");
 
 
 const validateLogin = (data) => {
