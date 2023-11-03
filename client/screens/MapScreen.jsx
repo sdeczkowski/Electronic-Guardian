@@ -16,7 +16,6 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
-
 import * as Location from "expo-location";
 
 
@@ -127,12 +126,15 @@ export default function MapScreen() {
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
+
     const [loading, setLoading] = useState(true);
     const data = [
       {key:'1', value:'Mobiles'},
       {key:'2', value:'Appliances'},
       {key:'3', value:'Cameras'}
     ]
+
 
     const userLocation = async () => {
       
@@ -162,14 +164,71 @@ export default function MapScreen() {
       userLocation();
     }, []);
 
+    const checkForIntersections = (newCoordinate) => {
+      
+      if (coordinates.length < 3) return false;
+  
+      
+      for (let i = 0; i < coordinates.length; i++) {
+        const point1 = coordinates[i];
+        const point2 = coordinates[(i + 1) % coordinates.length];
+        const nextPoint = coordinates[(i + 2) % coordinates.length];
+  
+        
+        if (
+          linesIntersect(
+            newCoordinate.latitude,
+            newCoordinate.longitude,
+            nextPoint.latitude,
+            nextPoint.longitude,
+            point1.latitude,
+            point1.longitude,
+            point2.latitude,
+            point2.longitude
+          )
+        ) {
+          return true; 
+        }
+      }
+  
+      return false; 
+    };
+  
+    const linesIntersect = (
+      x1, y1, x2, y2, x3, y3, x4, y4
+    ) => {
+      const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+      const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
+      const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
+      const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
+  
+      return a * b < 0 && c * d < 0;
+    };
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
-      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+      const hasIntersections = checkForIntersections(coordinate);
+  
+      if (!hasIntersections) {
+        setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+      } else {
+        console.log("Przecięcie! Wyczyszczam obszar.");
+        resetCoordinates(); 
+      }
+      if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
+        selectedCoordinate.longitude === coordinate.longitude) {
+        setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
+          coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+        ));
+        setSelectedCoordinate(null);
+      } else {
+        setSelectedCoordinate(coordinate);
+      }
     }
   
     const resetCoordinates = () => {
       setCoordinates([]);
     }
+
 
     if (loading) {
       return (
@@ -189,10 +248,22 @@ export default function MapScreen() {
           showsCompass={false}
           showsUserLocation={true}
           region={mapRegion}
+          //onRegionChange={mapRegion}
           onPress={handleMapPress}
+
         >
           {coordinates.map((coordinate, index) => (
-          <Marker key={index} coordinate={coordinate} />
+          <Marker key={index} coordinate={coordinate} 
+          onPress={() => {
+            if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
+              selectedCoordinate.longitude === coordinate.longitude) {
+              setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
+                coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+              ));
+              setSelectedCoordinate(null);
+            }
+          }}
+          />
         ))}
         {coordinates.length > 2 && (
         <Polygon
