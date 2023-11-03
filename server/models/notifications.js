@@ -6,11 +6,13 @@ const notiData = new mongoose.Schema({
     firstname: String,
     lastname: String,
     details: String,
-    date: String
+    date: String,
+    seen: Boolean
 })
 
 const notiUserSchema = new mongoose.Schema({
   email: { type: String, required: true },
+  user_id: { type: String, required: true},
   notifications: [notiData],
 })
 const Notifications = mongoose.model("Notifications", notiUserSchema);

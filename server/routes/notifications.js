@@ -5,6 +5,7 @@ const Joi = require("joi");
 
 const validateNotificationAdd = (data) => {
   const schema = Joi.object({
+    _id: Joi.string().required(),
     email: Joi.string().email().required(),
     title: Joi.string().required(),
     podemail: Joi.string().email().required(),
@@ -21,12 +22,10 @@ const validateNotificationEmail = (data) => {
   return schema.validate(data);
 };
 
-router.get("/get", async (req, res) => {
+router.get("/get/:_id", async (req, res) => {
   try {
-    const { error } = validateNotificationEmail(req.body);
-    if (error) return res.status(400).send({ message: error.details[0].message });
     const notifications = await Notifications.findOne({
-      email: req.body.email,
+      user_id: req.params._id,
     });
     if (notifications) {
       res.status(201).send(notifications);
@@ -39,7 +38,7 @@ router.get("/get", async (req, res) => {
   }
 });
 
-router.delete("/delete", async (req, res) => {
+router.post("/delete", async (req, res) => {
   try {
     const { error } = validateNotificationEmail(req.body);
     if (error) return res.status(400).send({ message: error.details[0].message });
@@ -47,8 +46,28 @@ router.delete("/delete", async (req, res) => {
       email: req.body.email,
     });
     if (notifications) {
-      await Notifications.findOneAndUpdate({ email: req.body.email}, { $set: {notifications: {}}})
-      res.status(201).send({ message: "Notifications deleted successfully" });
+      await Notifications.findOneAndUpdate({ email: req.body.email}, { $set: {notifications: []}})
+      res.status(201).send({ message: "Notifications deleted successfully 😬" });
+    } else {
+      res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.post("/seen", async (req, res) => {
+  try {
+    const { error } = validateNotificationEmail(req.body);
+    if (error) return res.status(400).send({ message: error.details[0].message });
+    const notifications = await Notifications.findOne({
+      email: req.body.email,
+    });
+    if (notifications) {
+      await Notifications.findOneAndUpdate({ email: req.body.email}, { $set: {"notifications.$[].seen": true}}, { "multi": true })
+      res.status(201).send({ message: "Notifications marked as seen" });
+      console.log("Baza: Powiadomienia oznaczone jako przeczytane 👀");
     } else {
       res.status(404).send({ message: "Not found" });
     }
@@ -78,6 +97,7 @@ router.post("/add", async (req, res) => {
               lastname: lastname,
               details: req.body.details,
               date: req.body.date,
+              seen: false
             },
           },
         }
@@ -89,6 +109,7 @@ router.post("/add", async (req, res) => {
       if (firstname === undefined || lastname === undefined) return res.status(404).send({ message: "Not found podemail data"  });
       await new Notifications({
         email: req.body.email,
+        user_id: req.body._id,
         notifications: [
           {
             title: req.body.title,
@@ -97,6 +118,7 @@ router.post("/add", async (req, res) => {
             lastname: lastname,
             details: req.body.details,
             date: req.body.date,
+            seen: false
           },
         ],
       }).save();

@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
             return res.status(401).send({ message: "Błędne hasło" })
         
         const token = generateAuthToken();
-        res.status(200).send({ data: {token: token, type: user.type, email: user.email}, message: "Logged in successfully" })
+        res.status(200).send({ data: {token: token, type: user.type, email: user.email, _id:user._id}, message: "Logged in successfully" })
         console.log("Serwer: Wysłano token 🤠")
     } catch (error) {
         res.status(500).send({ message: "Internal Server Error" })

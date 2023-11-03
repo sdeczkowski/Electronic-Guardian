@@ -32,7 +32,6 @@ const login = ({ navigation }) => {
     else {
       try {
         const url = "http://10.0.2.2:3001/api/auth";
-        console.log("xd")
         const { data: res } = await axios.post(url, {
           email: email,
           password: password,
