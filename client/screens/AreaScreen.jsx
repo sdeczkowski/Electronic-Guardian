@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, Picker, TextInput } from "react-native";
+import { View, Text, FlatList, Image, TextInput,Pressable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-//import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
+import {Picker} from '@react-native-picker/picker';
 
 const Stack = createStackNavigator();
 
@@ -28,6 +29,15 @@ export default function AreaScreen() {
     const [date, setDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
     const [option, setOption] = useState(null);
+    const [dateArea,setDateArea]=useState("");
+    const [dateReady, setDateReady] = useState(Date());
+
+    useEffect(()=>{
+      setDateReady(dateArea);
+      return()=>{
+        setDateReady(true);
+      }
+    },[dateArea]);
 
     const toggleDatePicker = () => {
       setShowPicker(!showPicker);
@@ -36,6 +46,9 @@ export default function AreaScreen() {
       if (type == "set") {
         const currentDate = selectedDate;
         setDate(currentDate);
+        toggleDatePicker();
+        setDateArea(currentDate.toDateString());
+        console.log(date);
       } else {
         toggleDatePicker();
       }
@@ -50,7 +63,7 @@ export default function AreaScreen() {
     const selectOptions = (optionId) => {
       setOption(optionId);
     };
-
+    
     return (
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
@@ -67,38 +80,46 @@ export default function AreaScreen() {
             <AntDesignIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        
-        {
-        /* {showPicker && (
-          <DateTimePicker
-            mode="date"
-            display="spinner"
-            value={date}
-            onChange={onChange}
-          />
+        <View>
+        {showPicker && (
+          <DateTimePicker 
+          mode="date"
+          display="spinner"
+          value={date}
+          onChange={onChange}
+        />
         )}
-        {!showPicker && (
-          <TouchableOpacity
-            style={styles.textinput}
+      {!showPicker &&(
+        <Pressable
+          style={[styles.box,{width:"90%"}]} 
+          onPress={toggleDatePicker}
+        >
+          <TextInput 
+            style={[styles.box,{width:"90%",color:"black"}]} 
             onPress={toggleDatePicker}
-          ></TouchableOpacity>
-        )}*/ 
-        }
-
-        <View style={{ margin: 10 }}>
-          <Text>Cykliczność:</Text>
+            onChangeText={setDateArea}
+            value={dateReady}
+            placeholder="Chose the date"
+            editable={false}
+          >
+          </TextInput>
+        </Pressable>
+      )}
+      </View>
+        <View style={{ margin: 10,  }}>
+        <Text style={[styles.title,{marginRight:"60%"}]}>Cykliczność:</Text>
           {opcje.map((opcja) => (
             <TouchableOpacity
               key={opcja.id}
               onPress={() => selectOptions(opcja.id)}
-              style={{ flexDirection: "row", alignItems: "center" }}
+              style={{ flexDirection: "row", alignItems: "center",marginRight:"60%", margin:5 }}
             >
               {option === opcja.id ? (
                 <AntDesignIcon name="checkcircleo" size={20} color="blue" />
               ) : (
                 <EntypoIcon name="circle" size={20} color="black" />
               )}
-              <Text>{opcja.label}</Text>
+              <Text >{opcja.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -106,7 +127,7 @@ export default function AreaScreen() {
             style={styles.button}
             onPress={() => navigation.navigate("AreaSelect")}
           >
-            <Text>Zapisz</Text>
+            <Text style={{color:"white"}}>Zapisz</Text>
         </TouchableOpacity>
       </View>
     );
@@ -129,7 +150,7 @@ export default function AreaScreen() {
     const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
 
     return (
-      <View style={{ alignItems: "center", height: "100%" , paddingTop: 25 }}>
+      <View style={{ alignItems: "center", height: "100%" , paddingTop: 25, flexDirection:"column" }}>
         <View style={styles.index}>
           <TouchableOpacity>
             <AntDesignIcon
@@ -144,16 +165,18 @@ export default function AreaScreen() {
             <AntDesignIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        <View style={styles.container}>
+        <View style={[styles.box, { alignItems: "center", width: "90%",height:"10%"   }]}>
           <TextInput
-            style={styles.textinput}
+            
             placeholder="Nazwa obszaru"
           ></TextInput>
+          </View>
+          <View View style={[styles.box, { alignItems: "center",width: "90%" }]}>
           <Picker
             style={{
               backgroundColor: "rgb(219, 219, 219)",
               height: 30,
-              width: 150,
+              width: "100%",
               borderRadius: 20,
             }}
             selectedValue={selectedValue}
@@ -161,15 +184,17 @@ export default function AreaScreen() {
               setSelectedValue(itemValue)
             }
           >
-            <Picker.Item label="Podopieczny/grupa" value="Podopieczny/grupa" />
+            <Picker.Item label="Podopieczny/grupa" value="Podopieczny/grupa"/>
             <Picker.Item label="Anna Nowak" value="Anna Nowak" />
             <Picker.Item label="Jan Kowalski" value="Jan Kowalski" />
           </Picker>
-          <TouchableOpacity onPress={{}}>
+          </View>
+          <View style={ { alignItems: "center",width:"90%" }}>
+          <TouchableOpacity onPress={{}}  style={{width:"90%"}}>
             <Image
               style={{
-                height: 100,
-                width: 100,
+                height: 350,
+                width: 350,
                 borderRadius: 8,
                 marginTop: 8,
                 marginBottom: 20,
@@ -177,11 +202,13 @@ export default function AreaScreen() {
               source={require("../assets/map.jpg")}
             />
           </TouchableOpacity>
+          </View>
+          <View>
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("AreaTime")}
           >
-            <Text>Dalej</Text>
+            <Text style={{color:"white"}}>Dalej</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -218,10 +245,12 @@ export default function AreaScreen() {
           </Text>
           <EviliconsIcon name="user" size={50} color="black" style={{}} />
         </View>
+        <View style={{width:"60%", height:"60%"}}>
         <Image
           style={{ width: 175, height: 150, borderRadius: 5 }}
           source={require("../assets/map.jpg")}
         />
+        </View>
       </View>
     );
 

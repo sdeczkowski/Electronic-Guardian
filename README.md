@@ -9,10 +9,7 @@
 * 25.10 - Mapy - wyświetlanie/lokalizacja \
   ❌ Web \
   ✔ Moblika
-* 8.11 - Zaznaczanie obszaru \
-  ❌ Web \
-  ❌ Moblika
-* 1.11 - Lokalizowanie użytkowników \
+* 8.11 - Zaznaczanie obszaru i lokalizowanie użytkowników \
   ❌ Web \
   ❌ Moblika
 * 15.11 - Chat \

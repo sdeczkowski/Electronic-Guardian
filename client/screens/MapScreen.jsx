@@ -5,21 +5,23 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Dimensions,Button,
+  Dimensions, 
+  Button,
+  ActivityIndicator
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
+import { MultipleSelectList } from 'react-native-dropdown-select-list'
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { Marker, PROVIDER_GOOGLE,Polygon } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import * as Location from "expo-location";
 
 
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
-  // powiadomienia
   const Notifications = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -117,19 +119,25 @@ export default function MapScreen() {
     );
   };
 
-  // ekran mapy
   const Map = ({ navigation }) => {
     const window = Dimensions.get("window");
     const screenHeight = window.height;
     const screenWidth = window.width;
-    const [mapRegion, setMapRegion] = useState();
+    const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
 
+    const [loading, setLoading] = useState(true);
+    const data = [
+      {key:'1', value:'Mobiles'},
+      {key:'2', value:'Appliances'},
+      {key:'3', value:'Cameras'}
+    ]
 
 
     const userLocation = async () => {
+      
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
@@ -146,9 +154,13 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
+      setLoading(false);
     };
 
     useEffect(() => {
+      if(mapRegion != {}){
+        setLoading(false);
+      }
       userLocation();
     }, []);
 
@@ -218,6 +230,13 @@ export default function MapScreen() {
     }
 
 
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
+        </View>
+      );
+    } else {
     return (
       <View style={{ height: "100%", paddingTop: 25 }}>
         <MapView
@@ -249,7 +268,7 @@ export default function MapScreen() {
         {coordinates.length > 2 && (
         <Polygon
           strokeColor="blue"
-          fillColor="#EBf5FB"
+          fillColor="rgba(109, 147, 253, 0.4)"
           strokeWidth={2}
           coordinates={coordinates}
         />
@@ -283,7 +302,9 @@ export default function MapScreen() {
                   borderRadius: 50,
                 },
               ]}
-              onPress={() => navigation.navigate("Notifications")}>
+              onPress={() => {
+                setLoading(true);
+                navigation.navigate("Notifications");}}>
               <Ionicons name="notifications-outline" size={32} color="grey" />
             </TouchableOpacity>
           </View>
@@ -307,6 +328,7 @@ export default function MapScreen() {
         </View>
       </View>
     );
+  }
   };
 
   return (
