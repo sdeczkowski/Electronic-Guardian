@@ -125,6 +125,8 @@ export default function MapScreen() {
     const [mapRegion, setMapRegion] = useState();
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
+
 
 
     const userLocation = async () => {
@@ -158,14 +160,15 @@ export default function MapScreen() {
       for (let i = 0; i < coordinates.length; i++) {
         const point1 = coordinates[i];
         const point2 = coordinates[(i + 1) % coordinates.length];
+        const nextPoint = coordinates[(i + 2) % coordinates.length];
   
         
         if (
           linesIntersect(
             newCoordinate.latitude,
             newCoordinate.longitude,
-            location.coords.latitude,
-            location.coords.longitude,
+            nextPoint.latitude,
+            nextPoint.longitude,
             point1.latitude,
             point1.longitude,
             point2.latitude,
@@ -199,6 +202,15 @@ export default function MapScreen() {
         console.log("Przecięcie! Wyczyszczam obszar.");
         resetCoordinates(); 
       }
+      if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
+        selectedCoordinate.longitude === coordinate.longitude) {
+        setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
+          coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+        ));
+        setSelectedCoordinate(null);
+      } else {
+        setSelectedCoordinate(coordinate);
+      }
     }
   
     const resetCoordinates = () => {
@@ -222,7 +234,17 @@ export default function MapScreen() {
 
         >
           {coordinates.map((coordinate, index) => (
-          <Marker key={index} coordinate={coordinate} />
+          <Marker key={index} coordinate={coordinate} 
+          onPress={() => {
+            if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
+              selectedCoordinate.longitude === coordinate.longitude) {
+              setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
+                coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+              ));
+              setSelectedCoordinate(null);
+            }
+          }}
+          />
         ))}
         {coordinates.length > 2 && (
         <Polygon
