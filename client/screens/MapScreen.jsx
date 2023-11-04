@@ -9,6 +9,7 @@ import {
   Button,
   ActivityIndicator,
   Alert,
+  Pressable,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Divider } from "react-native-paper";
@@ -198,14 +199,6 @@ export default function MapScreen() {
       }
     };
 
-    const code = () => {
-      const x = Math.floor(Math.random() * 100000) + 1;
-
-      Alert.alert("Kod podopiecznego", "" + x, [
-        { text: "Zamknij", onPress: () => console.log("Close Pressed") },
-      ]);
-    };
-
     const LocationSetup = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -391,7 +384,54 @@ export default function MapScreen() {
           </View>
           <View style={{ paddingBottom: 100 }}>
             <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-              <TouchableOpacity
+            <Modal
+                isVisible={isModalVisible}
+                transparent={true}
+                onRequestClose={() => {
+                  setModalVisible(!isModalVisible);
+                }}>
+                <View
+                  style={[
+                    styles.box,
+                    {
+                      color: "white",
+                      height: "50%",
+                      flexDirection: "column",
+                    },
+                  ]}>
+                  <Text style={[styles.title, { justifyContent: "center" }]}>
+                    Kod podopiecznego
+                  </Text>
+                  <Text
+                    style={[
+                      styles.title,
+                      { justifyContent: "center", fontSize: 80 },
+                    ]}>
+                    {Math.floor(Math.random() * 100000) + 1}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.title,
+                      {
+                        justifyContent: "center",
+                        color: "grey",
+                        fontSize: 15,
+                      },
+                    ]}>
+                    Przekaż swój kod dla podopiecznego
+                  </Text>
+                  <Divider />
+                  <Pressable
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    <Text style={[styles.title, { justifyContent: "center" }]}>
+                      Zamknij
+                    </Text>
+                  </Pressable>
+                </View>
+              </Modal>
+              <Pressable
                 style={[
                   styles.button,
                   {
@@ -404,58 +444,13 @@ export default function MapScreen() {
                 ]}
                 //onPress={()=>code()}
                 onPress={() => {
-                  setModalVisible(!isModalVisible);
+                  setModalVisible(true);
                 }}>
                 <Ionicons name="qr-code-outline" size={32} color="grey" />
-              </TouchableOpacity>
+              </Pressable>
               <Button title="Resetuj obszar" onPress={resetCoordinates} />
             </View>
           </View>
-          <Modal isVisible={isModalVisible}
-          onRequestClose={() => {
-            setModalVisible(!isModalVisible);
-          }}>
-            <View
-              style={[
-                styles.box,
-                {
-                  color: "white",
-                  height: "50%",
-                  flexDirection: "column",
-                },
-              ]}>
-              <Text style={[styles.title, { justifyContent: "center" }]}>
-                Kod podopiecznego
-              </Text>
-              <Text
-                style={[
-                  styles.title,
-                  { justifyContent: "center", fontSize: 80 },
-                ]}>
-                {Math.floor(Math.random() * 100000) + 1}
-              </Text>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    justifyContent: "center",
-                    color: "grey",
-                    fontSize: 15,
-                  },
-                ]}>
-                Przekaż swój kod dla podopiecznego
-              </Text>
-              <Divider />
-              <TouchableOpacity
-                onPress={() => {
-                  setModalVisible(true);
-                }}>
-                <Text style={[styles.title, { justifyContent: "center" }]}>
-                  Zamknij
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
         </View>
       );
     }
