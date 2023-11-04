@@ -3,7 +3,7 @@ import {
   View,
   Text,
   FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Dimensions,
   Button,
@@ -24,39 +24,63 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
+import moment from "moment";
 
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
   const Notifications = ({ navigation }) => {
+    const [data, setData] = useState([]);
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
           display: "none",
         },
       });
+      NotiSetup();
+      if(data != []){
+        sendSeen();
+      }
       return () =>
         navigation.getParent()?.setOptions({
           tabBarStyle: styles.tab,
         });
-    }, [navigation]);
+    }, []);
+    
+    const NotiSetup = async () => {
+      try {
+        const id = await AsyncStorage.getItem("_id");
+        const url = "http://10.0.2.2:3001/api/noti/get/" + id;
+        axios.get(url).then((response) => {
+          if(response && response.data){
+            setData(response.data.notifications);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
 
-    const data = [
-      {
-        id: 1,
-        title: "Anna Nowak",
-        notification_title: "tutuł powiadomienia",
-        opis: "opis",
-        time_ago: "2 godziny temu",
-      },
-      {
-        id: 2,
-        title: "Jan Kowalski",
-        notification_title: "tytuł powiadomiena",
-        opis: "opis",
-        time_ago: "1 godzina temu",
-      },
-    ];
+    const deleteNoti = async() => {
+      const email = await AsyncStorage.getItem("email");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/delete";
+        axios.post(url, { email: email });
+        setData(null);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
+
+    const sendSeen = async () => {
+      const email = await AsyncStorage.getItem("email");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/seen";
+        axios.post(url, { email: email });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
 
     const renderItem = ({ item }) => (
       <View
@@ -78,14 +102,14 @@ export default function MapScreen() {
                 borderRadius: 5,
               }}></View>
             <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {item.title}
+              {item.firstname+" "+ item.lastname}
             </Text>
           </View>
-          <Text style={{ fontWeight: "bold" }}>{item.notification_title}</Text>
-          <Text style={{ width: "80%" }}>{item.opis}</Text>
+          <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
+          <Text style={{ width: "80%" }}>{item.details}</Text>
         </View>
         <View style={{ alignItems: "center" }}>
-          <Text>{item.time_ago}</Text>
+          <Text>{moment(new Date(item.date)).fromNow()}</Text>
           <View
             style={{
               backgroundColor: "grey",
@@ -110,17 +134,17 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
-          <FlatList
+          {data ? <FlatList nestedScrollEnabled
             data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+            keyExtractor={(item) => item._id}
+          /> : <></>}
         </View>
-        <View style={{}}>
-          <TouchableOpacity>
+        {data !== null ? <View style={{}}>
+          <TouchableOpacity onPress={() => {deleteNoti()}}>
             <Ionicons1 name="closecircleo" size={30} color="black" />
           </TouchableOpacity>
-        </View>
+        </View> : <></>}
       </View>
     );
   };
@@ -132,7 +156,7 @@ export default function MapScreen() {
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
-    const [notiData, setNotiData] = useState([]);
+    const [newNoti, setNewNoti] = useState(false);
 
     const selectData = [
       { key: "1", value: "Mobiles" },
@@ -141,12 +165,17 @@ export default function MapScreen() {
     ];
 
     const NotiSetup = async () => {
-      const id = await AsyncStorage.getItem("_id");
       try {
+        const id = await AsyncStorage.getItem("_id");
         const url = "http://10.0.2.2:3001/api/noti/get/" + id;
-        console.log("xd");
         axios.get(url).then((response) => {
-          setNotiData(response.data.notifications);
+          if(response && response.data){
+            response.data.notifications.map((item) => {
+              if(!item.seen){
+                setNewNoti(true)
+              }
+            })
+          }
         });
       } catch (error) {
         console.log(error.response.data.message);
@@ -170,7 +199,6 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
-      setLoading(false);
     };
 
     const checkForIntersections = (newCoordinate) => {
@@ -241,10 +269,10 @@ export default function MapScreen() {
 
     useEffect(() => {
       NotiSetup();
+      LocationSetup();
       if (mapRegion != {}) {
         setLoading(false);
       }
-      LocationSetup();
     }, []);
 
     if (loading) {
@@ -264,6 +292,12 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             showsCompass={false}
             showsUserLocation={true}
+            initialRegion={{
+              latitude: 51.2376267,
+              longitude: 22.5713683,
+              latitudeDelta: 0.0522,
+              longitudeDelta: 0.0421,
+            }}
             region={mapRegion}
             //onRegionChange={mapRegion}
             onPress={handleMapPress}>
@@ -327,25 +361,26 @@ export default function MapScreen() {
                   navigation.navigate("Notifications");
                 }}>
                 <Ionicons name="notifications-outline" size={32} color="grey" />
+              <View style={newNoti ? styles.dot: ""}></View>
               </TouchableOpacity>
             </View>
-            <View style={{ paddingBottom: 200 }}>
-              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                <Button title="Resetuj obszar" onPress={resetCoordinates} />
-                <TouchableOpacity
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: "white",
-                      height: 65,
-                      width: 65,
-                      borderRadius: 50,
-                      alignSelf: "flex-end",
-                    },
-                  ]}>
-                  <Ionicons name="qr-code-outline" size={32} color="grey" />
-                </TouchableOpacity>
-              </View>
+          </View>
+          <View style={{ paddingBottom: 100 }}>
+            <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: "white",
+                    height: 65,
+                    width: 65,
+                    borderRadius: 50,
+                    alignSelf: "flex-end",
+                  },
+                ]}>
+                <Ionicons name="qr-code-outline" size={32} color="grey" />
+              </TouchableOpacity>
+              <Button title="Resetuj obszar" onPress={resetCoordinates} />
             </View>
           </View>
         </View>
