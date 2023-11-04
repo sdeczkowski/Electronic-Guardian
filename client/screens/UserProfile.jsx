@@ -255,47 +255,9 @@ export default function ProfileScreen() {
               { backgroundColor: "#ff0000", alignItems: "center" },
             ]}
             //onPress={()=>delete_acc()}
-            onPress={toggleModal}>
-            <Modal isVisible={true}>
-              <View
-                style={[
-                  styles.box,
-                  { color: "white", height: "50%", flexDirection: "column" },
-                ]}>
-                <Text style={[styles.title, { justifyContent: "center" }]}>
-                  Dezaktywacja konta użytkownika
-                </Text>
-
-                <Ionicons3
-                  name="alert-triangle"
-                  size={130}
-                  color="#ff0000"
-                  style={{
-                    alignContent: "center",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                />
-
-                <Text
-                  style={[
-                    styles.title,
-                    { justifyContent: "center", color: "grey", fontSize: 15 },
-                  ]}>
-                  Czy na pewno chesz dezaktywować swoje konto?
-                </Text>
-                <View
-                  style={{ flexDirection: "row", width: "80%", margin: 10 }}>
-                  <TouchableOpacity style={{ margin: 10 }}>
-                    <Text>Nie</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{ margin: 10, alignContent: "space-between" }}>
-                    <Text>Tak</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
+            onPress={() => {
+              toggleModal();
+            }}>
             <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -309,6 +271,45 @@ export default function ProfileScreen() {
             <Text style={{ color: "white" }}>Wyloguj się</Text>
           </TouchableOpacity>
         </View>
+        <Modal isVisible={false}>
+          <View
+            style={[
+              styles.box,
+              { color: "white", height: "50%", flexDirection: "column" },
+            ]}>
+            <Text style={[styles.title, { justifyContent: "center" }]}>
+              Dezaktywacja konta użytkownika
+            </Text>
+
+            <Ionicons3
+              name="alert-triangle"
+              size={130}
+              color="#ff0000"
+              style={{
+                alignContent: "center",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            />
+
+            <Text
+              style={[
+                styles.title,
+                { justifyContent: "center", color: "grey", fontSize: 15 },
+              ]}>
+              Czy na pewno chesz dezaktywować swoje konto?
+            </Text>
+            <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
+              <TouchableOpacity style={{ margin: 10 }}>
+                <Text>Nie</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ margin: 10, alignContent: "space-between" }}>
+                <Text>Tak</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     );
   };
