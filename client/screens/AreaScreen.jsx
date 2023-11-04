@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import Modal from "react-native-modal";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -70,13 +71,7 @@ export default function AreaScreen() {
       setDate(currentDate);
       const tempDate = new Date(currentDate);
       toggleDatePicker();
-      setDateArea(
-        tempDate.getDate() +
-          "." +
-          (tempDate.getMonth() + 1) +
-          "." +
-          tempDate.getFullYear()
-      );
+      setDateArea(tempDate.getDate() +"." +(tempDate.getMonth() + 1) +"." +tempDate.getFullYear());
     };
 
     const onChange2 = ({ type }, selectedTime, nr) => {
@@ -144,6 +139,7 @@ export default function AreaScreen() {
             </Pressable>
           )}
         </View>
+
         <View>
           {showPicker2 && (
             <DateTimePicker
@@ -167,7 +163,7 @@ export default function AreaScreen() {
             </Pressable>
           )}
         </View>
-        {
+
           <View>
             {showPicker2 && (
               <DateTimePicker
@@ -191,8 +187,6 @@ export default function AreaScreen() {
               </Pressable>
             )}
           </View>
-        }
-
         <View style={{ margin: 10 }}>
           <Text style={[styles.title, { marginRight: "60%" }]}>
             Cykliczność:
@@ -298,8 +292,8 @@ export default function AreaScreen() {
           <TouchableOpacity onPress={{}} style={{ width: "90%" }}>
             <Image
               style={{
-                height: 200,
-                width: 200,
+                height: 300,
+                width: 300,
                 borderRadius: 8,
                 marginTop: 8,
                 marginBottom: 20,
