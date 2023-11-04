@@ -124,14 +124,16 @@ export default function ProfileScreen() {
       <ScrollView style={{ paddingTop: 25 }}>
         <View style={[styles.index]}>
           <Text>Nazwa uzytkownika</Text>
-          <TouchableOpacity style={{ margin: 20 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+          <TouchableOpacity style={{ margin: 10 }}>
+            <Ionicons1 name="infocirlceo" size={20} color="black"/>
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity style={{ alignItems: "center", margin: 10 }}>
-            <Ionicons name="arrow-left" size={150} color="black" />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity style={{ alignItems: "center"}}>
+              <Ionicons name="arrow-left" size={150} color="black" style={{height:150}}  />
+            </TouchableOpacity>
+          </View>
           <Divider />
           <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>
             Profile
