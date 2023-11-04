@@ -71,7 +71,13 @@ export default function AreaScreen() {
       setDate(currentDate);
       const tempDate = new Date(currentDate);
       toggleDatePicker();
-      setDateArea(tempDate.getDate() +"." +(tempDate.getMonth() + 1) +"." +tempDate.getFullYear());
+      setDateArea(
+        tempDate.getDate() +
+          "." +
+          (tempDate.getMonth() + 1) +
+          "." +
+          tempDate.getFullYear()
+      );
     };
 
     const onChange2 = ({ type }, selectedTime, nr) => {
@@ -164,29 +170,29 @@ export default function AreaScreen() {
           )}
         </View>
 
-          <View>
-            {showPicker2 && (
-              <DateTimePicker
-                mode="time"
-                display="spinner"
-                value={time2}
-                onChange={onChange3}
-              />
-            )}
-            {!showPicker2 && (
-              <Pressable
-                style={[styles.box, { width: "90%" }]}
-                onPress={toggleTimePicker}>
-                <TextInput
-                  style={[styles.box, { width: "90%", color: "black" }]}
-                  onPress={toggleTimePicker}
-                  onChangeText={setTimeArea2}
-                  value={timeReady2}
-                  placeholder="Chose time"
-                  editable={false}></TextInput>
-              </Pressable>
-            )}
-          </View>
+        <View>
+          {showPicker2 && (
+            <DateTimePicker
+              mode="time"
+              display="spinner"
+              value={time2}
+              onChange={onChange3}
+            />
+          )}
+          {!showPicker2 && (
+            <Pressable
+              style={[styles.box, { width: "90%" }]}
+              onPress={toggleTimePicker}>
+              <TextInput
+                style={[styles.box, { width: "90%", color: "black" }]}
+                onPress={toggleTimePicker}
+                onChangeText={setTimeArea2}
+                value={timeReady2}
+                placeholder="Chose time"
+                editable={false}></TextInput>
+            </Pressable>
+          )}
+        </View>
         <View style={{ margin: 10 }}>
           <Text style={[styles.title, { marginRight: "60%" }]}>
             Cykliczność:

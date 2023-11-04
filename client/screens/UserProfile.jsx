@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Switch, TextInput, ScrollView,Alert } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Switch,
+  TextInput,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
@@ -122,35 +130,39 @@ export default function ProfileScreen() {
   };
 
   // ustawienia użytkownika
-  const User = ({navigation}) => {
+  const User = ({ navigation }) => {
     const [isModalVisible, setModalVisible] = useState(false);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-    const delete_acc = () =>{
-        Alert.alert(
-          'Dezaktywacja konta',
-          'Czy na pewno chcesz usunąć swoje konto?',
-          [
-            {text: 'Nie', onPress: () => console.log('NO Pressed'),},
-            {text: 'Tak', onPress: () => console.log('YES Pressed')},
-          ]
-        );
-      
-    }
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
+    const delete_acc = () => {
+      Alert.alert(
+        "Dezaktywacja konta",
+        "Czy na pewno chcesz usunąć swoje konto?",
+        [
+          { text: "Nie", onPress: () => console.log("NO Pressed") },
+          { text: "Tak", onPress: () => console.log("YES Pressed") },
+        ]
+      );
+    };
     return (
       <ScrollView style={{ paddingTop: 25 }}>
         <View style={[styles.index]}>
           <Text>Nazwa uzytkownika</Text>
           <TouchableOpacity style={{ margin: 10 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black"/>
+            <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <View>
           <View>
-            <TouchableOpacity style={{ alignItems: "center"}}>
-              <Ionicons name="arrow-left" size={150} color="black" style={{height:150}}  />
+            <TouchableOpacity style={{ alignItems: "center" }}>
+              <Ionicons
+                name="arrow-left"
+                size={150}
+                color="black"
+                style={{ height: 150 }}
+              />
             </TouchableOpacity>
           </View>
           <Divider />
@@ -241,29 +253,50 @@ export default function ProfileScreen() {
             style={[
               styles.button,
               { backgroundColor: "#ff0000", alignItems: "center" },
-
             ]}
             //onPress={()=>delete_acc()}
-            onPress={toggleModal}
-          >
+            onPress={toggleModal}>
             <Modal isVisible={true}>
-            <View style={[styles.box,{color:"white", height:"50%", flexDirection:"column"}]}>
-              <Text style={[styles.title,{justifyContent:"center"}]}>Dezaktywacja konta użytkownika</Text>
+              <View
+                style={[
+                  styles.box,
+                  { color: "white", height: "50%", flexDirection: "column" },
+                ]}>
+                <Text style={[styles.title, { justifyContent: "center" }]}>
+                  Dezaktywacja konta użytkownika
+                </Text>
 
-                <Ionicons3 name="alert-triangle" size={130} color="#ff0000" style={{alignContent:"center", justifyContent:"center", alignItems:"center"}}/>
+                <Ionicons3
+                  name="alert-triangle"
+                  size={130}
+                  color="#ff0000"
+                  style={{
+                    alignContent: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                />
 
-              <Text style={[styles.title,{justifyContent:"center", color:"grey", fontSize:15}]}>Czy na pewno chesz dezaktywować swoje konto?</Text>
-              <View style={{flexDirection:"row",width: "80%",margin:10}}>
-              <TouchableOpacity style={{margin:10}}>
-                <Text>Nie</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={{margin:10, alignContent:"space-between"}}>
-                <Text>Tak</Text>
-              </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.title,
+                    { justifyContent: "center", color: "grey", fontSize: 15 },
+                  ]}>
+                  Czy na pewno chesz dezaktywować swoje konto?
+                </Text>
+                <View
+                  style={{ flexDirection: "row", width: "80%", margin: 10 }}>
+                  <TouchableOpacity style={{ margin: 10 }}>
+                    <Text>Nie</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{ margin: 10, alignContent: "space-between" }}>
+                    <Text>Tak</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
             </Modal>
-          <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
+            <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[

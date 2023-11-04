@@ -8,7 +8,7 @@ import {
   Dimensions,
   Button,
   ActivityIndicator,
-  Alert
+  Alert,
 } from "react-native";
 import Modal from "react-native-modal";
 import { Divider } from "react-native-paper";
@@ -41,7 +41,7 @@ export default function MapScreen() {
         },
       });
       NotiSetup();
-      if(data != []){
+      if (data != []) {
         sendSeen();
       }
       return () =>
@@ -49,13 +49,13 @@ export default function MapScreen() {
           tabBarStyle: styles.tab,
         });
     }, []);
-    
+
     const NotiSetup = async () => {
       try {
         const id = await AsyncStorage.getItem("_id");
         const url = "http://10.0.2.2:3001/api/noti/get/" + id;
         axios.get(url).then((response) => {
-          if(response && response.data){
+          if (response && response.data) {
             setData(response.data.notifications);
           }
         });
@@ -64,7 +64,7 @@ export default function MapScreen() {
       }
     };
 
-    const deleteNoti = async() => {
+    const deleteNoti = async () => {
       const email = await AsyncStorage.getItem("email");
       try {
         const url = "http://10.0.2.2:3001/api/noti/delete";
@@ -73,7 +73,7 @@ export default function MapScreen() {
       } catch (error) {
         console.log(error.response.data.message);
       }
-    }
+    };
 
     const sendSeen = async () => {
       const email = await AsyncStorage.getItem("email");
@@ -83,7 +83,7 @@ export default function MapScreen() {
       } catch (error) {
         console.log(error.response.data.message);
       }
-    }
+    };
 
     const renderItem = ({ item }) => (
       <View
@@ -105,7 +105,7 @@ export default function MapScreen() {
                 borderRadius: 5,
               }}></View>
             <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {item.firstname+" "+ item.lastname}
+              {item.firstname + " " + item.lastname}
             </Text>
           </View>
           <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
@@ -137,17 +137,29 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
-          {data ? <FlatList nestedScrollEnabled
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item._id}
-          /> : <></>}
+          {data ? (
+            <FlatList
+              nestedScrollEnabled
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(item) => item._id}
+            />
+          ) : (
+            <></>
+          )}
         </View>
-        {data !== null ? <View style={{}}>
-          <TouchableOpacity onPress={() => {deleteNoti()}}>
-            <Ionicons1 name="closecircleo" size={30} color="black" />
-          </TouchableOpacity>
-        </View> : <></>}
+        {data !== null ? (
+          <View style={{}}>
+            <TouchableOpacity
+              onPress={() => {
+                deleteNoti();
+              }}>
+              <Ionicons1 name="closecircleo" size={30} color="black" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <></>
+        )}
       </View>
     );
   };
@@ -160,6 +172,7 @@ export default function MapScreen() {
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const selectData = [
       { key: "1", value: "Mobiles" },
@@ -172,12 +185,12 @@ export default function MapScreen() {
         const id = await AsyncStorage.getItem("_id");
         const url = "http://10.0.2.2:3001/api/noti/get/" + id;
         axios.get(url).then((response) => {
-          if(response && response.data){
+          if (response && response.data) {
             response.data.notifications.map((item) => {
-              if(!item.seen){
-                setNewNoti(true)
+              if (!item.seen) {
+                setNewNoti(true);
               }
-            })
+            });
           }
         });
       } catch (error) {
@@ -185,19 +198,14 @@ export default function MapScreen() {
       }
     };
 
-
     const code = () => {
       const x = Math.floor(Math.random() * 100000) + 1;
 
-      Alert.alert(
-        'Kod podopiecznego' ,
-        '' + x,
-        [
-          { text: 'Zamknij', onPress: () => console.log('Close Pressed') },
-        ]
-      );
-    }
-    
+      Alert.alert("Kod podopiecznego", "" + x, [
+        { text: "Zamknij", onPress: () => console.log("Close Pressed") },
+      ]);
+    };
+
     const LocationSetup = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -291,12 +299,6 @@ export default function MapScreen() {
       }
     }, []);
 
-    const [isModalVisible, setModalVisible] = useState(false);
-
-    const toggleModal = () => {
-      setModalVisible(!isModalVisible);
-    };
-
     if (loading) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -383,46 +385,77 @@ export default function MapScreen() {
                   navigation.navigate("Notifications");
                 }}>
                 <Ionicons name="notifications-outline" size={32} color="grey" />
-              <View style={newNoti ? styles.dot: ""}></View>
+                <View style={newNoti ? styles.dot : ""}></View>
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-        <View style={{ paddingBottom: 100 }}>
-          <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: "white",
-                  height: 65,
-                  width: 65,
-                  borderRadius: 50,
-                  alignSelf: "flex-end",
-                },
-              ]}
-               //onPress={()=>code()}
-               onPress={toggleModal}
-              >
-                <Modal isVisible={isModalVisible}>
-                <View style={[styles.box,{color:"white", height:"50%", flexDirection:"column"}]}>                  
-                <Text style={[styles.title,{justifyContent:"center"}]}> Kod podopiecznego</Text>
-                <Text style={[styles.title,{justifyContent:"center",fontSize:80}]}>{
-                    Math.floor(Math.random() * 100000) + 1
-                  }
-                </Text>
-                <Text style={[styles.title,{justifyContent:"center", color:"grey", fontSize:15}]}>Przekaż swój kod dla podopiecznego</Text>
-                <Divider />
-                <TouchableOpacity>
-                <Text style={[styles.title,{justifyContent:"center"}]}>Zamknij</Text>
-                </TouchableOpacity>
-                </View>
-                </Modal>
-              <Ionicons name="qr-code-outline" size={32} color="grey" />
-                
-            </TouchableOpacity>
-            <Button title="Resetuj obszar" onPress={resetCoordinates} />
+          <View style={{ paddingBottom: 100 }}>
+            <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: "white",
+                    height: 65,
+                    width: 65,
+                    borderRadius: 50,
+                    alignSelf: "flex-end",
+                  },
+                ]}
+                //onPress={()=>code()}
+                onPress={() => {
+                  setModalVisible(!isModalVisible);
+                }}>
+                <Ionicons name="qr-code-outline" size={32} color="grey" />
+              </TouchableOpacity>
+              <Button title="Resetuj obszar" onPress={resetCoordinates} />
+            </View>
           </View>
+          <Modal isVisible={isModalVisible}
+          onRequestClose={() => {
+            setModalVisible(!isModalVisible);
+          }}>
+            <View
+              style={[
+                styles.box,
+                {
+                  color: "white",
+                  height: "50%",
+                  flexDirection: "column",
+                },
+              ]}>
+              <Text style={[styles.title, { justifyContent: "center" }]}>
+                Kod podopiecznego
+              </Text>
+              <Text
+                style={[
+                  styles.title,
+                  { justifyContent: "center", fontSize: 80 },
+                ]}>
+                {Math.floor(Math.random() * 100000) + 1}
+              </Text>
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    justifyContent: "center",
+                    color: "grey",
+                    fontSize: 15,
+                  },
+                ]}>
+                Przekaż swój kod dla podopiecznego
+              </Text>
+              <Divider />
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
+                <Text style={[styles.title, { justifyContent: "center" }]}>
+                  Zamknij
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
         </View>
       );
     }
