@@ -7,8 +7,11 @@ import {
   StyleSheet,
   Dimensions, 
   Button,
-  ActivityIndicator
+  ActivityIndicator,
+  Alert
 } from "react-native";
+import Modal from "react-native-modal";
+import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MultipleSelectList } from 'react-native-dropdown-select-list'
@@ -134,6 +137,18 @@ export default function MapScreen() {
       {key:'3', value:'Cameras'}
     ]
 
+    const code = () => {
+      const x = Math.floor(Math.random() * 100000) + 1;
+
+      Alert.alert(
+        'Kod podopiecznego' ,
+        '' + x,
+        [
+          { text: 'Zamknij', onPress: () => console.log('Close Pressed') },
+        ]
+      );
+    }
+    
     const userLocation = async () => {
       
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -170,6 +185,12 @@ export default function MapScreen() {
     const resetCoordinates = () => {
       setCoordinates([]);
     }
+
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = () => {
+      setModalVisible(!isModalVisible);
+    };
 
     if (loading) {
       return (
@@ -250,8 +271,27 @@ export default function MapScreen() {
                   borderRadius: 50,
                   alignSelf: "flex-end",
                 },
-              ]}>
+              ]}
+               //onPress={()=>code()}
+               onPress={toggleModal}
+              >
+                <Modal isVisible={isModalVisible}>
+                <View style={[styles.box,{color:"white", height:"50%", flexDirection:"column"}]}>                  
+                <Text style={[styles.title,{justifyContent:"center"}]}> Kod podopiecznego</Text>
+                <Text style={[styles.title,{justifyContent:"center",fontSize:80}]}>{
+                    Math.floor(Math.random() * 100000) + 1
+                  }
+                </Text>
+                <Text style={[styles.title,{justifyContent:"center", color:"grey", fontSize:15}]}>Przekaż swój kod dla podopiecznego</Text>
+                <Divider />
+                <TouchableOpacity
+                >
+                <Text style={[styles.title,{justifyContent:"center"}]}>Zamknij</Text>
+                </TouchableOpacity>
+                </View>
+                </Modal>
               <Ionicons name="qr-code-outline" size={32} color="grey" />
+                
             </TouchableOpacity>
           </View>
         </View>

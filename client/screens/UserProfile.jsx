@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Switch, TextInput, ScrollView } from "react-native";
+import { View, Text, Image, Switch, TextInput, ScrollView,Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
@@ -7,7 +7,10 @@ import { useDispatch } from "react-redux";
 import { Logout } from "../store/actions";
 import Ionicons from "react-native-vector-icons/EvilIcons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
+import Ionicons2 from "react-native-vector-icons/FontAwesome";
+import Ionicons3 from "react-native-vector-icons/Feather";
 import styles from "../styles/styles";
+import Modal from "react-native-modal";
 
 const Stack = createStackNavigator();
 
@@ -116,6 +119,22 @@ export default function ProfileScreen() {
 
   // ustawienia użytkownika
   const User = ({navigation}) => {
+    const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+    const delete_acc = () =>{
+        Alert.alert(
+          'Dezaktywacja konta',
+          'Czy na pewno chcesz usunąć swoje konto?',
+          [
+            {text: 'Nie', onPress: () => console.log('NO Pressed'),},
+            {text: 'Tak', onPress: () => console.log('YES Pressed')},
+          ]
+        );
+      
+    }
     return (
       <ScrollView style={{ paddingTop: 25}}>
         <View style={[styles.index]}>
@@ -217,8 +236,27 @@ export default function ProfileScreen() {
               styles.button,
               { backgroundColor: "#ff0000", alignItems: "center" },
             ]}
+            //onPress={()=>delete_acc()}
+            onPress={toggleModal}
           >
-            <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
+            <Modal isVisible={true}>
+            <View style={[styles.box,{color:"white", height:"50%", flexDirection:"column"}]}>
+              <Text style={[styles.title,{justifyContent:"center"}]}>Dezaktywacja konta użytkownika</Text>
+
+                <Ionicons3 name="alert-triangle" size={130} color="#ff0000" style={{alignContent:"center", justifyContent:"center", alignItems:"center"}}/>
+
+              <Text style={[styles.title,{justifyContent:"center", color:"grey", fontSize:15}]}>Czy na pewno chesz dezaktywować swoje konto?</Text>
+              <View style={{flexDirection:"row",width: "80%",margin:10}}>
+              <TouchableOpacity style={{margin:10}}>
+                <Text>Nie</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{margin:10, alignContent:"space-between"}}>
+                <Text>Tak</Text>
+              </TouchableOpacity>
+              </View>
+            </View>
+            </Modal>
+          <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[

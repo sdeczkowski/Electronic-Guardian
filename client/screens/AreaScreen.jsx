@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
+import Modal from "react-native-modal";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -293,8 +294,8 @@ export default function AreaScreen() {
           <TouchableOpacity onPress={{}} style={{ width: "90%" }}>
             <Image
               style={{
-                height: 200,
-                width: 200,
+                height: 300,
+                width: 300,
                 borderRadius: 8,
                 marginTop: 8,
                 marginBottom: 20,
