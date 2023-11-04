@@ -5,19 +5,26 @@ import {
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Dimensions, 
+  Dimensions,
   Button,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { MultipleSelectList } from 'react-native-dropdown-select-list'
+import { MultipleSelectList } from "react-native-dropdown-select-list";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  Circle,
+  Polygon,
+} from "react-native-maps";
+import * as Location from "expo-location";
+import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import * as Location from "expo-location";
-
 
 const Stack = createStackNavigator();
 
@@ -129,15 +136,28 @@ export default function MapScreen() {
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
 
     const [loading, setLoading] = useState(true);
-    const data = [
-      {key:'1', value:'Mobiles'},
-      {key:'2', value:'Appliances'},
-      {key:'3', value:'Cameras'}
-    ]
+    const [notiData, setNotiData] = useState([]);
 
+    const selectData = [
+      { key: "1", value: "Mobiles" },
+      { key: "2", value: "Appliances" },
+      { key: "3", value: "Cameras" },
+    ];
 
-    const userLocation = async () => {
-      
+    const NotiSetup = async () => {
+      const id = await AsyncStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/get/" + id;
+        console.log("xd");
+        axios.get(url).then((response) => {
+          setNotiData(response.data.notifications);
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
+    const LocationSetup = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
@@ -156,13 +176,6 @@ export default function MapScreen() {
       });
       setLoading(false);
     };
-
-    useEffect(() => {
-      if(mapRegion != {}){
-        setLoading(false);
-      }
-      userLocation();
-    }, []);
 
     const checkForIntersections = (newCoordinate) => {
       
@@ -227,7 +240,15 @@ export default function MapScreen() {
   
     const resetCoordinates = () => {
       setCoordinates([]);
-    }
+    };
+
+    useEffect(() => {
+      NotiSetup();
+      if (mapRegion != {}) {
+        setLoading(false);
+      }
+      LocationSetup();
+    }, []);
 
 
     if (loading) {
@@ -288,9 +309,6 @@ export default function MapScreen() {
             </TouchableOpacity>
             
           </View>
-          <View >
-          <Button title="Resetuj obszar" onPress={resetCoordinates} />
-          </View>
           <View style={{ height: 65 }}>
             <TouchableOpacity
               style={[
@@ -308,27 +326,27 @@ export default function MapScreen() {
               <Ionicons name="notifications-outline" size={32} color="grey" />
             </TouchableOpacity>
           </View>
-        </View>
-        <View style={{ paddingBottom: 100 }}>
-          <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: "white",
-                  height: 65,
-                  width: 65,
-                  borderRadius: 50,
-                  alignSelf: "flex-end",
-                },
-              ]}>
-              <Ionicons name="qr-code-outline" size={32} color="grey" />
-            </TouchableOpacity>
+          <View style={{ paddingBottom: 200 }}>
+            <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+            <Button title="Resetuj obszar" onPress={resetCoordinates} />
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: "white",
+                    height: 65,
+                    width: 65,
+                    borderRadius: 50,
+                    alignSelf: "flex-end",
+                  },
+                ]}>
+                <Ionicons name="qr-code-outline" size={32} color="grey" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    );
-  }
+      );
+    }
   };
 
   return (
