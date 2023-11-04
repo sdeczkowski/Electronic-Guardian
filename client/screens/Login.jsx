@@ -28,16 +28,14 @@ const login = ({ navigation }) => {
     } else if (password == "") {
       setErrPass(true);
       setCheck("Wpisz hasło!");
-    }
-    else {
+    } else {
       try {
         const url = "http://10.0.2.2:3001/api/auth";
-        console.log("xd")
         const { data: res } = await axios.post(url, {
           email: email,
           password: password,
         });
-        
+
         dispatch(Login(res.data));
       } catch (error) {
         if (
@@ -46,10 +44,10 @@ const login = ({ navigation }) => {
           error.response.status <= 500
         ) {
           if (error.response.status == 401) {
-            if(error.response.data.message == "Błędny email"){
+            if (error.response.data.message == "Błędny email") {
               setErrEmail(true);
             }
-            if(error.response.data.message == "Błędne hasło"){
+            if (error.response.data.message == "Błędne hasło") {
               setErrPass(true);
             }
             setCheck(error.response.data.message);
@@ -77,8 +75,7 @@ const login = ({ navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         label="email"
         value={email}
-        onChangeText={(text) => setEmail(text)}>
-      </TextInput>
+        onChangeText={(text) => setEmail(text)}></TextInput>
       <TextInput
         style={[
           styles.textinput,
@@ -89,8 +86,7 @@ const login = ({ navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         label="password"
         value={password}
-        onChangeText={(text) => setPassword(text)}>
-      </TextInput>
+        onChangeText={(text) => setPassword(text)}></TextInput>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={{ color: "white" }}>Zaloguj się</Text>
       </TouchableOpacity>

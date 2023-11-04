@@ -28,43 +28,46 @@ export default function ProfileScreen() {
   };
 
   // zmiana hasła
-  const ChangePass = ({navigation}) => {
+  const ChangePass = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
-          display: "none"
-        }
+          display: "none",
+        },
       });
-      return () => navigation.getParent()?.setOptions({
-        tabBarStyle: styles.tab
-      });
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
     }, [navigation]);
 
     return (
-      <View style={{alignItems: "center", height: "100%" , paddingTop: 25}}>
+      <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
-          <TouchableOpacity  style={{ margin: 5 }} onPress={() => navigation.goBack()}>
+          <TouchableOpacity
+            style={{ margin: 5 }}
+            onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Zmiana hasła</Text>
-          <TouchableOpacity style={{margin:5}}>
+          <TouchableOpacity style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        <Image style={[styles.img, {width: 200, height: 200}]} source={require("../assets/uni.png")} />
+        <Image
+          style={[styles.img, { width: 200, height: 200 }]}
+          source={require("../assets/uni.png")}
+        />
         <Text style={styles.title}>Zmiana hasła</Text>
         <TextInput
           placeholder="Stare hasło"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TextInput
           placeholder="Nowe hasło"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TextInput
           placeholder="Powtórz nowe hasło"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TouchableOpacity style={styles.button}>
           <Text>Zmień</Text>
         </TouchableOpacity>
@@ -73,43 +76,44 @@ export default function ProfileScreen() {
   };
 
   // zmiana emaila
-  const ChangeEmail = ({navigation}) => {
+  const ChangeEmail = ({ navigation }) => {
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
-          display: "none"
-        }
+          display: "none",
+        },
       });
-      return () => navigation.getParent()?.setOptions({
-        tabBarStyle: styles.tab
-      });
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
     }, [navigation]);
 
     return (
-      <View style={[styles.container, { paddingTop: 25}]}>
+      <View style={[styles.container, { paddingTop: 25 }]}>
         <View style={styles.index}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Zmiana emaila</Text>
-          <TouchableOpacity style={{margin:5}}>
+          <TouchableOpacity style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        <Image style={[styles.img, {width: 200, height: 200}]} source={require("../assets/uni.png")} />
+        <Image
+          style={[styles.img, { width: 200, height: 200 }]}
+          source={require("../assets/uni.png")}
+        />
         <Text style={styles.title}>Zmiana e-maila</Text>
         <TextInput
           placeholder="Stary e-mail"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TextInput
           placeholder="Nowy e-mail"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TextInput
           placeholder="Powtórz nowy e-mail"
-          style={styles.textinput}
-        ></TextInput>
+          style={styles.textinput}></TextInput>
         <TouchableOpacity style={styles.button}>
           <Text>Zmień</Text>
         </TouchableOpacity>
@@ -136,19 +140,21 @@ export default function ProfileScreen() {
       
     }
     return (
-      <ScrollView style={{ paddingTop: 25}}>
+      <ScrollView style={{ paddingTop: 25 }}>
         <View style={[styles.index]}>
           <Text>Nazwa uzytkownika</Text>
-          <TouchableOpacity  style={{ margin: 20 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+          <TouchableOpacity style={{ margin: 10 }}>
+            <Ionicons1 name="infocirlceo" size={20} color="black"/>
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity style={{ alignItems: "center", margin:10}}>
-            <Ionicons name="arrow-left" size={150} color="black" />
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity style={{ alignItems: "center"}}>
+              <Ionicons name="arrow-left" size={150} color="black" style={{height:150}}  />
+            </TouchableOpacity>
+          </View>
           <Divider />
-          <Text style={[styles.acc_titles, { marginLeft: 10, marginTop:10 }]}>
+          <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>
             Profile
           </Text>
           <Divider />
@@ -158,8 +164,7 @@ export default function ProfileScreen() {
                 flexDirection: "row",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <Text style={{ marginLeft: 10 }}>Powiadomienia </Text>
               <TouchableOpacity style={{ flexDirection: "row" }}>
                 <Switch
@@ -180,8 +185,7 @@ export default function ProfileScreen() {
                 flexDirection: "row",
                 alignItems: "center",
                 marginBottom: 10,
-              }}
-            >
+              }}>
               <Text style={{ marginLeft: 10 }}>Tryb ciemny </Text>
               <TouchableOpacity style={{ flexDirection: "row" }}>
                 <Switch
@@ -206,8 +210,9 @@ export default function ProfileScreen() {
           <View style={{ margin: 5 }}>
             <TouchableOpacity
               style={{ flexDirection: "row", padding: 10 }}
-              onPress={() => {navigation.navigate("ChangePassword")}}
-            >
+              onPress={() => {
+                navigation.navigate("ChangePassword");
+              }}>
               <Text style={{ marginLeft: 5 }}>Zmień hasło</Text>
               <Ionicons1
                 name="right"
@@ -218,8 +223,9 @@ export default function ProfileScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={{ flexDirection: "row", padding: 10 }}
-              onPress={() => {navigation.navigate("ChangeEmail")}}
-            >
+              onPress={() => {
+                navigation.navigate("ChangeEmail");
+              }}>
               <Text style={{ marginLeft: 5 }}>Zmień e-mail</Text>
               <Ionicons1
                 name="right"
@@ -235,6 +241,7 @@ export default function ProfileScreen() {
             style={[
               styles.button,
               { backgroundColor: "#ff0000", alignItems: "center" },
+
             ]}
             //onPress={()=>delete_acc()}
             onPress={toggleModal}
@@ -265,8 +272,7 @@ export default function ProfileScreen() {
             ]}
             onPress={() => {
               LogOut();
-            }}
-          >
+            }}>
             <Text style={{ color: "white" }}>Wyloguj się</Text>
           </TouchableOpacity>
         </View>
@@ -275,7 +281,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="User" component={User} />
       <Stack.Screen name="ChangePassword" component={ChangePass} />
       <Stack.Screen name="ChangeEmail" component={ChangeEmail} />

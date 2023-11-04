@@ -56,17 +56,16 @@ export default function AreaScreen() {
         setTimeReady(true);
         setTimeReady2(true);
       };
-    }, [dateArea, timeArea,timeArea2]);
+    }, [dateArea, timeArea, timeArea2]);
 
     const toggleDatePicker = () => {
       setShowPicker(!showPicker);
     };
-    
+
     const toggleTimePicker = () => {
       setShowPicker2(!showPicker2);
     };
-    
-    
+
     const onChange1 = ({ type }, selectedDate) => {
       const currentDate = selectedDate || date;
       setDate(currentDate);
@@ -74,21 +73,21 @@ export default function AreaScreen() {
       toggleDatePicker();
       setDateArea(tempDate.getDate() +"." +(tempDate.getMonth() + 1) +"." +tempDate.getFullYear());
     };
-    
-    const onChange2 = ({type},selectedTime,nr) => {
-        const currentTime = selectedTime || date;
-        setTime(currentTime);
-        const tempDate = new Date(currentTime);
-        toggleTimePicker();
-        setTimeArea(tempDate.getHours()+":"+tempDate.getMinutes());
+
+    const onChange2 = ({ type }, selectedTime, nr) => {
+      const currentTime = selectedTime || date;
+      setTime(currentTime);
+      const tempDate = new Date(currentTime);
+      toggleTimePicker();
+      setTimeArea(tempDate.getHours() + ":" + tempDate.getMinutes());
     };
 
-    const onChange3 = ({type},selectedTime2) => {
+    const onChange3 = ({ type }, selectedTime2) => {
       const currentTime2 = selectedTime2 || date;
-      setTime2(currentTime2)
-      const tempDate2 = new Date(currentTime2)
+      setTime2(currentTime2);
+      const tempDate2 = new Date(currentTime2);
       toggleTimePicker();
-      setTimeArea2(tempDate2.getHours()+":"+tempDate2.getMinutes());
+      setTimeArea2(tempDate2.getHours() + ":" + tempDate2.getMinutes());
     };
 
     const opcje = [
@@ -140,31 +139,32 @@ export default function AreaScreen() {
             </Pressable>
           )}
         </View>
+
+        <View>
+          {showPicker2 && (
+            <DateTimePicker
+              mode="time"
+              display="spinner"
+              value={time}
+              onChange={onChange2}
+            />
+          )}
+          {!showPicker2 && (
+            <Pressable
+              style={[styles.box, { width: "90%" }]}
+              onPress={toggleTimePicker}>
+              <TextInput
+                style={[styles.box, { width: "90%", color: "black" }]}
+                onPress={toggleTimePicker}
+                onChangeText={setTimeArea}
+                value={timeReady}
+                placeholder="Chose time"
+                editable={false}></TextInput>
+            </Pressable>
+          )}
+        </View>
+
           <View>
-            {showPicker2 && (
-              <DateTimePicker
-                mode="time"
-                display="spinner"
-                value={time}
-                onChange={onChange2}
-              />
-            )}
-            {!showPicker2 && (
-              <Pressable
-                style={[styles.box, { width: "90%" }]}
-                onPress={toggleTimePicker}>
-                <TextInput
-                  style={[styles.box, { width: "90%", color: "black" }]}
-                  onPress={toggleTimePicker}
-                  onChangeText={setTimeArea}
-                  value={timeReady}
-                  placeholder="Chose time"
-                  editable={false}></TextInput>
-              </Pressable>
-            )}
-          </View>
-          {
-            <View>
             {showPicker2 && (
               <DateTimePicker
                 mode="time"
@@ -187,8 +187,6 @@ export default function AreaScreen() {
               </Pressable>
             )}
           </View>
-          }
-
         <View style={{ margin: 10 }}>
           <Text style={[styles.title, { marginRight: "60%" }]}>
             Cykliczność:

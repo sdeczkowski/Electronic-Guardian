@@ -3,9 +3,9 @@ import {
   View,
   Text,
   FlatList,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
-  Dimensions, 
+  Dimensions,
   Button,
   ActivityIndicator,
   Alert
@@ -14,47 +14,76 @@ import Modal from "react-native-modal";
 import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { MultipleSelectList } from 'react-native-dropdown-select-list'
+import { MultipleSelectList } from "react-native-dropdown-select-list";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  Circle,
+  Polygon,
+} from "react-native-maps";
+import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
-import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
-
 import * as Location from "expo-location";
-
+import moment from "moment";
 
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
   const Notifications = ({ navigation }) => {
+    const [data, setData] = useState([]);
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
           display: "none",
         },
       });
+      NotiSetup();
+      if(data != []){
+        sendSeen();
+      }
       return () =>
         navigation.getParent()?.setOptions({
           tabBarStyle: styles.tab,
         });
-    }, [navigation]);
+    }, []);
+    
+    const NotiSetup = async () => {
+      try {
+        const id = await AsyncStorage.getItem("_id");
+        const url = "http://10.0.2.2:3001/api/noti/get/" + id;
+        axios.get(url).then((response) => {
+          if(response && response.data){
+            setData(response.data.notifications);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
 
-    const data = [
-      {
-        id: 1,
-        title: "Anna Nowak",
-        notification_title: "tutuł powiadomienia",
-        opis: "opis",
-        time_ago: "2 godziny temu",
-      },
-      {
-        id: 2,
-        title: "Jan Kowalski",
-        notification_title: "tytuł powiadomiena",
-        opis: "opis",
-        time_ago: "1 godzina temu",
-      },
-    ];
+    const deleteNoti = async() => {
+      const email = await AsyncStorage.getItem("email");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/delete";
+        axios.post(url, { email: email });
+        setData(null);
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
+
+    const sendSeen = async () => {
+      const email = await AsyncStorage.getItem("email");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/seen";
+        axios.post(url, { email: email });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
 
     const renderItem = ({ item }) => (
       <View
@@ -76,14 +105,14 @@ export default function MapScreen() {
                 borderRadius: 5,
               }}></View>
             <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {item.title}
+              {item.firstname+" "+ item.lastname}
             </Text>
           </View>
-          <Text style={{ fontWeight: "bold" }}>{item.notification_title}</Text>
-          <Text style={{ width: "80%" }}>{item.opis}</Text>
+          <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
+          <Text style={{ width: "80%" }}>{item.details}</Text>
         </View>
         <View style={{ alignItems: "center" }}>
-          <Text>{item.time_ago}</Text>
+          <Text>{moment(new Date(item.date)).fromNow()}</Text>
           <View
             style={{
               backgroundColor: "grey",
@@ -108,34 +137,54 @@ export default function MapScreen() {
           </TouchableOpacity>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
-          <FlatList
+          {data ? <FlatList nestedScrollEnabled
             data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+            keyExtractor={(item) => item._id}
+          /> : <></>}
         </View>
-        <View style={{}}>
-          <TouchableOpacity>
+        {data !== null ? <View style={{}}>
+          <TouchableOpacity onPress={() => {deleteNoti()}}>
             <Ionicons1 name="closecircleo" size={30} color="black" />
           </TouchableOpacity>
-        </View>
+        </View> : <></>}
       </View>
     );
   };
 
   const Map = ({ navigation }) => {
     const window = Dimensions.get("window");
-    const screenHeight = window.height;
-    const screenWidth = window.width;
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
-    const data = [
-      {key:'1', value:'Mobiles'},
-      {key:'2', value:'Appliances'},
-      {key:'3', value:'Cameras'}
-    ]
+    const [newNoti, setNewNoti] = useState(false);
+
+    const selectData = [
+      { key: "1", value: "Mobiles" },
+      { key: "2", value: "Appliances" },
+      { key: "3", value: "Cameras" },
+    ];
+
+    const NotiSetup = async () => {
+      try {
+        const id = await AsyncStorage.getItem("_id");
+        const url = "http://10.0.2.2:3001/api/noti/get/" + id;
+        axios.get(url).then((response) => {
+          if(response && response.data){
+            response.data.notifications.map((item) => {
+              if(!item.seen){
+                setNewNoti(true)
+              }
+            })
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
 
     const code = () => {
       const x = Math.floor(Math.random() * 100000) + 1;
@@ -149,8 +198,7 @@ export default function MapScreen() {
       );
     }
     
-    const userLocation = async () => {
-      
+    const LocationSetup = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setErrorMsg("Permission to access location was denied");
@@ -167,24 +215,81 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
-      setLoading(false);
+    };
+
+    const checkForIntersections = (newCoordinate) => {
+      if (coordinates.length < 3) return false;
+
+      for (let i = 0; i < coordinates.length; i++) {
+        const point1 = coordinates[i];
+        const point2 = coordinates[(i + 1) % coordinates.length];
+        const nextPoint = coordinates[(i + 2) % coordinates.length];
+
+        if (
+          linesIntersect(
+            newCoordinate.latitude,
+            newCoordinate.longitude,
+            nextPoint.latitude,
+            nextPoint.longitude,
+            point1.latitude,
+            point1.longitude,
+            point2.latitude,
+            point2.longitude
+          )
+        ) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+      const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+      const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
+      const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
+      const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
+
+      return a * b < 0 && c * d < 0;
+    };
+    const handleMapPress = (event) => {
+      const { coordinate } = event.nativeEvent;
+      const hasIntersections = checkForIntersections(coordinate);
+
+      if (!hasIntersections) {
+        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
+      } else {
+        console.log("Przecięcie! Wyczyszczam obszar.");
+        resetCoordinates();
+      }
+      if (
+        selectedCoordinate &&
+        selectedCoordinate.latitude === coordinate.latitude &&
+        selectedCoordinate.longitude === coordinate.longitude
+      ) {
+        setCoordinates((prevCoordinates) =>
+          prevCoordinates.filter(
+            (coord) =>
+              coord.latitude !== coordinate.latitude ||
+              coord.longitude !== coordinate.longitude
+          )
+        );
+        setSelectedCoordinate(null);
+      } else {
+        setSelectedCoordinate(coordinate);
+      }
+    };
+
+    const resetCoordinates = () => {
+      setCoordinates([]);
     };
 
     useEffect(() => {
-      if(mapRegion != {}){
+      NotiSetup();
+      LocationSetup();
+      if (mapRegion != {}) {
         setLoading(false);
       }
-      userLocation();
     }, []);
-
-    const handleMapPress = (event) => {
-      const { coordinate } = event.nativeEvent;
-      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
-    }
-  
-    const resetCoordinates = () => {
-      setCoordinates([]);
-    }
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -199,64 +304,88 @@ export default function MapScreen() {
         </View>
       );
     } else {
-    return (
-      <View style={{ height: "100%", paddingTop: 25 }}>
-        <MapView
-          style={{
-            ...StyleSheet.absoluteFillObject,
-          }}
-          provider={PROVIDER_GOOGLE}
-          showsMyLocationButton={false}
-          showsCompass={false}
-          showsUserLocation={true}
-          region={mapRegion}
-          onPress={handleMapPress}
-        >
-          {coordinates.map((coordinate, index) => (
-          <Marker key={index} coordinate={coordinate} />
-        ))}
-        {coordinates.length > 2 && (
-        <Polygon
-          strokeColor="blue"
-          fillColor="rgba(109, 147, 253, 0.4)"
-          strokeWidth={2}
-          coordinates={coordinates}
-        />
-        )}
-      </MapView>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}>
-          <View style={styles.leftbar}>
-            <Ionicons name="person-circle-sharp" size={50} color="grey" />
-            <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
-            <TouchableOpacity style={{ margin: 10 }}>
-              <Ionicons name="chevron-down-outline" size={32} color="grey" />
-            </TouchableOpacity>
-            
-          </View>
-          <View >
-          <Button title="Resetuj obszar" onPress={resetCoordinates} />
-          </View>
-          <View style={{ height: 65 }}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: "white",
-                  height: 65,
-                  width: 65,
-                  borderRadius: 50,
-                },
-              ]}
-              onPress={() => {
-                setLoading(true);
-                navigation.navigate("Notifications");}}>
-              <Ionicons name="notifications-outline" size={32} color="grey" />
-            </TouchableOpacity>
+      return (
+        <View style={{ height: "100%", paddingTop: 25 }}>
+          <MapView
+            style={{
+              ...StyleSheet.absoluteFillObject,
+            }}
+            provider={PROVIDER_GOOGLE}
+            showsMyLocationButton={false}
+            showsCompass={false}
+            showsUserLocation={true}
+            initialRegion={{
+              latitude: 51.2376267,
+              longitude: 22.5713683,
+              latitudeDelta: 0.0522,
+              longitudeDelta: 0.0421,
+            }}
+            region={mapRegion}
+            //onRegionChange={mapRegion}
+            onPress={handleMapPress}>
+            {coordinates.map((coordinate, index) => (
+              <Marker
+                key={index}
+                coordinate={coordinate}
+                onPress={() => {
+                  if (
+                    selectedCoordinate &&
+                    selectedCoordinate.latitude === coordinate.latitude &&
+                    selectedCoordinate.longitude === coordinate.longitude
+                  ) {
+                    setCoordinates((prevCoordinates) =>
+                      prevCoordinates.filter(
+                        (coord) =>
+                          coord.latitude !== coordinate.latitude ||
+                          coord.longitude !== coordinate.longitude
+                      )
+                    );
+                    setSelectedCoordinate(null);
+                  }
+                }}
+              />
+            ))}
+            {coordinates.length > 2 && (
+              <Polygon
+                strokeColor="blue"
+                fillColor="rgba(109, 147, 253, 0.4)"
+                strokeWidth={2}
+                coordinates={coordinates}
+              />
+            )}
+          </MapView>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}>
+            <View style={styles.leftbar}>
+              <Ionicons name="person-circle-sharp" size={50} color="grey" />
+              <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
+              <TouchableOpacity style={{ margin: 10 }}>
+                <Ionicons name="chevron-down-outline" size={32} color="grey" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 65 }}>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: "white",
+                    height: 65,
+                    width: 65,
+                    borderRadius: 50,
+                  },
+                ]}
+                onPress={() => {
+                  setLoading(true);
+                  navigation.navigate("Notifications");
+                }}>
+                <Ionicons name="notifications-outline" size={32} color="grey" />
+              <View style={newNoti ? styles.dot: ""}></View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
         <View style={{ paddingBottom: 100 }}>
@@ -284,8 +413,7 @@ export default function MapScreen() {
                 </Text>
                 <Text style={[styles.title,{justifyContent:"center", color:"grey", fontSize:15}]}>Przekaż swój kod dla podopiecznego</Text>
                 <Divider />
-                <TouchableOpacity
-                >
+                <TouchableOpacity>
                 <Text style={[styles.title,{justifyContent:"center"}]}>Zamknij</Text>
                 </TouchableOpacity>
                 </View>
@@ -293,11 +421,11 @@ export default function MapScreen() {
               <Ionicons name="qr-code-outline" size={32} color="grey" />
                 
             </TouchableOpacity>
+            <Button title="Resetuj obszar" onPress={resetCoordinates} />
           </View>
         </View>
-      </View>
-    );
-  }
+      );
+    }
   };
 
   return (

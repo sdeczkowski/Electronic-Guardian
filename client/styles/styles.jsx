@@ -103,5 +103,14 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     shadowOffset: { width: 1, height: 3 },
   },
+  dot:{
+    width: 15,
+    height: 15,
+    backgroundColor: "rgb(204, 34, 34)",
+    borderRadius: 50,
+    position: "absolute",
+    right: 49,
+    top: 50
+  }
 });
 export default styles;

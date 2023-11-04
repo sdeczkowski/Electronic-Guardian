@@ -18,8 +18,7 @@ export default function ChatScreen() {
       <View>
         <TouchableOpacity
           style={[styles.box, { alignItems: "center" }]}
-          onPress={{}}
-        >
+          onPress={{}}>
           <Ionicons1 name="user" size={30} color="black" />
           <Text style={{ paddingLeft: 10, fontWeight: "bold", flex: 1 }}>
             {item.title}
@@ -29,8 +28,8 @@ export default function ChatScreen() {
     );
 
     return (
-      <View style={{ alignItems: "center", height: "100%", paddingTop: 25}}>
-        <View style={[styles.index, {justifyContent: "center"}]}>
+      <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
+        <View style={[styles.index, { justifyContent: "center" }]}>
           <Text style={{ textAlign: "center", margin: 5 }}>Osoby</Text>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
@@ -38,8 +37,7 @@ export default function ChatScreen() {
           <FlatList
             data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          ></FlatList>
+            keyExtractor={(item) => item.id.toString()}></FlatList>
         </View>
       </View>
     );
