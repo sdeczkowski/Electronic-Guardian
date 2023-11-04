@@ -19,7 +19,6 @@ import MapView, {
   Circle,
   Polygon,
 } from "react-native-maps";
-import * as Location from "expo-location";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
@@ -128,13 +127,10 @@ export default function MapScreen() {
 
   const Map = ({ navigation }) => {
     const window = Dimensions.get("window");
-    const screenHeight = window.height;
-    const screenWidth = window.width;
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-
     const [loading, setLoading] = useState(true);
     const [notiData, setNotiData] = useState([]);
 
@@ -178,16 +174,13 @@ export default function MapScreen() {
     };
 
     const checkForIntersections = (newCoordinate) => {
-      
       if (coordinates.length < 3) return false;
-  
-      
+
       for (let i = 0; i < coordinates.length; i++) {
         const point1 = coordinates[i];
         const point2 = coordinates[(i + 1) % coordinates.length];
         const nextPoint = coordinates[(i + 2) % coordinates.length];
-  
-        
+
         if (
           linesIntersect(
             newCoordinate.latitude,
@@ -200,44 +193,48 @@ export default function MapScreen() {
             point2.longitude
           )
         ) {
-          return true; 
+          return true;
         }
       }
-  
-      return false; 
+      return false;
     };
-  
-    const linesIntersect = (
-      x1, y1, x2, y2, x3, y3, x4, y4
-    ) => {
+
+    const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
       const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
       const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
       const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
       const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
-  
+
       return a * b < 0 && c * d < 0;
     };
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
       const hasIntersections = checkForIntersections(coordinate);
-  
+
       if (!hasIntersections) {
-        setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
       } else {
         console.log("Przecięcie! Wyczyszczam obszar.");
-        resetCoordinates(); 
+        resetCoordinates();
       }
-      if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
-        selectedCoordinate.longitude === coordinate.longitude) {
-        setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
-          coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-        ));
+      if (
+        selectedCoordinate &&
+        selectedCoordinate.latitude === coordinate.latitude &&
+        selectedCoordinate.longitude === coordinate.longitude
+      ) {
+        setCoordinates((prevCoordinates) =>
+          prevCoordinates.filter(
+            (coord) =>
+              coord.latitude !== coordinate.latitude ||
+              coord.longitude !== coordinate.longitude
+          )
+        );
         setSelectedCoordinate(null);
       } else {
         setSelectedCoordinate(coordinate);
       }
-    }
-  
+    };
+
     const resetCoordinates = () => {
       setCoordinates([]);
     };
@@ -250,7 +247,6 @@ export default function MapScreen() {
       LocationSetup();
     }, []);
 
-
     if (loading) {
       return (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -258,77 +254,64 @@ export default function MapScreen() {
         </View>
       );
     } else {
-    return (
-      <View style={{ height: "100%", paddingTop: 25 }}>
-        <MapView
-          style={{
-            ...StyleSheet.absoluteFillObject,
-          }}
-          provider={PROVIDER_GOOGLE}
-          showsMyLocationButton={false}
-          showsCompass={false}
-          showsUserLocation={true}
-          region={mapRegion}
-          //onRegionChange={mapRegion}
-          onPress={handleMapPress}
-
-        >
-          {coordinates.map((coordinate, index) => (
-          <Marker key={index} coordinate={coordinate} 
-          onPress={() => {
-            if (selectedCoordinate && selectedCoordinate.latitude === coordinate.latitude &&
-              selectedCoordinate.longitude === coordinate.longitude) {
-              setCoordinates(prevCoordinates => prevCoordinates.filter(coord =>
-                coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-              ));
-              setSelectedCoordinate(null);
-            }
-          }}
-          />
-        ))}
-        {coordinates.length > 2 && (
-        <Polygon
-          strokeColor="blue"
-          fillColor="rgba(109, 147, 253, 0.4)"
-          strokeWidth={2}
-          coordinates={coordinates}
-        />
-        )}
-      </MapView>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}>
-          <View style={styles.leftbar}>
-            <Ionicons name="person-circle-sharp" size={50} color="grey" />
-            <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
-            <TouchableOpacity style={{ margin: 10 }}>
-              <Ionicons name="chevron-down-outline" size={32} color="grey" />
-            </TouchableOpacity>
-            
-          </View>
-          <View style={{ height: 65 }}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: "white",
-                  height: 65,
-                  width: 65,
-                  borderRadius: 50,
-                },
-              ]}
-              onPress={() => {
-                setLoading(true);
-                navigation.navigate("Notifications");}}>
-              <Ionicons name="notifications-outline" size={32} color="grey" />
-            </TouchableOpacity>
-          </View>
-          <View style={{ paddingBottom: 200 }}>
-            <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-            <Button title="Resetuj obszar" onPress={resetCoordinates} />
+      return (
+        <View style={{ height: "100%", paddingTop: 25 }}>
+          <MapView
+            style={{
+              ...StyleSheet.absoluteFillObject,
+            }}
+            provider={PROVIDER_GOOGLE}
+            showsMyLocationButton={false}
+            showsCompass={false}
+            showsUserLocation={true}
+            region={mapRegion}
+            //onRegionChange={mapRegion}
+            onPress={handleMapPress}>
+            {coordinates.map((coordinate, index) => (
+              <Marker
+                key={index}
+                coordinate={coordinate}
+                onPress={() => {
+                  if (
+                    selectedCoordinate &&
+                    selectedCoordinate.latitude === coordinate.latitude &&
+                    selectedCoordinate.longitude === coordinate.longitude
+                  ) {
+                    setCoordinates((prevCoordinates) =>
+                      prevCoordinates.filter(
+                        (coord) =>
+                          coord.latitude !== coordinate.latitude ||
+                          coord.longitude !== coordinate.longitude
+                      )
+                    );
+                    setSelectedCoordinate(null);
+                  }
+                }}
+              />
+            ))}
+            {coordinates.length > 2 && (
+              <Polygon
+                strokeColor="blue"
+                fillColor="rgba(109, 147, 253, 0.4)"
+                strokeWidth={2}
+                coordinates={coordinates}
+              />
+            )}
+          </MapView>
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              justifyContent: "space-between",
+            }}>
+            <View style={styles.leftbar}>
+              <Ionicons name="person-circle-sharp" size={50} color="grey" />
+              <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
+              <TouchableOpacity style={{ margin: 10 }}>
+                <Ionicons name="chevron-down-outline" size={32} color="grey" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 65 }}>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -337,11 +320,32 @@ export default function MapScreen() {
                     height: 65,
                     width: 65,
                     borderRadius: 50,
-                    alignSelf: "flex-end",
                   },
-                ]}>
-                <Ionicons name="qr-code-outline" size={32} color="grey" />
+                ]}
+                onPress={() => {
+                  setLoading(true);
+                  navigation.navigate("Notifications");
+                }}>
+                <Ionicons name="notifications-outline" size={32} color="grey" />
               </TouchableOpacity>
+            </View>
+            <View style={{ paddingBottom: 200 }}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                <Button title="Resetuj obszar" onPress={resetCoordinates} />
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                    },
+                  ]}>
+                  <Ionicons name="qr-code-outline" size={32} color="grey" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
