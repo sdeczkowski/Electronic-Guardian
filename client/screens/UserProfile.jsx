@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Pressable
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -249,17 +250,70 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View style={{ alignItems: "center" }}>
-          <TouchableOpacity
+          <Modal 
+            isVisible={isModalVisible}
+            transparent={true}
+            onRequestClose={() => {
+              setModalVisible(!isModalVisible);
+            }}
+          >
+            <View
+              style={[
+                styles.box,
+                { color: "white", height: "50%", flexDirection: "column", alignItem:"center" },
+              ]}>
+              <Text style={[styles.title, { justifyContent: "center" }]}>
+                Dezaktywacja konta użytkownika
+              </Text>
+              <Ionicons3
+                name="alert-triangle"
+                size={130}
+                color="#ff0000"
+                style={{
+                  alignContent: "center",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft:"30%"
+                }}
+              />
+              <Text
+                style={[
+                  styles.title,
+                  { justifyContent: "center", color: "grey", fontSize: 15 },
+                ]}>
+                Czy na pewno chesz dezaktywować swoje konto?
+              </Text>
+                <Divider/>
+              <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
+                <Pressable style={{ margin: 10, width:"60%", alignContent: "space-between", marginLeft:"20%" }}
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}
+                >
+                  <Text>Nie</Text>
+                </Pressable>
+                <Pressable
+                  style={{ margin: 10, alignContent: "space-between", width:"50%", marginLeft:"50" }}
+                  onPress={() => {
+                    LogOut();
+                  }}
+                  >
+                  <Text>Tak</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+          <Pressable
             style={[
               styles.button,
               { backgroundColor: "#ff0000", alignItems: "center" },
             ]}
             //onPress={()=>delete_acc()}
             onPress={() => {
-              toggleModal();
+              setModalVisible(true);
             }}>
             <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
-          </TouchableOpacity>
+          </Pressable>
           <TouchableOpacity
             style={[
               styles.button,
@@ -271,45 +325,6 @@ export default function ProfileScreen() {
             <Text style={{ color: "white" }}>Wyloguj się</Text>
           </TouchableOpacity>
         </View>
-        <Modal isVisible={false}>
-          <View
-            style={[
-              styles.box,
-              { color: "white", height: "50%", flexDirection: "column" },
-            ]}>
-            <Text style={[styles.title, { justifyContent: "center" }]}>
-              Dezaktywacja konta użytkownika
-            </Text>
-
-            <Ionicons3
-              name="alert-triangle"
-              size={130}
-              color="#ff0000"
-              style={{
-                alignContent: "center",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            />
-
-            <Text
-              style={[
-                styles.title,
-                { justifyContent: "center", color: "grey", fontSize: 15 },
-              ]}>
-              Czy na pewno chesz dezaktywować swoje konto?
-            </Text>
-            <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
-              <TouchableOpacity style={{ margin: 10 }}>
-                <Text>Nie</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ margin: 10, alignContent: "space-between" }}>
-                <Text>Tak</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
       </ScrollView>
     );
   };
