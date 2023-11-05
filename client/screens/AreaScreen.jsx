@@ -5,9 +5,17 @@ import {
   FlatList,
   Image,
   TextInput,
+  StyleSheet,
   Pressable,
 } from "react-native";
+import MapView, {
+  Marker,
+  PROVIDER_GOOGLE,
+  Circle,
+  Polygon,
+} from "react-native-maps";
 import Modal from "react-native-modal";
+import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -16,7 +24,7 @@ import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
 import { Picker } from "@react-native-picker/picker";
-
+import MapScreen from "./MapScreen";
 const Stack = createStackNavigator();
 
 export default function AreaScreen() {
@@ -239,7 +247,54 @@ export default function AreaScreen() {
         });
     }, [navigation]);
 
+    const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+      const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+      const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
+      const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
+      const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
+
+      return a * b < 0 && c * d < 0;
+    };
+    const handleMapPress = (event) => {
+      const { coordinate } = event.nativeEvent;
+      const hasIntersections = checkForIntersections(coordinate);
+
+      if (!hasIntersections) {
+        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
+      } else {
+        console.log("Przecięcie! Wyczyszczam obszar.");
+        resetCoordinates();
+      }
+      if (
+        selectedCoordinate &&
+        selectedCoordinate.latitude === coordinate.latitude &&
+        selectedCoordinate.longitude === coordinate.longitude
+      ) {
+        setCoordinates((prevCoordinates) =>
+          prevCoordinates.filter(
+            (coord) =>
+              coord.latitude !== coordinate.latitude ||
+              coord.longitude !== coordinate.longitude
+          )
+        );
+        setSelectedCoordinate(null);
+      } else {
+        setSelectedCoordinate(coordinate);
+      }
+    };
+
+    const resetCoordinates = () => {
+      setCoordinates([]);
+    };
+
+
     const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [mapRegion, setMapRegion] = useState({});
+    const [location, setLocation] = useState();
+    const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
+    const [loading, setLoading] = useState(true);
 
     return (
       <View
@@ -295,7 +350,103 @@ export default function AreaScreen() {
           </Picker>
         </View>
         <View style={{ alignItems: "center", width: "90%" }}>
-          <TouchableOpacity onPress={{}} style={{ width: "90%" }}>
+        <Modal
+                isVisible={isModalVisible}
+                transparent={true}
+                onRequestClose={() => {
+                  setModalVisible(!isModalVisible);
+                }}>
+                <View
+                  style={[
+                    styles.box,
+                    {
+                      color: "white",
+                      height: "90%",
+                      width: "90%",
+                      flexDirection: "column",
+                    },
+                  ]}>
+                    <MapView
+                      style={{
+                        //...StyleSheet.absoluteFillObject,
+                        height:"90%",
+                        width: "90%",
+                        alignItems:"center",
+                        marginLeft:"5%",
+                        borderRadius:"20%"
+
+                      }}
+                      provider={PROVIDER_GOOGLE}
+                      showsMyLocationButton={false}
+                      showsCompass={false}
+                      showsUserLocation={true}
+                      initialRegion={{
+                        latitude: 51.2376267,
+                        longitude: 22.5713683,
+                        latitudeDelta: 0.0522,
+                        longitudeDelta: 0.0421,
+                      }}
+                      region={mapRegion}
+                      //onRegionChange={mapRegion}
+                      onPress={handleMapPress}>
+                      {coordinates.map((coordinate, index) => (
+                        <Marker
+                          key={index}
+                          coordinate={coordinate}
+                          onPress={() => {
+                            if (
+                              selectedCoordinate &&
+                              selectedCoordinate.latitude === coordinate.latitude &&
+                              selectedCoordinate.longitude === coordinate.longitude
+                            ) {
+                              setCoordinates((prevCoordinates) =>
+                                prevCoordinates.filter(
+                                  (coord) =>
+                                    coord.latitude !== coordinate.latitude ||
+                                    coord.longitude !== coordinate.longitude
+                                )
+                              );
+                              setSelectedCoordinate(null);
+                            }
+                          }}
+                        />
+                      ))}
+                      {coordinates.length > 2 && (
+                        <Polygon
+                          strokeColor="blue"
+                          fillColor="rgba(109, 147, 253, 0.4)"
+                          strokeWidth={2}
+                          coordinates={coordinates}
+                        />
+                      )}
+                    </MapView>
+                    <View style={{flexDirection:"row"}}>
+                  <Pressable
+                    style={{ margin: 10, width:"60%", alignContent: "space-between", marginLeft:"10%" }}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    <Text >
+                      Reset
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                  style={{ margin: 10, alignContent: "space-between", width:"45%"}}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    <Text>
+                      Zapisz
+                    </Text>
+                  </Pressable>
+                  </View>
+                </View>
+              </Modal>
+          <TouchableOpacity style={{ width: "90%" }}
+            onPress={() => {
+              setModalVisible(true);
+            }}
+          >
             <Image
               style={{
                 height: 300,
