@@ -166,9 +166,7 @@ export default function MapScreen() {
   };
 
   const Map = ({ navigation }) => {
-    const window = Dimensions.get("window");
     const [mapRegion, setMapRegion] = useState({});
-    const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
@@ -209,7 +207,6 @@ export default function MapScreen() {
       console.log(
         "\nx: " + location.coords.latitude + "\ny: " + location.coords.longitude
       );
-      setLocation(location);
       setMapRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,

@@ -235,6 +235,12 @@ export default function AreaScreen() {
 
   // tworzenie nowego obszaru
   const CreateArea = ({ navigation }) => {
+    const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [mapRegion, setMapRegion] = useState({});
+    const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
+
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -246,6 +252,32 @@ export default function AreaScreen() {
           tabBarStyle: styles.tab,
         });
     }, [navigation]);
+
+    const checkForIntersections = (newCoordinate) => {
+      if (coordinates.length < 3) return false;
+
+      for (let i = 0; i < coordinates.length; i++) {
+        const point1 = coordinates[i];
+        const point2 = coordinates[(i + 1) % coordinates.length];
+        const nextPoint = coordinates[(i + 2) % coordinates.length];
+
+        if (
+          linesIntersect(
+            newCoordinate.latitude,
+            newCoordinate.longitude,
+            nextPoint.latitude,
+            nextPoint.longitude,
+            point1.latitude,
+            point1.longitude,
+            point2.latitude,
+            point2.longitude
+          )
+        ) {
+          return true;
+        }
+      }
+      return false;
+    };
 
     const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
       const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
@@ -286,15 +318,6 @@ export default function AreaScreen() {
     const resetCoordinates = () => {
       setCoordinates([]);
     };
-
-
-    const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [mapRegion, setMapRegion] = useState({});
-    const [location, setLocation] = useState();
-    const [coordinates, setCoordinates] = useState([]);
-    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-    const [loading, setLoading] = useState(true);
 
     return (
       <View
@@ -350,103 +373,112 @@ export default function AreaScreen() {
           </Picker>
         </View>
         <View style={{ alignItems: "center", width: "90%" }}>
-        <Modal
-                isVisible={isModalVisible}
-                transparent={true}
-                onRequestClose={() => {
-                  setModalVisible(!isModalVisible);
-                }}>
-                <View
-                  style={[
-                    styles.box,
-                    {
-                      color: "white",
-                      height: "90%",
-                      width: "90%",
-                      flexDirection: "column",
-                    },
-                  ]}>
-                    <MapView
-                      style={{
-                        //...StyleSheet.absoluteFillObject,
-                        height:"90%",
-                        width: "90%",
-                        alignItems:"center",
-                        marginLeft:"5%",
-                        borderRadius:"20%"
-
-                      }}
-                      provider={PROVIDER_GOOGLE}
-                      showsMyLocationButton={false}
-                      showsCompass={false}
-                      showsUserLocation={true}
-                      initialRegion={{
-                        latitude: 51.2376267,
-                        longitude: 22.5713683,
-                        latitudeDelta: 0.0522,
-                        longitudeDelta: 0.0421,
-                      }}
-                      region={mapRegion}
-                      //onRegionChange={mapRegion}
-                      onPress={handleMapPress}>
-                      {coordinates.map((coordinate, index) => (
-                        <Marker
-                          key={index}
-                          coordinate={coordinate}
-                          onPress={() => {
-                            if (
-                              selectedCoordinate &&
-                              selectedCoordinate.latitude === coordinate.latitude &&
-                              selectedCoordinate.longitude === coordinate.longitude
-                            ) {
-                              setCoordinates((prevCoordinates) =>
-                                prevCoordinates.filter(
-                                  (coord) =>
-                                    coord.latitude !== coordinate.latitude ||
-                                    coord.longitude !== coordinate.longitude
-                                )
-                              );
-                              setSelectedCoordinate(null);
-                            }
-                          }}
-                        />
-                      ))}
-                      {coordinates.length > 2 && (
-                        <Polygon
-                          strokeColor="blue"
-                          fillColor="rgba(109, 147, 253, 0.4)"
-                          strokeWidth={2}
-                          coordinates={coordinates}
-                        />
-                      )}
-                    </MapView>
-                    <View style={{flexDirection:"row"}}>
-                  <Pressable
-                    style={{ margin: 10, width:"60%", alignContent: "space-between", marginLeft:"10%" }}
+          <Modal
+            isVisible={isModalVisible}
+            transparent={true}
+            onRequestClose={() => {
+              setModalVisible(!isModalVisible);
+            }}>
+            <View
+              style={[
+                styles.box,
+                {
+                  color: "white",
+                  height: "90%",
+                  width: "98vh",
+                  flexDirection: "column",
+                  padding: 7,
+                },
+              ]}>
+              <MapView
+                style={{
+                  //...StyleSheet.absoluteFillObject,
+                  height: "90%",
+                  width: "100vh",
+                  alignItems: "center",
+                  overflow: "hidden",
+                }}
+                provider={PROVIDER_GOOGLE}
+                showsMyLocationButton={false}
+                showsCompass={false}
+                showsUserLocation={true}
+                initialRegion={{
+                  latitude: 51.2376267,
+                  longitude: 22.5713683,
+                  latitudeDelta: 0.0522,
+                  longitudeDelta: 0.0421,
+                }}
+                region={mapRegion}
+                //onRegionChange={mapRegion}
+                onPress={handleMapPress}>
+                {coordinates.map((coordinate, index) => (
+                  <Marker
+                    key={index}
+                    coordinate={coordinate}
                     onPress={() => {
-                      setModalVisible(false);
-                    }}>
-                    <Text >
-                      Reset
-                    </Text>
-                  </Pressable>
-                  <Pressable
-                  style={{ margin: 10, alignContent: "space-between", width:"45%"}}
-                    onPress={() => {
-                      setModalVisible(false);
-                    }}>
-                    <Text>
-                      Zapisz
-                    </Text>
-                  </Pressable>
-                  </View>
-                </View>
-              </Modal>
-          <TouchableOpacity style={{ width: "90%" }}
+                      if (
+                        selectedCoordinate &&
+                        selectedCoordinate.latitude === coordinate.latitude &&
+                        selectedCoordinate.longitude === coordinate.longitude
+                      ) {
+                        setCoordinates((prevCoordinates) =>
+                          prevCoordinates.filter(
+                            (coord) =>
+                              coord.latitude !== coordinate.latitude ||
+                              coord.longitude !== coordinate.longitude
+                          )
+                        );
+                        setSelectedCoordinate(null);
+                      }
+                    }}
+                  />
+                ))}
+                {coordinates.length > 2 && (
+                  <Polygon
+                    strokeColor="blue"
+                    fillColor="rgba(109, 147, 253, 0.4)"
+                    strokeWidth={2}
+                    coordinates={coordinates}
+                  />
+                )}
+              </MapView>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Pressable
+                  style={{
+                    margin: 10,
+                  }}
+                  onPress={() => {
+                    resetCoordinates();
+                    setModalVisible(false);
+                  }}>
+                  <Text>Anuluj</Text>
+                </Pressable>
+                <Pressable
+                  style={{
+                    margin: 10,
+                  }}
+                  onPress={() => {
+                    resetCoordinates();
+                  }}>
+                  <Text>Reset</Text>
+                </Pressable>
+                <Pressable
+                  style={{
+                    margin: 10,
+                  }}
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}>
+                  <Text>Zapisz</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+          <TouchableOpacity
+            style={{ width: "90%" }}
             onPress={() => {
               setModalVisible(true);
-            }}
-          >
+            }}>
             <Image
               style={{
                 height: 300,
