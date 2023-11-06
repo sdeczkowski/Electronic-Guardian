@@ -30,6 +30,8 @@ import styles from "../styles/styles";
 import * as Location from "expo-location";
 import moment from "moment";
 
+
+
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
@@ -217,72 +219,66 @@ export default function MapScreen() {
         longitudeDelta: 0.0421,
       });
     };
-
-    const checkForIntersections = (newCoordinate) => {
-      if (coordinates.length < 3) return false;
-
-      for (let i = 0; i < coordinates.length; i++) {
-        const point1 = coordinates[i];
-        const point2 = coordinates[(i + 1) % coordinates.length];
-        const nextPoint = coordinates[(i + 2) % coordinates.length];
-
-        if (
-          linesIntersect(
-            newCoordinate.latitude,
-            newCoordinate.longitude,
-            nextPoint.latitude,
-            nextPoint.longitude,
-            point1.latitude,
-            point1.longitude,
-            point2.latitude,
-            point2.longitude
-          )
-        ) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
-      const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-      const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
-      const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
-      const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
-
-      return a * b < 0 && c * d < 0;
-    };
+  
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
-      const hasIntersections = checkForIntersections(coordinate);
-
-      if (!hasIntersections) {
-        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-      } else {
-        console.log("Przecięcie! Wyczyszczam obszar.");
-        resetCoordinates();
-      }
-      if (
-        selectedCoordinate &&
-        selectedCoordinate.latitude === coordinate.latitude &&
-        selectedCoordinate.longitude === coordinate.longitude
-      ) {
-        setCoordinates((prevCoordinates) =>
-          prevCoordinates.filter(
-            (coord) =>
-              coord.latitude !== coordinate.latitude ||
-              coord.longitude !== coordinate.longitude
-          )
-        );
-        setSelectedCoordinate(null);
-      } else {
-        setSelectedCoordinate(coordinate);
-      }
-    };
-
+      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
+    }
+  
     const resetCoordinates = () => {
       setCoordinates([]);
+    }
+
+    const isPointInPolygon = (point, polygon) => {
+      let oddNodes = false;
+      let j = polygon.length - 1;
+    
+      for (let i = 0; i < polygon.length; i++) {
+        const vertexI = polygon[i];
+        const vertexJ = polygon[j];
+    
+        if (
+          vertexI.longitude < point.longitude &&
+          vertexJ.longitude >= point.longitude ||
+          vertexJ.longitude < point.longitude &&
+          vertexI.longitude >= point.longitude
+        ) {
+          if (
+            vertexI.latitude +
+              ((point.longitude - vertexI.longitude) /
+                (vertexJ.longitude - vertexI.longitude)) *
+                (vertexJ.latitude - vertexI.latitude) <
+            point.latitude
+          ) {
+            oddNodes = !oddNodes;
+          }
+        }
+    
+        j = i;
+      }
+    
+      return oddNodes;
     };
+    const checkIfInsidePolygon = () => {
+      const point = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+    
+      const isInside = isPointInPolygon(point, coordinates);
+    
+      if (isInside) {
+        console.log("Jesteś w obszarze");
+      } else {
+        console.log("Jesteś poza obszarem");
+      }
+    };
+    
+    
+const handleCheckLocation = () => {
+  checkIfInsidePolygon();
+};
+
 
     useEffect(() => {
       NotiSetup();
@@ -309,12 +305,12 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             showsCompass={false}
             showsUserLocation={true}
-            initialRegion={{
+           /* initialRegion={{
               latitude: 51.2376267,
               longitude: 22.5713683,
               latitudeDelta: 0.0522,
               longitudeDelta: 0.0421,
-            }}
+            }}*/
             region={mapRegion}
             //onRegionChange={mapRegion}
             onPress={handleMapPress}>
@@ -361,6 +357,9 @@ export default function MapScreen() {
               <TouchableOpacity style={{ margin: 10 }}>
                 <Ionicons name="chevron-down-outline" size={32} color="grey" />
               </TouchableOpacity>
+              <TouchableOpacity style={{backgroundColor: '#007BFF',padding: 10,borderRadius: 20,}} onPress={handleCheckLocation}>
+        <Text style={styles.buttonText}>Lokalizuj</Text>
+      </TouchableOpacity>
             </View>
             <View style={{ height: 65 }}>
               <TouchableOpacity
