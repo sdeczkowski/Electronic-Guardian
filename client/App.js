@@ -12,7 +12,7 @@ import styles from "./styles/styles";
 
 //importy widoków
 //autoryzacja
-import {Register, Role} from "./screens/Signup";
+import { Register, Role } from "./screens/Signup";
 import LoginScreen from "./screens/Login";
 //aplikacja
 import MapScreen from "./screens/MapScreen";
@@ -75,7 +75,7 @@ const RootNavigation = () => {
   const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
-  
+
   const init = async () => {
     await dispatch(Init());
     setLoading(false);

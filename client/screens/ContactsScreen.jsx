@@ -16,13 +16,9 @@ export default function ChatScreen() {
     ];
     const renderItem = ({ item }) => (
       <View>
-        <TouchableOpacity
-          style={[styles.box, { alignItems: "center" }]}
-          onPress={{}}>
+        <TouchableOpacity style={[styles.box, { alignItems: "center" }]} onPress={{}}>
           <Ionicons1 name="user" size={30} color="black" />
-          <Text style={{ paddingLeft: 10, fontWeight: "bold", flex: 1 }}>
-            {item.title}
-          </Text>
+          <Text style={{ paddingLeft: 10, fontWeight: "bold", flex: 1 }}>{item.title}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -34,10 +30,7 @@ export default function ChatScreen() {
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
           <TextInput placeholder="Search" style={styles.box} />
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}></FlatList>
+          <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()}></FlatList>
         </View>
       </View>
     );

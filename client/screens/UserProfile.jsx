@@ -7,7 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  Pressable
+  Pressable,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -250,17 +250,21 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View style={{ alignItems: "center" }}>
-          <Modal 
+          <Modal
             isVisible={isModalVisible}
             transparent={true}
             onRequestClose={() => {
               setModalVisible(!isModalVisible);
-            }}
-          >
+            }}>
             <View
               style={[
                 styles.box,
-                { color: "white", height: "50%", flexDirection: "column", alignItem:"center" },
+                {
+                  color: "white",
+                  height: "50%",
+                  flexDirection: "column",
+                  alignItem: "center",
+                },
               ]}>
               <Text style={[styles.title, { justifyContent: "center" }]}>
                 Dezaktywacja konta użytkownika
@@ -273,7 +277,7 @@ export default function ProfileScreen() {
                   alignContent: "center",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginLeft:"30%"
+                  marginLeft: "30%",
                 }}
               />
               <Text
@@ -283,21 +287,30 @@ export default function ProfileScreen() {
                 ]}>
                 Czy na pewno chesz dezaktywować swoje konto?
               </Text>
-                <Divider/>
+              <Divider />
               <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
-                <Pressable style={{ margin: 10, width:"60%", alignContent: "space-between", marginLeft:"20%" }}
+                <Pressable
+                  style={{
+                    margin: 10,
+                    width: "60%",
+                    alignContent: "space-between",
+                    marginLeft: "20%",
+                  }}
                   onPress={() => {
                     setModalVisible(false);
-                  }}
-                >
+                  }}>
                   <Text>Nie</Text>
                 </Pressable>
                 <Pressable
-                  style={{ margin: 10, alignContent: "space-between", width:"50%", marginLeft:"50" }}
+                  style={{
+                    margin: 10,
+                    alignContent: "space-between",
+                    width: "50%",
+                    marginLeft: "50",
+                  }}
                   onPress={() => {
                     LogOut();
-                  }}
-                  >
+                  }}>
                   <Text>Tak</Text>
                 </Pressable>
               </View>

@@ -1,19 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-  TextInput,
-  StyleSheet,
-  Pressable,
-} from "react-native";
-import MapView, {
-  Marker,
-  PROVIDER_GOOGLE,
-  Circle,
-  Polygon,
-} from "react-native-maps";
+import { View, Text, FlatList, Image, TextInput, StyleSheet, Pressable } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import Modal from "react-native-modal";
 import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -79,13 +66,7 @@ export default function AreaScreen() {
       setDate(currentDate);
       const tempDate = new Date(currentDate);
       toggleDatePicker();
-      setDateArea(
-        tempDate.getDate() +
-          "." +
-          (tempDate.getMonth() + 1) +
-          "." +
-          tempDate.getFullYear()
-      );
+      setDateArea(tempDate.getDate() + "." + (tempDate.getMonth() + 1) + "." + tempDate.getFullYear());
     };
 
     const onChange2 = ({ type }, selectedTime, nr) => {
@@ -118,12 +99,7 @@ export default function AreaScreen() {
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity>
-            <AntDesignIcon
-              name="arrowleft"
-              size={20}
-              color="black"
-              onPress={() => navigation.goBack()}
-            />
+            <AntDesignIcon name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Tworzenie obszaru</Text>
           <TouchableOpacity>
@@ -131,18 +107,9 @@ export default function AreaScreen() {
           </TouchableOpacity>
         </View>
         <View>
-          {showPicker && (
-            <DateTimePicker
-              mode="date"
-              display="spinner"
-              value={date}
-              onChange={onChange1}
-            />
-          )}
+          {showPicker && <DateTimePicker mode="date" display="spinner" value={date} onChange={onChange1} />}
           {!showPicker && (
-            <Pressable
-              style={[styles.box, { width: "90%" }]}
-              onPress={toggleDatePicker}>
+            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleDatePicker}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
                 onPress={toggleDatePicker}
@@ -155,18 +122,9 @@ export default function AreaScreen() {
         </View>
 
         <View>
-          {showPicker2 && (
-            <DateTimePicker
-              mode="time"
-              display="spinner"
-              value={time}
-              onChange={onChange2}
-            />
-          )}
+          {showPicker2 && <DateTimePicker mode="time" display="spinner" value={time} onChange={onChange2} />}
           {!showPicker2 && (
-            <Pressable
-              style={[styles.box, { width: "90%" }]}
-              onPress={toggleTimePicker}>
+            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleTimePicker}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
                 onPress={toggleTimePicker}
@@ -179,18 +137,9 @@ export default function AreaScreen() {
         </View>
 
         <View>
-          {showPicker2 && (
-            <DateTimePicker
-              mode="time"
-              display="spinner"
-              value={time2}
-              onChange={onChange3}
-            />
-          )}
+          {showPicker2 && <DateTimePicker mode="time" display="spinner" value={time2} onChange={onChange3} />}
           {!showPicker2 && (
-            <Pressable
-              style={[styles.box, { width: "90%" }]}
-              onPress={toggleTimePicker}>
+            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleTimePicker}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
                 onPress={toggleTimePicker}
@@ -202,9 +151,7 @@ export default function AreaScreen() {
           )}
         </View>
         <View style={{ margin: 10 }}>
-          <Text style={[styles.title, { marginRight: "60%" }]}>
-            Cykliczność:
-          </Text>
+          <Text style={[styles.title, { marginRight: "60%" }]}>Cykliczność:</Text>
           {opcje.map((opcja) => (
             <TouchableOpacity
               key={opcja.id}
@@ -224,9 +171,7 @@ export default function AreaScreen() {
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("AreaSelect")}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaSelect")}>
           <Text style={{ color: "white" }}>Zapisz</Text>
         </TouchableOpacity>
       </View>
@@ -242,7 +187,7 @@ export default function AreaScreen() {
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
-    
+
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -306,9 +251,7 @@ export default function AreaScreen() {
       ) {
         setCoordinates((prevCoordinates) =>
           prevCoordinates.filter(
-            (coord) =>
-              coord.latitude !== coordinate.latitude ||
-              coord.longitude !== coordinate.longitude
+            (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
           )
         );
         setSelectedCoordinate(null);
@@ -331,23 +274,14 @@ export default function AreaScreen() {
         }}>
         <View style={styles.index}>
           <TouchableOpacity>
-            <AntDesignIcon
-              name="arrowleft"
-              size={20}
-              color="black"
-              onPress={() => navigation.goBack()}
-            />
+            <AntDesignIcon name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Tworzenie obszaru</Text>
           <TouchableOpacity style={{ margin: 5 }}>
             <AntDesignIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
-        <View
-          style={[
-            styles.box,
-            { alignItems: "center", width: "90%", height: "8%" },
-          ]}>
+        <View style={[styles.box, { alignItems: "center", width: "90%", height: "8%" }]}>
           <TextInput
             style={{
               paddingLeft: 15,
@@ -366,9 +300,7 @@ export default function AreaScreen() {
               borderRadius: 20,
             }}
             selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedValue(itemValue)
-            }>
+            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
             <Picker.Item label="Podopieczny/grupa" value="Podopieczny/grupa" />
             <Picker.Item label="Anna Nowak" value="Anna Nowak" />
             <Picker.Item label="Jan Kowalski" value="Jan Kowalski" />
@@ -426,8 +358,7 @@ export default function AreaScreen() {
                         setCoordinates((prevCoordinates) =>
                           prevCoordinates.filter(
                             (coord) =>
-                              coord.latitude !== coordinate.latitude ||
-                              coord.longitude !== coordinate.longitude
+                              coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
                           )
                         );
                         setSelectedCoordinate(null);
@@ -444,7 +375,11 @@ export default function AreaScreen() {
                   />
                 )}
               </MapView>
-              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}>
                 <Pressable
                   style={{
                     margin: 10,
@@ -494,9 +429,7 @@ export default function AreaScreen() {
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("AreaTime")}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaTime")}>
             <Text style={{ color: "white" }}>Dalej</Text>
           </TouchableOpacity>
         </View>
@@ -523,8 +456,7 @@ export default function AreaScreen() {
           margin: 10,
           paddingTop: 25,
         }}>
-        <View
-          style={{ flexDirection: "column", justifyContent: "space-between" }}>
+        <View style={{ flexDirection: "column", justifyContent: "space-between" }}>
           <Text
             style={{
               flex: 1,
@@ -537,10 +469,7 @@ export default function AreaScreen() {
           <EviliconsIcon name="user" size={50} color="black" style={{}} />
         </View>
         <View style={{ width: "60%", height: "60%" }}>
-          <Image
-            style={{ width: 175, height: 150, borderRadius: 5 }}
-            source={require("../assets/map.jpg")}
-          />
+          <Image style={{ width: 175, height: 150, borderRadius: 5 }} source={require("../assets/map.jpg")} />
         </View>
       </View>
     );
@@ -559,11 +488,7 @@ export default function AreaScreen() {
           </TouchableOpacity>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-          />
+          <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
         </View>
       </View>
     );
