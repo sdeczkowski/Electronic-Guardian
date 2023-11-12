@@ -17,20 +17,13 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MultipleSelectList } from "react-native-dropdown-select-list";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import MapView, {
-  Marker,
-  PROVIDER_GOOGLE,
-  Circle,
-  Polygon,
-} from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
 import moment from "moment";
-
-
 
 const Stack = createStackNavigator();
 
@@ -107,9 +100,7 @@ export default function MapScreen() {
                 height: 25,
                 borderRadius: 5,
               }}></View>
-            <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>
-              {item.firstname + " " + item.lastname}
-            </Text>
+            <Text style={{ paddingLeft: 10, fontWeight: "bold" }}>{item.firstname + " " + item.lastname}</Text>
           </View>
           <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
           <Text style={{ width: "80%" }}>{item.details}</Text>
@@ -141,12 +132,7 @@ export default function MapScreen() {
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
           {data ? (
-            <FlatList
-              nestedScrollEnabled
-              data={data}
-              renderItem={renderItem}
-              keyExtractor={(item) => item._id}
-            />
+            <FlatList nestedScrollEnabled data={data} renderItem={renderItem} keyExtractor={(item) => item._id} />
           ) : (
             <></>
           )}
@@ -206,9 +192,7 @@ export default function MapScreen() {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      console.log(
-        "\nx: " + location.coords.latitude + "\ny: " + location.coords.longitude
-      );
+      console.log("\nx: " + location.coords.latitude + "\ny: " + location.coords.longitude);
       setMapRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -216,44 +200,41 @@ export default function MapScreen() {
         longitudeDelta: 0.0421,
       });
     };
-  
+
     const handleMapPress = (event) => {
       const { coordinate } = event.nativeEvent;
-      setCoordinates(prevCoordinates => [...prevCoordinates, coordinate]);
-    }
-  
+      setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
+    };
+
     const resetCoordinates = () => {
       setCoordinates([]);
-    }
+    };
 
     const isPointInPolygon = (point, polygon) => {
       let oddNodes = false;
       let j = polygon.length - 1;
-    
+
       for (let i = 0; i < polygon.length; i++) {
         const vertexI = polygon[i];
         const vertexJ = polygon[j];
-    
+
         if (
-          vertexI.longitude < point.longitude &&
-          vertexJ.longitude >= point.longitude ||
-          vertexJ.longitude < point.longitude &&
-          vertexI.longitude >= point.longitude
+          (vertexI.longitude < point.longitude && vertexJ.longitude >= point.longitude) ||
+          (vertexJ.longitude < point.longitude && vertexI.longitude >= point.longitude)
         ) {
           if (
             vertexI.latitude +
-              ((point.longitude - vertexI.longitude) /
-                (vertexJ.longitude - vertexI.longitude)) *
+              ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
                 (vertexJ.latitude - vertexI.latitude) <
             point.latitude
           ) {
             oddNodes = !oddNodes;
           }
         }
-    
+
         j = i;
       }
-    
+
       return oddNodes;
     };
     const checkIfInsidePolygon = () => {
@@ -261,21 +242,19 @@ export default function MapScreen() {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-    
+
       const isInside = isPointInPolygon(point, coordinates);
-    
+
       if (isInside) {
         console.log("Jesteś w obszarze");
       } else {
         console.log("Jesteś poza obszarem");
       }
     };
-    
-    
-const handleCheckLocation = () => {
-  checkIfInsidePolygon();
-};
 
+    const handleCheckLocation = () => {
+      checkIfInsidePolygon();
+    };
 
     useEffect(() => {
       NotiSetup();
@@ -302,7 +281,7 @@ const handleCheckLocation = () => {
             showsMyLocationButton={false}
             showsCompass={false}
             showsUserLocation={true}
-           /* initialRegion={{
+            /* initialRegion={{
               latitude: 51.2376267,
               longitude: 22.5713683,
               latitudeDelta: 0.0522,
@@ -323,9 +302,7 @@ const handleCheckLocation = () => {
                   ) {
                     setCoordinates((prevCoordinates) =>
                       prevCoordinates.filter(
-                        (coord) =>
-                          coord.latitude !== coordinate.latitude ||
-                          coord.longitude !== coordinate.longitude
+                        (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
                       )
                     );
                     setSelectedCoordinate(null);
@@ -354,9 +331,15 @@ const handleCheckLocation = () => {
               <TouchableOpacity style={{ margin: 10 }}>
                 <Ionicons name="chevron-down-outline" size={32} color="grey" />
               </TouchableOpacity>
-              <TouchableOpacity style={{backgroundColor: '#007BFF',padding: 10,borderRadius: 20,}} onPress={handleCheckLocation}>
-        <Text style={styles.buttonText}>Lokalizuj</Text>
-      </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#007BFF",
+                  padding: 10,
+                  borderRadius: 20,
+                }}
+                onPress={handleCheckLocation}>
+                <Text style={styles.buttonText}>Lokalizuj</Text>
+              </TouchableOpacity>
             </View>
             <View style={{ height: 65 }}>
               <TouchableOpacity
@@ -380,7 +363,7 @@ const handleCheckLocation = () => {
           </View>
           <View style={{ paddingBottom: 100 }}>
             <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-            <Modal
+              <Modal
                 isVisible={isModalVisible}
                 transparent={true}
                 onRequestClose={() => {
@@ -395,14 +378,8 @@ const handleCheckLocation = () => {
                       flexDirection: "column",
                     },
                   ]}>
-                  <Text style={[styles.title, { justifyContent: "center" }]}>
-                    Kod podopiecznego
-                  </Text>
-                  <Text
-                    style={[
-                      styles.title,
-                      { justifyContent: "center", fontSize: 80 },
-                    ]}>
+                  <Text style={[styles.title, { justifyContent: "center" }]}>Kod podopiecznego</Text>
+                  <Text style={[styles.title, { justifyContent: "center", fontSize: 80 }]}>
                     {Math.floor(Math.random() * 100000) + 1}
                   </Text>
                   <Text
@@ -421,9 +398,7 @@ const handleCheckLocation = () => {
                     onPress={() => {
                       setModalVisible(false);
                     }}>
-                    <Text style={[styles.title, { justifyContent: "center" }]}>
-                      Zamknij
-                    </Text>
+                    <Text style={[styles.title, { justifyContent: "center" }]}>Zamknij</Text>
                   </Pressable>
                 </View>
               </Modal>

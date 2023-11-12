@@ -20,12 +20,12 @@ const validateArea = (data) => {
 
 router.get("/get/:opid/:podid/:name", async (req, res) => {
   try {
-    console.log(req.params.opid)
-    console.log(req.params.podid)
+    console.log(req.params.opid);
+    console.log(req.params.podid);
     const area = await AreaDetails.findOne({
       _opid: req.params.opid,
       _podid: req.params.podid,
-      name: req.params.name
+      name: req.params.name,
     });
     if (area) {
       res.status(201).send(area);
@@ -40,10 +40,7 @@ router.get("/get/:opid/:podid/:name", async (req, res) => {
 
 router.get("/getall/:_id", async (req, res) => {
   try {
-    const area = await AreaDetails.find(
-      { _opid: req.params._id },
-      { _podid: 1, name: 1 }
-    );
+    const area = await AreaDetails.find({ _opid: req.params._id }, { _podid: 1, name: 1 });
     if (area) {
       res.status(201).send(area);
     } else {
@@ -58,7 +55,8 @@ router.get("/getall/:_id", async (req, res) => {
 router.post("/delete", async (req, res) => {
   try {
     await AreaDetails.findOneAndDelete({
-      _opid: req.body._opid, _podid: req.body._podid 
+      _opid: req.body._opid,
+      _podid: req.body._podid,
     });
     res.status(201).send({ message: "Area deleted successfully " });
   } catch (error) {
@@ -70,8 +68,7 @@ router.post("/delete", async (req, res) => {
 router.post("/add", async (req, res) => {
   try {
     const { error } = validateArea(req.body);
-    if (error)
-      return res.status(400).send({ message: error.details[0].message });
+    if (error) return res.status(400).send({ message: error.details[0].message });
     const { firstname, lastname } = await User.findOne({
       _id: req.body._podid,
     }).select({ firstname: 1, lastname: 1 });

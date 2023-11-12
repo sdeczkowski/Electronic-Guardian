@@ -38,11 +38,7 @@ const login = ({ navigation }) => {
 
         dispatch(Login(res.data));
       } catch (error) {
-        if (
-          error.response &&
-          error.response.status >= 400 &&
-          error.response.status <= 500
-        ) {
+        if (error.response && error.response.status >= 400 && error.response.status <= 500) {
           if (error.response.status == 401) {
             if (error.response.data.message == "Błędny email") {
               setErrEmail(true);
@@ -59,28 +55,17 @@ const login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Image
-        style={[styles.img, { width: 200, height: 200 }]}
-        source={require("../assets/uni.png")}
-      />
+      <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
       <Text style={{ color: "red" }}>{check}</Text>
       <TextInput
-        style={[
-          styles.textinput,
-          errEmail
-            ? { borderColor: "red", borderWidth: 1 }
-            : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errEmail ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         placeholder="Email"
         placeholderTextColor="rgb(145, 145, 145)"
         label="email"
         value={email}
         onChangeText={(text) => setEmail(text)}></TextInput>
       <TextInput
-        style={[
-          styles.textinput,
-          errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         secureTextEntry={true}
         placeholder="Hasło"
         placeholderTextColor="rgb(145, 145, 145)"

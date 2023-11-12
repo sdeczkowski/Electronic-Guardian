@@ -7,10 +7,7 @@ import axios from "axios";
 const Role = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Image
-        style={[styles.img, { width: 200, height: 200 }]}
-        source={require("../assets/uni.png")}
-      />
+      <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
       <Text>Wybierz role</Text>
       <TouchableOpacity
         style={styles.button}
@@ -86,16 +83,9 @@ const Register = ({ route, navigation }) => {
         });
         navigation.navigate("Login");
       } catch (error) {
-        if (
-          error.response &&
-          error.response.status >= 400 &&
-          error.response.status <= 500
-        ) {
+        if (error.response && error.response.status >= 400 && error.response.status <= 500) {
           if (error.response.status == 409) {
-            if (
-              error.response.data.message ==
-              "Konto z podanym emailem już istnieje"
-            ) {
+            if (error.response.data.message == "Konto z podanym emailem już istnieje") {
               setErrEmail(true);
             } else {
               setErrPass(true);
@@ -115,52 +105,31 @@ const Register = ({ route, navigation }) => {
         justifyContent: "center",
         paddingTop: 25,
       }}>
-      <Image
-        style={[styles.img, { width: 200, height: 200 }]}
-        source={require("../assets/uni.png")}
-      />
+      <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
       <Text style={{ color: "red" }}>{check}</Text>
       <TextInput
-        style={[
-          styles.textinput,
-          errFname
-            ? { borderColor: "red", borderWidth: 1 }
-            : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errFname ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         label="firstname"
         placeholder="Imię"
         placeholderTextColor="rgb(145, 145, 145)"
         value={firstname}
         onChangeText={(text) => setFirst(text)}></TextInput>
       <TextInput
-        style={[
-          styles.textinput,
-          errLname
-            ? { borderColor: "red", borderWidth: 1 }
-            : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errLname ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         label="lastname"
         placeholder="Nazwisko"
         placeholderTextColor="rgb(145, 145, 145)"
         value={lastname}
         onChangeText={(text) => setLast(text)}></TextInput>
       <TextInput
-        style={[
-          styles.textinput,
-          errEmail
-            ? { borderColor: "red", borderWidth: 1 }
-            : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errEmail ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         label="email"
         placeholder="E-mail"
         placeholderTextColor="rgb(145, 145, 145)"
         value={email}
         onChangeText={(text) => setEmail(text)}></TextInput>
       <TextInput
-        style={[
-          styles.textinput,
-          errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         label="password"
         placeholder="Hasło"
         placeholderTextColor="rgb(145, 145, 145)"
@@ -168,12 +137,7 @@ const Register = ({ route, navigation }) => {
         onChangeText={(text) => setPassword(text)}
         secureTextEntry={true}></TextInput>
       <TextInput
-        style={[
-          styles.textinput,
-          errRPass
-            ? { borderColor: "red", borderWidth: 1 }
-            : { borderWidth: 0 },
-        ]}
+        style={[styles.textinput, errRPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         placeholder="Powtórz hasło"
         placeholderTextColor="rgb(145, 145, 145)"
         value={passwordrepeat}

@@ -46,7 +46,7 @@ router.post("/delete", async (req, res) => {
       email: req.body.email,
     });
     if (notifications) {
-      await Notifications.findOneAndUpdate({ email: req.body.email}, { $set: {notifications: []}})
+      await Notifications.findOneAndUpdate({ email: req.body.email }, { $set: { notifications: [] } });
       res.status(201).send({ message: "Notifications deleted successfully 😬" });
     } else {
       res.status(404).send({ message: "Not found" });
@@ -65,7 +65,11 @@ router.post("/seen", async (req, res) => {
       email: req.body.email,
     });
     if (notifications) {
-      await Notifications.findOneAndUpdate({ email: req.body.email}, { $set: {"notifications.$[].seen": true}}, { "multi": true })
+      await Notifications.findOneAndUpdate(
+        { email: req.body.email },
+        { $set: { "notifications.$[].seen": true } },
+        { multi: true }
+      );
       res.status(201).send({ message: "Notifications marked as seen" });
       console.log("Baza: Powiadomienia oznaczone jako przeczytane 👀");
     } else {
@@ -83,21 +87,23 @@ router.post("/add", async (req, res) => {
     if (error) return res.status(400).send({ message: error.details[0].message });
     const notification = await Notifications.findOne({ email: req.body.email });
     if (notification) {
-      const {firstname, lastname} = await User.findOne({ email: req.body.podemail }).select({"firstname": 1, "lastname": 1})
-      if (firstname === undefined || lastname === undefined) return res.status(404).send({ message: "Not found podemail data" });
+      const { firstname, lastname } = await User.findOne({
+        email: req.body.podemail,
+      }).select({ firstname: 1, lastname: 1 });
+      if (firstname === undefined || lastname === undefined)
+        return res.status(404).send({ message: "Not found podemail data" });
       await Notifications.updateOne(
         { email: req.body.email },
         {
           $push: {
-            notifications: 
-            {
+            notifications: {
               title: req.body.title,
               podemail: req.body.podemail,
               firstname: firstname,
               lastname: lastname,
               details: req.body.details,
               date: req.body.date,
-              seen: false
+              seen: false,
             },
           },
         }
@@ -105,8 +111,11 @@ router.post("/add", async (req, res) => {
       res.status(201).send({ message: "Notification added successfully" });
       console.log("Baza: Dodano powiadomienie do dokumentu 💫");
     } else {
-      const {firstname, lastname} = await User.findOne({ email: req.body.podemail }).select({"firstname": 1, "lastname": 1})
-      if (firstname === undefined || lastname === undefined) return res.status(404).send({ message: "Not found podemail data"  });
+      const { firstname, lastname } = await User.findOne({
+        email: req.body.podemail,
+      }).select({ firstname: 1, lastname: 1 });
+      if (firstname === undefined || lastname === undefined)
+        return res.status(404).send({ message: "Not found podemail data" });
       await new Notifications({
         email: req.body.email,
         user_id: req.body._id,
@@ -118,7 +127,7 @@ router.post("/add", async (req, res) => {
             lastname: lastname,
             details: req.body.details,
             date: req.body.date,
-            seen: false
+            seen: false,
           },
         ],
       }).save();
