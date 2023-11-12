@@ -235,6 +235,14 @@ export default function AreaScreen() {
 
   // tworzenie nowego obszaru
   const CreateArea = ({ navigation }) => {
+    const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [mapRegion, setMapRegion] = useState({});
+    const [location, setLocation] = useState();
+    const [coordinates, setCoordinates] = useState([]);
+    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
+    const [loading, setLoading] = useState(true);
+    
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -286,15 +294,6 @@ export default function AreaScreen() {
     const resetCoordinates = () => {
       setCoordinates([]);
     };
-
-
-    const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
-    const [isModalVisible, setModalVisible] = useState(false);
-    const [mapRegion, setMapRegion] = useState({});
-    const [location, setLocation] = useState();
-    const [coordinates, setCoordinates] = useState([]);
-    const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-    const [loading, setLoading] = useState(true);
 
     return (
       <View

@@ -5,25 +5,27 @@ const Joi = require("joi");
 
 const validateArea = (data) => {
   const schema = Joi.object({
-    _id: Joi.string().required(),
+    _opid: Joi.string().required(),
     _podid: Joi.string().required(),
     email: Joi.string().email().required(),
-    podemail: Joi.string().email().required(),
     name: Joi.string().required(),
     cords: Joi.array(),
     date: Joi.string().required(),
+    repeat: Joi.string().required(),
     time_f: Joi.string().required(),
     time_t: Joi.string().required(),
-    repeat: Joi.string().required(),
   });
   return schema.validate(data);
 };
 
-router.get("/get/:_id", async (req, res) => {
+router.get("/get/:opid/:podid/:name", async (req, res) => {
   try {
+    console.log(req.params.opid)
+    console.log(req.params.podid)
     const area = await AreaDetails.findOne({
-      _opid: req.params._id,
-      _podid: req.params._podid,
+      _opid: req.params.opid,
+      _podid: req.params.podid,
+      name: req.params.name
     });
     if (area) {
       res.status(201).send(area);
@@ -71,7 +73,7 @@ router.post("/add", async (req, res) => {
     if (error)
       return res.status(400).send({ message: error.details[0].message });
     const { firstname, lastname } = await User.findOne({
-      email: req.body.podemail,
+      _id: req.body._podid,
     }).select({ firstname: 1, lastname: 1 });
     if (firstname === undefined || lastname === undefined)
       return res.status(404).send({ message: "Not found podemail data" });
@@ -84,8 +86,8 @@ router.post("/add", async (req, res) => {
       date: req.body.date,
       cords: req.body.cords,
       repeat: req.body.repeat,
-      time_from: req.body.time_from,
-      time_to: req.body.time_to,
+      time_from: req.body.time_f,
+      time_to: req.body.time_t,
     }).save();
     res.status(201).send({ message: "Area created successfully" });
     console.log("Baza: Dodano Obszar 🗺️");
