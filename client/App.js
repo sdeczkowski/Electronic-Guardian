@@ -31,7 +31,17 @@ const Stack = createSharedElementStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
-  const type = AsyncStorage.getItem("type");
+  const [type, setType] = useState("");
+
+  const SetType = async() => {
+    const type = await AsyncStorage.getItem("type");
+    setType(type);
+  }
+
+  useEffect(() => {
+    SetType();
+  }, []);
+
   return (
     <Tab.Navigator
       initialRouteName={MapName}
@@ -55,7 +65,7 @@ const AppNavigator = () => {
         tabBarStyle: styles.tab,
       })}>
       <Tab.Screen name={ChatName} component={ChatScreen} />
-      {(type==="op") ? (<Tab.Screen name={LocationName} component={AreaScreen} key={{type:"op"}}/>) : (<></>)}
+      {(type==="op") ? (<Tab.Screen name={LocationName} component={AreaScreen}/>) : (<></>)}
       <Tab.Screen name={MapName} component={MapScreen} />
       <Tab.Screen name={ProfileName} component={ProfileScreen} />
     </Tab.Navigator>

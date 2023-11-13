@@ -165,7 +165,7 @@ export default function MapScreen() {
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
-    const type = AsyncStorage.getItem("type");
+    const [type, setType] = useState("");
 
     const selectData = [
       { key: "1", value: "Mobiles" },
@@ -258,11 +258,17 @@ export default function MapScreen() {
       }
     };
 
+    const SetType = async() => {
+      const type = await AsyncStorage.getItem("type");
+      setType(type);
+    }
+
     const handleCheckLocation = () => {
       checkIfInsidePolygon();
     };
 
     useEffect(() => {
+      SetType();
       NotiSetup();
       LocationSetup();
       if (mapRegion != {}) {
@@ -347,7 +353,7 @@ export default function MapScreen() {
                 <Text style={styles.buttonText}>Lokalizuj</Text>
               </TouchableOpacity>
             </View>):(
-              <></>
+              <View key={{type:"pod"}}></View>
             )
             }
             {(type==="op") ? (<View style={{ height: 65 }} key={{type:"op"}}>
@@ -368,10 +374,10 @@ export default function MapScreen() {
                 <Ionicons name="notifications-outline" size={32} color="grey" />
                 <View style={newNoti ? styles.dot : ""}></View>
               </TouchableOpacity>
-            </View>) : (<></>)
+            </View>) : (<View key={{type:"pod"}}/>)
             }
           </View>
-          {(type==="op") ? (<View style={{ paddingBottom: 100 }} key={{type:"op"}}>
+          {(type==="op") ? (<View style={{ paddingBottom: 100 }} key={{type:"op"}} type={{type:"op"}}>
             <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
               <Modal
                 isVisible={isModalVisible}
