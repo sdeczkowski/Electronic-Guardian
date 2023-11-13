@@ -55,36 +55,46 @@ export default function ChatScreen() {
     useEffect(() => {
       setMessages([
         {
+          _id: 1,
+        text: 'Hello developer',
           user: {
-            _id: 1,
+            _id: 2,
           },
         },
       ])
     }, [])
   
     const onSend = useCallback((messages = []) => {
+      
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, messages),
       )
     }, [])
+
+    const renderMessageItem = ({ item }) => {
+      return (
+        <View style={{ display: 'none' }}>
+          {}
+          <Text>{item.text}</Text>
+          <Text style={{ color: 'gray', fontSize: 12 }}>{item.user._id === 1 ? 'You' : 'Other User'}</Text>
+        </View>
+      );
+    };
   
     return (
-      <View>
-        <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
-        <View style={[styles.index, { justifyContent: "center" }]}>
-          <Text style={{ textAlign: "center", margin: 5 }}>Osoby</Text>
-        </View>
-        </View>
-        <GiftedChat
-          //style={{width:"100%"}}
-          messages={messages}
-          onSend={messages => onSend(messages)}
-          user={{
-            _id: 1,
-            _id: 2,
-          }}
-        />
-      </View>
+      <>
+      <FlatList
+        data={messages}
+        renderItem={renderMessageItem}
+        keyExtractor={(item) => item._id}
+      />
+      <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{ _id: 1 }} // Bieżący użytkownik
+      />
+    </>
+      
     )
   };
   return (
