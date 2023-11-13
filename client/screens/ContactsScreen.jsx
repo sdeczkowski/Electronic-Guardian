@@ -53,6 +53,12 @@ export default function ChatScreen() {
     }, [navigation]);
 
     useEffect(() => {
+      const storedMessages = localStorage.getItem('chatMessages');
+    
+    if (storedMessages) {
+      // Jeśli są, wczytaj je
+      setMessages(JSON.parse(storedMessages));
+    }
       setMessages([
         {
           user: {
@@ -66,25 +72,26 @@ export default function ChatScreen() {
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, messages),
       )
-    }, [])
-  
+    }, [])    
+
     return (
-      <View>
-        <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
-        <View style={[styles.index, { justifyContent: "center" }]}>
-          <Text style={{ textAlign: "center", margin: 5 }}>Osoby</Text>
-        </View>
+        <View style={{flex:1}}>
+        <View style={[styles.index, { justifyContent: "center", paddingTop:25 }]}>
+        <TouchableOpacity>
+            <Ionicons name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
+          </TouchableOpacity>
+          <Text style={{ textAlign: "center", margin: 5 }}>Osoba</Text>
         </View>
         <GiftedChat
-          //style={{width:"100%"}}
           messages={messages}
           onSend={messages => onSend(messages)}
+          alwaysShowSend={true}
           user={{
             _id: 1,
-            _id: 2,
           }}
-        />
-      </View>
+        >
+        </GiftedChat>
+        </View>
     )
   };
   return (

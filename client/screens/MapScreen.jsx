@@ -17,6 +17,7 @@ import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { SelectList } from "react-native-dropdown-select-list";
+import { Picker } from "@react-native-picker/picker";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -172,17 +173,8 @@ export default function MapScreen() {
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [type, setType] = useState("");
-    const [selected, setSelected] = useState("");
+    const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
   
-  const data = [
-      {key:'1', value:'Mobiles'},
-      {key:'2', value:'Appliances'},
-      {key:'3', value:'Cameras'},
-      {key:'4', value:'Computers'},
-      {key:'5', value:'Vegetables'},
-      {key:'6', value:'Diary Products'},
-      {key:'7', value:'Drinks'},
-  ]
     const selectData = [
       { key: "1", value: "Mobiles" },
       { key: "2", value: "Appliances" },
@@ -355,22 +347,30 @@ export default function MapScreen() {
               justifyContent: "space-between",
             }}>
             {(type === "op") ? (
-            <View style={{width:"40vh", marginLeft:0, paddingLeft:0, flex:0, position:"absolute"}}>           
-                <SelectList 
-                  style={{marginLeft:0, paddingLeft:0}}
-                  setSelected={(val) => setSelected(val)} 
-                  data={data} 
-                  save="value"
-                  dropdownStyles={{backgroundColor:"white"}}
-                  boxStyles={{borderColor:"white", borderRadius: 20, backgroundColor:"white"}}
-                  placeholder="Nazwa użytkownika"
-                  >
-                </SelectList>
+            <View >           
+                <View View style={[styles.box,{width:"80%",height:"12.5%",backgroundColor: "white",paddingBottom:60}]}>
+                  <Picker
+                    style={{
+                      backgroundColor: "white",
+                      height: "12.5%",
+                      width: "95%",
+                      borderRadius: 20,
+                      marginLeft:5,
+                    }}
+                    selectedValue={selectedValue}
+                    onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
+                    <Picker.Item label="Podopieczny 1" value="Podopieczny 1" />
+                    <Picker.Item label="Podopieczny 2" value="Podopieczny 2" />
+                    <Picker.Item label="Podopieczny 3" value="Podopieczny 3" />
+                  </Picker>
+                </View>
               <TouchableOpacity
                 style={{
                   backgroundColor: "#007BFF",
                   padding: 10,
                   borderRadius: 20,
+                  width:"80%",
+                  marginLeft:10,
                 }}
                 onPress={handleCheckLocation}>
                 <Text style={styles.buttonText}>Lokalizuj</Text>
