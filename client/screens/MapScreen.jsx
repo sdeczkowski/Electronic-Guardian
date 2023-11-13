@@ -12,11 +12,11 @@ import {
   Pressable,
 } from "react-native";
 import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { SelectList } from "react-native-dropdown-select-list";
+import { MultipleSelectList } from "react-native-dropdown-select-list";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -125,16 +125,6 @@ export default function MapScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
-          {data ? (
-            /*<FlatList nestedScrollEnabled data={data} renderItem={renderItem} keyExtractor={(item) => item._id} />*/
-            <SelectList
-            setSelected={(val) => setSelected(val)} 
-            data={data} 
-            save="value"
-            />
-          ) : (
-            <></>
-          )}
           <Text style={{ textAlign: "center" }}>Powiadomienia</Text>
           <TouchableOpacity style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
@@ -163,26 +153,15 @@ export default function MapScreen() {
     );
   };
 
-  const Map = ({navigation }) => {
+  const Map = ({ navigation }) => {
     const [mapRegion, setMapRegion] = useState({});
+    const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
-    const [location,setLocation] = useState();
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
-    const [type, setType] = useState("");
-    const [selected, setSelected] = useState("");
-  
-  const data = [
-      {key:'1', value:'Mobiles'},
-      {key:'2', value:'Appliances'},
-      {key:'3', value:'Cameras'},
-      {key:'4', value:'Computers'},
-      {key:'5', value:'Vegetables'},
-      {key:'6', value:'Diary Products'},
-      {key:'7', value:'Drinks'},
-  ]
+
     const selectData = [
       { key: "1", value: "Mobiles" },
       { key: "2", value: "Appliances" },
@@ -214,7 +193,7 @@ export default function MapScreen() {
         return;
       }
       let location = await Location.getCurrentPositionAsync({});
-      console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
+      console.log("\nx: " + location.coords.latitude + "\ny: " + location.coords.longitude);
       setLocation(location);
       setMapRegion({
         latitude: location.coords.latitude,
@@ -275,17 +254,11 @@ export default function MapScreen() {
       }
     };
 
-    const SetType = async() => {
-      const type = await AsyncStorage.getItem("type");
-      setType(type);
-    }
-
     const handleCheckLocation = () => {
       checkIfInsidePolygon();
     };
 
     useEffect(() => {
-      SetType();
       NotiSetup();
       LocationSetup();
       if (mapRegion != {}) {
@@ -354,18 +327,12 @@ export default function MapScreen() {
               flexDirection: "row",
               justifyContent: "space-between",
             }}>
-            {(type === "op") ? (
-            <View style={{width:"40vh", marginLeft:0, paddingLeft:0, flex:0, position:"absolute"}}>           
-                <SelectList 
-                  style={{marginLeft:0, paddingLeft:0}}
-                  setSelected={(val) => setSelected(val)} 
-                  data={data} 
-                  save="value"
-                  dropdownStyles={{backgroundColor:"white"}}
-                  boxStyles={{borderColor:"white", borderRadius: 20, backgroundColor:"white"}}
-                  placeholder="Nazwa użytkownika"
-                  >
-                </SelectList>
+            <View style={styles.leftbar}>
+              <Ionicons name="person-circle-sharp" size={50} color="grey" />
+              <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
+              <TouchableOpacity style={{ margin: 10 }}>
+                <Ionicons name="chevron-down-outline" size={32} color="grey" />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={{
                   backgroundColor: "#007BFF",
@@ -375,11 +342,8 @@ export default function MapScreen() {
                 onPress={handleCheckLocation}>
                 <Text style={styles.buttonText}>Lokalizuj</Text>
               </TouchableOpacity>
-            </View>):(
-              <View key={{type:"pod"}}></View>
-            )
-            }
-            {(type==="op") ? (<View style={{ height: 65 }} key={{type:"op"}}>
+            </View>
+            <View style={{ height: 65 }}>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -397,10 +361,9 @@ export default function MapScreen() {
                 <Ionicons name="notifications-outline" size={32} color="grey" />
                 <View style={newNoti ? styles.dot : ""}></View>
               </TouchableOpacity>
-            </View>) : (<View key={{type:"pod"}}/>)
-            }
+            </View>
           </View>
-          {(type==="op") ? (<View style={{ paddingBottom: 100 }} key={{type:"op"}} type={{type:"op"}}>
+          <View style={{ paddingBottom: 100 }}>
             <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
               <Modal
                 isVisible={isModalVisible}
@@ -459,27 +422,8 @@ export default function MapScreen() {
                 <Ionicons name="qr-code-outline" size={32} color="grey" />
               </Pressable>
               <Button title="Resetuj obszar" onPress={resetCoordinates} />
-            </View> 
-          </View>) : (
-              <View style={{ paddingBottom: 100 }} key={{type:"pod"}}>
-              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                <Pressable
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: "white",
-                      height: 65,
-                      width: 65,
-                      borderRadius: 50,
-                      alignSelf: "flex-end",
-                    },
-                  ]}
-                 >
-                  <Ionicons name="alert" size={32} color="grey" />
-                </Pressable>
-              </View> 
             </View>
-          )}
+          </View>
         </View>
       );
     }
