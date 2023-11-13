@@ -65,6 +65,7 @@ export default function ChatScreen() {
     }, [])
   
     const onSend = useCallback((messages = []) => {
+
       
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, messages),
@@ -82,7 +83,13 @@ export default function ChatScreen() {
     };
   
     return (
-      <>
+      <View style={{flex:1}}>
+        <View style={[styles.index, { justifyContent: "center", paddingTop:25 }]}>
+        <TouchableOpacity>
+            <Ionicons name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
+          </TouchableOpacity>
+          <Text style={{ textAlign: "center", margin: 5 }}>Osoba</Text>
+        </View>
       <FlatList
         data={messages}
         renderItem={renderMessageItem}
@@ -93,8 +100,7 @@ export default function ChatScreen() {
         onSend={messages => onSend(messages)}
         user={{ _id: 1 }} // Bieżący użytkownik
       />
-    </>
-      
+    </View>
     )
   };
   return (
