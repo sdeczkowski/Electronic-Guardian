@@ -510,12 +510,7 @@ export default function AreaScreen() {
       height: '100%',
        }}>
         <View>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>
-          Data: 23.11.2023
-        </Text>
-        <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'white' }}>
-          Czas: 14:30
-        </Text>
+        
         </View>
         <MapView
           style={{ ...StyleSheet.absoluteFillObject, borderRadius:20,height:'60%',width:'90%' ,flex:1,}}
