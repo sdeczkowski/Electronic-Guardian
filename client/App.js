@@ -4,6 +4,7 @@ import { createSharedElementStackNavigator } from "react-navigation-shared-eleme
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { View, ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { store } from "./store";
@@ -30,6 +31,17 @@ const Stack = createSharedElementStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
+  const [type, setType] = useState("");
+
+  const SetType = async() => {
+    const type = await AsyncStorage.getItem("type");
+    setType(type);
+  }
+
+  useEffect(() => {
+    SetType();
+  }, []);
+
   return (
     <Tab.Navigator
       initialRouteName={MapName}
@@ -53,7 +65,7 @@ const AppNavigator = () => {
         tabBarStyle: styles.tab,
       })}>
       <Tab.Screen name={ChatName} component={ChatScreen} />
-      <Tab.Screen name={LocationName} component={AreaScreen} />
+      {(type==="op") ? (<Tab.Screen name={LocationName} component={AreaScreen}/>) : (<></>)}
       <Tab.Screen name={MapName} component={MapScreen} />
       <Tab.Screen name={ProfileName} component={ProfileScreen} />
     </Tab.Navigator>

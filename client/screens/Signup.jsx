@@ -19,7 +19,7 @@ const Role = ({ navigation }) => {
       <TouchableOpacity
         style={styles.button}
         onPress={async () => {
-          dispatch(Type(2));
+          //dispatch(Type(2));
           navigation.navigate("Register", { type: "pod" });
         }}>
         <Text style={{ color: "white" }}>Podopieczny</Text>
