@@ -53,45 +53,54 @@ export default function ChatScreen() {
     }, [navigation]);
 
     useEffect(() => {
-      const storedMessages = localStorage.getItem('chatMessages');
-    
-    if (storedMessages) {
-      // Jeśli są, wczytaj je
-      setMessages(JSON.parse(storedMessages));
-    }
       setMessages([
         {
+          _id: 1,
+        text: 'Hello developer',
           user: {
-            _id: 1,
+            _id: 2,
           },
         },
       ])
     }, [])
   
     const onSend = useCallback((messages = []) => {
+
+      
       setMessages(previousMessages =>
         GiftedChat.append(previousMessages, messages),
       )
-    }, [])    
+    }, [])
 
+    const renderMessageItem = ({ item }) => {
+      return (
+        <View style={{ display: 'none' }}>
+          {}
+          <Text>{item.text}</Text>
+          <Text style={{ color: 'gray', fontSize: 12 }}>{item.user._id === 1 ? 'You' : 'Other User'}</Text>
+        </View>
+      );
+    };
+  
     return (
-        <View style={{flex:1}}>
+      <View style={{flex:1}}>
         <View style={[styles.index, { justifyContent: "center", paddingTop:25 }]}>
         <TouchableOpacity>
             <Ionicons name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
           </TouchableOpacity>
           <Text style={{ textAlign: "center", margin: 5 }}>Osoba</Text>
         </View>
-        <GiftedChat
-          messages={messages}
-          onSend={messages => onSend(messages)}
-          alwaysShowSend={true}
-          user={{
-            _id: 1,
-          }}
-        >
-        </GiftedChat>
-        </View>
+      <FlatList
+        data={messages}
+        renderItem={renderMessageItem}
+        keyExtractor={(item) => item._id}
+      />
+      <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{ _id: 1 }} // Bieżący użytkownik
+      />
+    </View>
     )
   };
   return (

@@ -166,6 +166,7 @@ export default function MapScreen() {
 
   const Map = ({navigation }) => {
     const [mapRegion, setMapRegion] = useState({});
+    const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [location,setLocation] = useState();
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
