@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const areaData = new mongoose.Schema({
-  cords_x: Number,
-  cords_y: Number,
+  latitude: Number,
+  longitude: Number,
 });
 
 const areaDetails = new mongoose.Schema({

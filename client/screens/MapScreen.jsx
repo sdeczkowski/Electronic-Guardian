@@ -176,6 +176,7 @@ export default function MapScreen() {
     const [type, setType] = useState("");
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
   
+
     const selectData = [
       { key: "1", value: "Mobiles" },
       { key: "2", value: "Appliances" },
@@ -215,6 +216,13 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
+      setLocation(location)
+      AsyncStorage.setItem("location", JSON.stringify({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0522,
+        longitudeDelta: 0.0421,
+      }));
     };
 
     const handleMapPress = (event) => {
