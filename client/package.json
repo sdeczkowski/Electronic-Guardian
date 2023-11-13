@@ -30,6 +30,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.72.5",
     "react-native-dropdown-select-list": "^2.0.5",
+    "react-native-gifted-chat": "^2.4.0",
     "react-native-maps": "^1.8.0",
     "react-native-modal": "^13.0.1",
     "react-native-network-info": "^5.2.1",

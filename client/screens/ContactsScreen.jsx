@@ -17,7 +17,7 @@ export default function ChatScreen() {
     ];
     const renderItem = ({ item }) => (
       <View>
-        <TouchableOpacity style={[styles.box, { alignItems: "center" }]} onPress={{}}>
+        <TouchableOpacity style={[styles.box, { alignItems: "center" }]} onPress={() => navigation.navigate("Chat")}>
           <Ionicons1 name="user" size={30} color="black" />
           <Text style={{ paddingLeft: 10, fontWeight: "bold", flex: 1 }}>{item.title}</Text>
         </TouchableOpacity>
@@ -36,41 +36,40 @@ export default function ChatScreen() {
       </View>
     );
   };
-
+  const Chat = ({navigation}) => {
+    //const router = useRouter();
+    const [messages, setMessages] = useState([])
+    const [savedMsg, saveMsg] = useState([])
+    useEffect(() => {
+      setMessages([
+        {
+          user: {
+            _id: 1,
+          },
+        },
+      ])
+    }, [])
+  
+    const onSend = useCallback((messages = []) => {
+      setMessages(previousMessages =>
+        GiftedChat.append(previousMessages, messages),
+      )
+    }, [])
+  
+    return (
+      <GiftedChat
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+      />
+    )
+  };
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Contacs" component={Contacts} />
+      <Stack.Screen name="Chat" component={Chat} />
     </Stack.Navigator>
   );
-}
-
-const Chat = () => {
-	//const router = useRouter();
-  const [messages, setMessages] = useState([])
-  const [savedMsg, saveMsg] = useState([])
-  useEffect(() => {
-    setMessages([
-      {
-        user: {
-          _id: 1,
-        },
-      },
-    ])
-  }, [])
-
-  const onSend = useCallback((messages = []) => {
-    setMessages(previousMessages =>
-      GiftedChat.append(previousMessages, messages),
-    )
-  }, [])
-
-  return (
-    <GiftedChat
-      messages={messages}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: 1,
-      }}
-    />
-  )
-}
+};
