@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, TextInput, StyleSheet, Pressable } from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
+import { View, Text, FlatList, Image, TextInput, ActivityIndicator, Pressable } from "react-native";
+import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from "react-native-maps";
 import Modal from "react-native-modal";
-import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -11,7 +10,9 @@ import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
 import { Picker } from "@react-native-picker/picker";
-import MapScreen from "./MapScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
+
 const Stack = createStackNavigator();
 
 export default function AreaScreen() {
@@ -182,23 +183,11 @@ export default function AreaScreen() {
   const CreateArea = ({ navigation }) => {
     const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
     const [isModalVisible, setModalVisible] = useState(false);
-    const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      navigation.getParent()?.setOptions({
-        tabBarStyle: {
-          display: "none",
-        },
-      });
-      return () =>
-        navigation.getParent()?.setOptions({
-          tabBarStyle: styles.tab,
-        });
-    }, [navigation]);
+    const [mapRegionComplete, setRegionComplete] = useState([]);
+    const [areaname, setAreaName] = useState();
 
     const checkForIntersections = (newCoordinate) => {
       if (coordinates.length < 3) return false;
@@ -264,6 +253,52 @@ export default function AreaScreen() {
       setCoordinates([]);
     };
 
+    const onSubmit = () => {
+      let partData = [];
+      if (mapRegionComplete.length == 0) {
+        partData = [
+          {
+            name: areaname,
+            podname: selectedValue,
+            initRegion: {
+              latitude: location.latitude,
+              longitude: location.longitude,
+              latitudeDelta: location.latitudeDelta,
+              longitudeDelta: location.longitudeDelta,
+            },
+          },
+        ];
+      } else {
+        partData = [
+          {
+            name: areaname,
+            podname: selectedValue,
+            initRegion: mapRegionComplete,
+          },
+        ];
+      }
+      console.log(partData);
+      navigation.navigate("AreaTime");
+    };
+
+    const GetLocation = async () => {
+      const region = await AsyncStorage.getItem("location");
+      setLocation(JSON.parse(region));
+    };
+
+    useEffect(() => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {
+          display: "none",
+        },
+      });
+      GetLocation();
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
+    }, [navigation]);
+
     return (
       <View
         style={{
@@ -289,7 +324,9 @@ export default function AreaScreen() {
               color: "black",
               width: "90%",
             }}
-            placeholder="Nazwa obszaru"></TextInput>
+            placeholder="Nazwa obszaru"
+            value={areaname}
+            onChangeText={(text) => setAreaName(text)}></TextInput>
         </View>
         <View View style={[styles.box, { alignItems: "center", width: "90%" }]}>
           <Picker
@@ -336,14 +373,17 @@ export default function AreaScreen() {
                 showsMyLocationButton={false}
                 showsCompass={false}
                 showsUserLocation={true}
-                initialRegion={{
-                  latitude: 51.2376267,
-                  longitude: 22.5713683,
-                  latitudeDelta: 0.0522,
-                  longitudeDelta: 0.0421,
-                }}
-                region={mapRegion}
+                initialRegion={location}
                 //onRegionChange={mapRegion}
+                onRegionChangeComplete={(region) => {
+                  console.log(region);
+                  setRegionComplete({
+                    latitude: region.latitude,
+                    longitude: region.longitude,
+                    latitudeDelta: region.latitudeDelta,
+                    longitudeDelta: region.longitudeDelta,
+                  });
+                }}
                 onPress={handleMapPress}>
                 {coordinates.map((coordinate, index) => (
                   <Marker
@@ -429,7 +469,11 @@ export default function AreaScreen() {
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaTime")}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              onSubmit();
+            }}>
             <Text style={{ color: "white" }}>Dalej</Text>
           </TouchableOpacity>
         </View>
@@ -441,10 +485,24 @@ export default function AreaScreen() {
 
   // lista obszarów
   const AreaSelect = ({ navigation }) => {
-    const data = [
-      { id: 1, title: "Obszar1" },
-      { id: 2, title: "Obszar2" },
-    ];
+    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState([]);
+
+    const AreaSetup = async () => {
+      try {
+        const id = await AsyncStorage.getItem("_id");
+        const url = "http://10.0.2.2:3001/api/area/getall/" + id;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            setData(response.data);
+            setLoading(false);
+          }
+        });
+      } catch (error) {
+        console.log(error.response);
+      }
+    };
+
     const renderItem = ({ item }) => (
       <View
         style={{
@@ -464,7 +522,7 @@ export default function AreaScreen() {
               fontWeight: "bold",
               marginLeft: 8,
             }}>
-            {item.title}
+            {item.name}
           </Text>
           <EviliconsIcon name="user" size={50} color="black" style={{}} />
         </View>
@@ -474,24 +532,36 @@ export default function AreaScreen() {
       </View>
     );
 
-    return (
-      <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
-        <View style={styles.index}>
-          <View></View>
-          <Text style={{ textAlign: "center" }}> Obszary</Text>
-          <TouchableOpacity
-            style={{ margin: 5 }}
-            onPress={() => {
-              navigation.navigate("CreateArea");
-            }}>
-            <AntDesignIcon name="plus" size={20} color="black" />
-          </TouchableOpacity>
+    useEffect(() => {
+      AreaSetup();
+    }, []);
+
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
         </View>
-        <View style={{ width: "90%", height: "87%", margin: 5 }}>
-          <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
+      );
+    } else {
+      return (
+        <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
+          <View style={styles.index}>
+            <View></View>
+            <Text style={{ textAlign: "center" }}> Obszary</Text>
+            <TouchableOpacity
+              style={{ margin: 5 }}
+              onPress={() => {
+                navigation.navigate("CreateArea");
+              }}>
+              <AntDesignIcon name="plus" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View style={{ width: "90%", height: "87%", margin: 5 }}>
+            <FlatList data={data} renderItem={renderItem} keyExtractor={(item) => item._id.toString()} />
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
   };
 
   return (

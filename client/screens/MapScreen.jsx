@@ -160,6 +160,7 @@ export default function MapScreen() {
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
+    const [location, setLocation] = useState()
 
     const selectData = [
       { key: "1", value: "Mobiles" },
@@ -199,6 +200,13 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
+      setLocation(location)
+      AsyncStorage.setItem("location", JSON.stringify({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.0522,
+        longitudeDelta: 0.0421,
+      }));
     };
 
     const handleMapPress = (event) => {

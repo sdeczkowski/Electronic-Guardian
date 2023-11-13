@@ -57,6 +57,7 @@ router.post("/delete", async (req, res) => {
     await AreaDetails.findOneAndDelete({
       _opid: req.body._opid,
       _podid: req.body._podid,
+      name: req.body.name,
     });
     res.status(201).send({ message: "Area deleted successfully " });
   } catch (error) {
@@ -69,6 +70,8 @@ router.post("/add", async (req, res) => {
   try {
     const { error } = validateArea(req.body);
     if (error) return res.status(400).send({ message: error.details[0].message });
+    const area = await AreaDetails.findOne({ _opid: req.body._opid, _podid: req.body._podid, name: req.body.name, });
+    if (area) return res.status(401).send({ message: "Area already exists" });
     const { firstname, lastname } = await User.findOne({
       _id: req.body._podid,
     }).select({ firstname: 1, lastname: 1 });
