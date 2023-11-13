@@ -37,9 +37,8 @@ export default function ChatScreen() {
     );
   };
   const Chat = ({navigation}) => {
-    //const router = useRouter();
-    const [messages, setMessages] = useState([])
-    const [savedMsg, saveMsg] = useState([])
+    const [messages, setMessages] = useState([]);
+    const [savedMsg, saveMsg] = useState([]);
 
     useEffect(() => {
       navigation.getParent()?.setOptions({
@@ -70,13 +69,22 @@ export default function ChatScreen() {
     }, [])
   
     return (
-      <GiftedChat
-        messages={messages}
-        onSend={messages => onSend(messages)}
-        user={{
-          _id: 1,
-        }}
-      />
+      <View>
+        <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
+        <View style={[styles.index, { justifyContent: "center" }]}>
+          <Text style={{ textAlign: "center", margin: 5 }}>Osoby</Text>
+        </View>
+        </View>
+        <GiftedChat
+          //style={{width:"100%"}}
+          messages={messages}
+          onSend={messages => onSend(messages)}
+          user={{
+            _id: 1,
+            _id: 2,
+          }}
+        />
+      </View>
     )
   };
   return (
