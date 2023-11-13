@@ -12,11 +12,11 @@ import {
   Pressable,
 } from "react-native";
 import Modal from "react-native-modal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { MultipleSelectList } from "react-native-dropdown-select-list";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -125,6 +125,11 @@ export default function MapScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
+          {data ? (
+            <FlatList nestedScrollEnabled data={data} renderItem={renderItem} keyExtractor={(item) => item._id} />
+          ) : (
+            <></>
+          )}
           <Text style={{ textAlign: "center" }}>Powiadomienia</Text>
           <TouchableOpacity style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
@@ -153,13 +158,14 @@ export default function MapScreen() {
     );
   };
 
-  const Map = ({ navigation }) => {
+  const Map = ({navigation }) => {
     const [mapRegion, setMapRegion] = useState({});
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
+    const type = AsyncStorage.getItem("type");
 
     const selectData = [
       { key: "1", value: "Mobiles" },
@@ -325,7 +331,7 @@ export default function MapScreen() {
               flexDirection: "row",
               justifyContent: "space-between",
             }}>
-            <View style={styles.leftbar}>
+            {(type === "op") ? (<View style={styles.leftbar} key={{type:"op"}}>
               <Ionicons name="person-circle-sharp" size={50} color="grey" />
               <Text style={{ margin: 10 }}>Nazwa użytkownika</Text>
               <TouchableOpacity style={{ margin: 10 }}>
@@ -340,8 +346,11 @@ export default function MapScreen() {
                 onPress={handleCheckLocation}>
                 <Text style={styles.buttonText}>Lokalizuj</Text>
               </TouchableOpacity>
-            </View>
-            <View style={{ height: 65 }}>
+            </View>):(
+              <></>
+            )
+            }
+            {(type==="op") ? (<View style={{ height: 65 }} key={{type:"op"}}>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -359,9 +368,10 @@ export default function MapScreen() {
                 <Ionicons name="notifications-outline" size={32} color="grey" />
                 <View style={newNoti ? styles.dot : ""}></View>
               </TouchableOpacity>
-            </View>
+            </View>) : (<></>)
+            }
           </View>
-          <View style={{ paddingBottom: 100 }}>
+          {(type==="op") ? (<View style={{ paddingBottom: 100 }} key={{type:"op"}}>
             <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
               <Modal
                 isVisible={isModalVisible}
@@ -420,8 +430,27 @@ export default function MapScreen() {
                 <Ionicons name="qr-code-outline" size={32} color="grey" />
               </Pressable>
               <Button title="Resetuj obszar" onPress={resetCoordinates} />
+            </View> 
+          </View>) : (
+              <View style={{ paddingBottom: 100 }} key={{type:"pod"}}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                <Pressable
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                    },
+                  ]}
+                 >
+                  <Ionicons name="alert" size={32} color="grey" />
+                </Pressable>
+              </View> 
             </View>
-          </View>
+          )}
         </View>
       );
     }
