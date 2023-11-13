@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TextInput } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
+import { GiftedChat, MessageContainer } from 'react-native-gifted-chat';
 import Ionicons from "react-native-vector-icons/AntDesign";
 import Ionicons1 from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
@@ -41,4 +42,35 @@ export default function ChatScreen() {
       <Stack.Screen name="Contacs" component={Contacts} />
     </Stack.Navigator>
   );
+}
+
+const Chat = () => {
+	//const router = useRouter();
+  const [messages, setMessages] = useState([])
+  const [savedMsg, saveMsg] = useState([])
+  useEffect(() => {
+    setMessages([
+      {
+        user: {
+          _id: 1,
+        },
+      },
+    ])
+  }, [])
+
+  const onSend = useCallback((messages = []) => {
+    setMessages(previousMessages =>
+      GiftedChat.append(previousMessages, messages),
+    )
+  }, [])
+
+  return (
+    <GiftedChat
+      messages={messages}
+      onSend={messages => onSend(messages)}
+      user={{
+        _id: 1,
+      }}
+    />
+  )
 }
