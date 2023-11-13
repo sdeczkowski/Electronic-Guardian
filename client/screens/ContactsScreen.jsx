@@ -40,6 +40,19 @@ export default function ChatScreen() {
     //const router = useRouter();
     const [messages, setMessages] = useState([])
     const [savedMsg, saveMsg] = useState([])
+
+    useEffect(() => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {
+          display: "none",
+        },
+      });
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
+    }, [navigation]);
+
     useEffect(() => {
       setMessages([
         {
