@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
   Pressable,
+  Animated,
 } from "react-native";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -165,7 +166,17 @@ export default function MapScreen() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [type, setType] = useState("");
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const [isVisible, setIsVisible] = useState(true);
 
+    const fade = (toValue, duration) => {
+      setIsVisible(toValue === 1);
+      Animated.timing(fadeAnim, {
+        toValue,
+        duration,
+        useNativeDriver: true,
+      }).start();
+    };
     const NotiSetup = async () => {
       try {
         const id = await AsyncStorage.getItem("_id");
@@ -461,9 +472,16 @@ export default function MapScreen() {
               </View>
             </View>
           ) : (
-            <View style={{ paddingBottom: 100 }}>
-              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                <Pressable
+          <View>
+            {isVisible && (
+            <Animated.View
+              style={[
+                styles.fadingContainer,
+                {
+                  opacity: fadeAnim,
+                },
+              ]}>
+              <Pressable
                   style={[
                     styles.button,
                     {
@@ -474,9 +492,45 @@ export default function MapScreen() {
                       alignSelf: "flex-end",
                     },
                   ]}>
+                  <Ionicons1 name="user" size={32} color="grey" />
+                </Pressable>
+              <Pressable
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                      //marginRight:"30%",
+                    },
+                  ]}>
+                  <Ionicons1 name="fork" size={32} color="grey" />
+                </Pressable>
+            </Animated.View>
+            )}
+            <View style={{ paddingBottom: 100 }}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                <View>
+                <Pressable
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                    },
+                  ]}
+                  onPress={() => fade(isVisible ? 0 : 1, isVisible ? 3000 : 5000)}
+                  >
                   <Ionicons name="alert" size={32} color="grey" />
                 </Pressable>
+                </View>
               </View>
+            </View>
             </View>
           )}
         </View>
