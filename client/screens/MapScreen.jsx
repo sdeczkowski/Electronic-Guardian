@@ -31,21 +31,6 @@ const Stack = createStackNavigator();
 export default function MapScreen() {
   const Notifications = ({ navigation }) => {
     const [data, setData] = useState([]);
-    useEffect(() => {
-      navigation.getParent()?.setOptions({
-        tabBarStyle: {
-          display: "none",
-        },
-      });
-      NotiSetup();
-      if (data != []) {
-        sendSeen();
-      }
-      return () =>
-        navigation.getParent()?.setOptions({
-          tabBarStyle: styles.tab,
-        });
-    }, []);
 
     const NotiSetup = async () => {
       try {
@@ -119,6 +104,22 @@ export default function MapScreen() {
         </View>
       </View>
     );
+    
+    useEffect(() => {
+      NotiSetup();
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {
+          display: "none",
+        },
+      });
+      if (data != []) {
+        sendSeen();
+      }
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
+    }, []);
 
     return (
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
@@ -126,16 +127,6 @@ export default function MapScreen() {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons1 name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
-          {data ? (
-            /*<FlatList nestedScrollEnabled data={data} renderItem={renderItem} keyExtractor={(item) => item._id} />*/
-            <SelectList
-            setSelected={(val) => setSelected(val)} 
-            data={data} 
-            save="value"
-            />
-          ) : (
-            <></>
-          )}
           <Text style={{ textAlign: "center" }}>Powiadomienia</Text>
           <TouchableOpacity style={{ margin: 5 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
@@ -164,24 +155,16 @@ export default function MapScreen() {
     );
   };
 
-  const Map = ({navigation }) => {
+  const Map = ({ navigation }) => {
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
-    const [location,setLocation] = useState();
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [type, setType] = useState("");
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
-  
-
-    const selectData = [
-      { key: "1", value: "Mobiles" },
-      { key: "2", value: "Appliances" },
-      { key: "3", value: "Cameras" },
-    ];
 
     const NotiSetup = async () => {
       try {
@@ -216,13 +199,16 @@ export default function MapScreen() {
         latitudeDelta: 0.0522,
         longitudeDelta: 0.0421,
       });
-      setLocation(location)
-      AsyncStorage.setItem("location", JSON.stringify({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0522,
-        longitudeDelta: 0.0421,
-      }));
+      setLocation(location);
+      AsyncStorage.setItem(
+        "location",
+        JSON.stringify({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0522,
+          longitudeDelta: 0.0421,
+        })
+      );
     };
 
     const handleMapPress = (event) => {
@@ -276,10 +262,10 @@ export default function MapScreen() {
       }
     };
 
-    const SetType = async() => {
+    const SetType = async () => {
       const type = await AsyncStorage.getItem("type");
       setType(type);
-    }
+    };
 
     const handleCheckLocation = () => {
       checkIfInsidePolygon();
@@ -355,16 +341,16 @@ export default function MapScreen() {
               flexDirection: "row",
               justifyContent: "space-between",
             }}>
-            {(type === "op") ? (
-            <View >           
-                <View View style={[styles.box,{width:"80%",height:"12.5%",backgroundColor: "white",paddingBottom:60}]}>
+            {type === "op" ? (
+              <View>
+                <View style={[styles.box, { width: "75%", height: 65, backgroundColor: "white", paddingBottom: 60 }]}>
                   <Picker
                     style={{
                       backgroundColor: "white",
                       height: "12.5%",
                       width: "95%",
                       borderRadius: 20,
-                      marginLeft:5,
+                      marginLeft: 5,
                     }}
                     selectedValue={selectedValue}
                     onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
@@ -373,105 +359,87 @@ export default function MapScreen() {
                     <Picker.Item label="Podopieczny 3" value="Podopieczny 3" />
                   </Picker>
                 </View>
-              <TouchableOpacity
-                style={{
-                  backgroundColor: "#007BFF",
-                  padding: 10,
-                  borderRadius: 20,
-                  width:"80%",
-                  marginLeft:10,
-                }}
-                onPress={handleCheckLocation}>
-                <Text style={styles.buttonText}>Lokalizuj</Text>
-              </TouchableOpacity>
-            </View>):(
-              <View key={{type:"pod"}}></View>
-            )
-            }
-            {(type==="op") ? (<View style={{ height: 65 }} key={{type:"op"}}>
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: "white",
-                    height: 65,
-                    width: 65,
-                    borderRadius: 50,
-                  },
-                ]}
-                onPress={() => {
-                  setLoading(true);
-                  navigation.navigate("Notifications");
-                }}>
-                <Ionicons name="notifications-outline" size={32} color="grey" />
-                <View style={newNoti ? styles.dot : ""}></View>
-              </TouchableOpacity>
-            </View>) : (<View key={{type:"pod"}}/>)
-            }
-          </View>
-          {(type==="op") ? (<View style={{ paddingBottom: 100 }} key={{type:"op"}} type={{type:"op"}}>
-            <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-              <Modal
-                isVisible={isModalVisible}
-                transparent={true}
-                onRequestClose={() => {
-                  setModalVisible(!isModalVisible);
-                }}>
-                <View
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: "#007BFF",
+                    padding: 10,
+                    borderRadius: 20,
+                    width: "80%",
+                    marginLeft: 10,
+                  }}
+                  onPress={handleCheckLocation}>
+                  <Text style={styles.buttonText}>Lokalizuj</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View></View>
+            )}
+            {type === "op" ? (
+              <View style={{ height: 65 }}>
+                <TouchableOpacity
                   style={[
-                    styles.box,
+                    styles.button,
                     {
-                      color: "white",
-                      height: "50%",
-                      flexDirection: "column",
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
                     },
-                  ]}>
-                  <Text style={[styles.title, { justifyContent: "center" }]}>Kod podopiecznego</Text>
-                  <Text style={[styles.title, { justifyContent: "center", fontSize: 80 }]}>
-                    {Math.floor(Math.random() * 100000) + 1}
-                  </Text>
-                  <Text
+                  ]}
+                  onPress={() => {
+                    setLoading(true);
+                    navigation.navigate("Notifications");
+                  }}>
+                  <Ionicons name="notifications-outline" size={32} color="grey" />
+                  <View style={newNoti ? styles.dot : ""}></View>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View/>
+            )}
+          </View>
+          {type === "op" ? (
+            <View style={{ paddingBottom: 100 }}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                <Modal
+                  isVisible={isModalVisible}
+                  transparent={true}
+                  onRequestClose={() => {
+                    setModalVisible(!isModalVisible);
+                  }}>
+                  <View
                     style={[
-                      styles.title,
+                      styles.box,
                       {
-                        justifyContent: "center",
-                        color: "grey",
-                        fontSize: 15,
+                        color: "white",
+                        height: "50%",
+                        flexDirection: "column",
                       },
                     ]}>
-                    Przekaż swój kod dla podopiecznego
-                  </Text>
-                  <Divider />
-                  <Pressable
-                    onPress={() => {
-                      setModalVisible(false);
-                    }}>
-                    <Text style={[styles.title, { justifyContent: "center" }]}>Zamknij</Text>
-                  </Pressable>
-                </View>
-              </Modal>
-              <Pressable
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: "white",
-                    height: 65,
-                    width: 65,
-                    borderRadius: 50,
-                    alignSelf: "flex-end",
-                  },
-                ]}
-                //onPress={()=>code()}
-                onPress={() => {
-                  setModalVisible(true);
-                }}>
-                <Ionicons name="qr-code-outline" size={32} color="grey" />
-              </Pressable>
-              <Button title="Resetuj obszar" onPress={resetCoordinates} />
-            </View> 
-          </View>) : (
-              <View style={{ paddingBottom: 100 }} key={{type:"pod"}}>
-              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                    <Text style={[styles.title, { justifyContent: "center" }]}>Kod podopiecznego</Text>
+                    <Text style={[styles.title, { justifyContent: "center", fontSize: 80 }]}>
+                      {Math.floor(Math.random() * 100000) + 1}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.title,
+                        {
+                          justifyContent: "center",
+                          color: "grey",
+                          fontSize: 15,
+                        },
+                      ]}>
+                      Przekaż swój kod dla podopiecznego
+                    </Text>
+                    <Divider />
+                    <Pressable
+                      onPress={() => {
+                        setModalVisible(false);
+                      }}>
+                      <Text style={[styles.title, { justifyContent: "center" }]}>Zamknij</Text>
+                    </Pressable>
+                  </View>
+                </Modal>
                 <Pressable
                   style={[
                     styles.button,
@@ -483,10 +451,32 @@ export default function MapScreen() {
                       alignSelf: "flex-end",
                     },
                   ]}
-                 >
+                  //onPress={()=>code()}
+                  onPress={() => {
+                    setModalVisible(true);
+                  }}>
+                  <Ionicons name="qr-code-outline" size={32} color="grey" />
+                </Pressable>
+                <Button title="Resetuj obszar" onPress={resetCoordinates} />
+              </View>
+            </View>
+          ) : (
+            <View style={{ paddingBottom: 100 }}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                <Pressable
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                    },
+                  ]}>
                   <Ionicons name="alert" size={32} color="grey" />
                 </Pressable>
-              </View> 
+              </View>
             </View>
           )}
         </View>
