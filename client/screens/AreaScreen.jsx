@@ -12,6 +12,7 @@ import styles from "../styles/styles";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { Button } from "react-native-paper";
 
 const Stack = createStackNavigator();
 
@@ -489,12 +490,13 @@ export default function AreaScreen() {
     ];
 
     return (
-      <View style={{ alignItems: "center", height: "100%" }}>
-        <View></View>
+      <View style={{ alignItems: "center", height: "80%", width: "100%", justifyContent: "flex-end" }}>
+
         <MapView
-          style={{ borderRadius: 20, height: "40%", width: "90%", flex: 1 }}
+          style={{ borderRadius: 20, height: "60%", width: "90%", flex: 1, justifyContent: "flex-end" }}
           provider={PROVIDER_GOOGLE}
           showsMyLocationButton={false}
+          scrollEnabled={false}
           showsCompass={false}
           region={{
             latitude:
@@ -526,6 +528,19 @@ export default function AreaScreen() {
             />
           )}
         </MapView>
+        <View style={{ backgroundColor: "rgb(221, 222, 223)", padding: 10, width: "100%" }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Nazwa Obszaru</Text>
+          <Text>Data: DD/MM/YYYY</Text>
+          <Text>Czas od: HH:mm</Text>
+          <Text>Czas do: HH:mm</Text>
+        </View>
+        <View style={{ alignItems: "center", paddingBottom: 20 }}>
+          <TouchableOpacity onPress={() => navigation.navigate("AreaSelect")}>
+            <View style={{ backgroundColor: 'blue', padding: 10, borderRadius: 5 }}>
+              <Text style={{ color: 'white', fontSize: 16 }}>Powrót</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
