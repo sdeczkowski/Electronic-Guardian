@@ -26,6 +26,7 @@ import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
 import moment from "moment";
+import call from "react-native-phone-call";
 
 const Stack = createStackNavigator();
 
@@ -168,6 +169,7 @@ export default function MapScreen() {
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const [isVisible, setIsVisible] = useState(true);
+    const [phoneNr, setPhoneNr] = useState('101000000');
 
     const fade = (toValue, duration) => {
       setIsVisible(toValue === 1);
@@ -177,6 +179,16 @@ export default function MapScreen() {
         useNativeDriver: true,
       }).start();
     };
+
+    const makeCall = () =>{
+        const args = {
+          number: phoneNr,
+          prompt: false,
+          skipCanOpen: true
+        };
+        call(args).catch(console.error);
+    };
+
     const NotiSetup = async () => {
       try {
         const id = await AsyncStorage.getItem("_id");
@@ -505,7 +517,9 @@ export default function MapScreen() {
                       alignSelf: "flex-end",
                       //marginRight:"30%",
                     },
-                  ]}>
+                  ]}
+                    onPress={makeCall}
+                  >
                   <Ionicons1 name="fork" size={32} color="grey" />
                 </Pressable>
             </Animated.View>

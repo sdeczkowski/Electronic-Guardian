@@ -35,6 +35,7 @@
     "react-native-modal": "^13.0.1",
     "react-native-network-info": "^5.2.1",
     "react-native-paper": "^5.10.6",
+    "react-native-phone-call": "^1.2.0",
     "react-native-svg": "^13.14.0",
     "react-native-svg-transformer": "^1.1.0",
     "react-native-web": "~0.19.6",
