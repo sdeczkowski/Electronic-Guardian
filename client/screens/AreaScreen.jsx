@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, TextInput, ActivityIndicator, Pressable } from "react-native";
+import { View, Text, FlatList, Image, TextInput, ActivityIndicator, StyleSheet, Pressable } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from "react-native-maps";
 import Modal from "react-native-modal";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -14,7 +14,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const Stack = createStackNavigator();
-
 
 export default function AreaScreen() {
   // czas obszaru
@@ -482,7 +481,54 @@ export default function AreaScreen() {
     );
   };
 
-  const AreaDetail = () => {};
+  const AreaDetail = ({ navigation }) => {
+    const coordinates = [
+      { latitude: 51.24433861957029, longitude: 22.558915726840496 },
+      { latitude: 51.24194190277511, longitude: 22.583090141415596 },
+      { latitude: 51.22874754520771, longitude: 22.571560330688953 },
+    ];
+
+    return (
+      <View style={{ alignItems: "center", height: "100%" }}>
+        <View></View>
+        <MapView
+          style={{ borderRadius: 20, height: "40%", width: "90%", flex: 1 }}
+          provider={PROVIDER_GOOGLE}
+          showsMyLocationButton={false}
+          showsCompass={false}
+          region={{
+            latitude:
+              (Math.min(...coordinates.map((coord) => coord.latitude)) +
+                Math.max(...coordinates.map((coord) => coord.latitude))) /
+              2,
+            longitude:
+              (Math.min(...coordinates.map((coord) => coord.longitude)) +
+                Math.max(...coordinates.map((coord) => coord.longitude))) /
+              2,
+            latitudeDelta:
+              Math.max(...coordinates.map((coord) => coord.latitude)) -
+              Math.min(...coordinates.map((coord) => coord.latitude)) +
+              0.01,
+            longitudeDelta:
+              Math.max(...coordinates.map((coord) => coord.longitude)) -
+              Math.min(...coordinates.map((coord) => coord.longitude)) +
+              0.01,
+          }}>
+          {coordinates.map((coordinate, index) => (
+            <Marker key={index} coordinate={coordinate} />
+          ))}
+          {coordinates.length > 2 && (
+            <Polygon
+              strokeColor="blue"
+              fillColor="rgba(109, 147, 253, 0.4)"
+              strokeWidth={2}
+              coordinates={coordinates}
+            />
+          )}
+        </MapView>
+      </View>
+    );
+  };
 
   // lista obszarów
   const AreaSelect = ({ navigation }) => {
@@ -515,8 +561,8 @@ export default function AreaScreen() {
           margin: 10,
           paddingTop: 25,
         }}
-        onPress={()=>{
-          navigation.navigate('AreaDetail')
+        onPress={() => {
+          navigation.navigate("AreaDetail");
         }}>
         <View style={{ flexDirection: "column", justifyContent: "space-between" }}>
           <Text
@@ -568,58 +614,12 @@ export default function AreaScreen() {
     }
   };
 
-  const AreaDetailScreen = () => {
-    const coordinates = [
-      {"latitude": 51.24433861957029, "longitude": 22.558915726840496},
-      {"latitude": 51.24194190277511, "longitude": 22.583090141415596},
-      {"latitude": 51.22874754520771, "longitude": 22.571560330688953}
-    ];
-  
-    return (
-      <View style={{alignItems: 'center',
-      height: '100%',
-       }}>
-        <View>
-        
-        </View>
-        <MapView
-          style={{ ...StyleSheet.absoluteFillObject, borderRadius:20,height:'60%',width:'90%' ,flex:1,}}
-          provider={PROVIDER_GOOGLE}
-          showsMyLocationButton={false}
-          showsCompass={false}
-          
-          region={{
-            latitude: (Math.min(...coordinates.map(coord => coord.latitude)) + Math.max(...coordinates.map(coord => coord.latitude))) / 2,
-            longitude: (Math.min(...coordinates.map(coord => coord.longitude)) + Math.max(...coordinates.map(coord => coord.longitude))) / 2,
-            latitudeDelta: Math.max(...coordinates.map(coord => coord.latitude)) - Math.min(...coordinates.map(coord => coord.latitude)) + 0.01,
-            longitudeDelta: Math.max(...coordinates.map(coord => coord.longitude)) - Math.min(...coordinates.map(coord => coord.longitude)) + 0.01
-          }}
-        >
-          
-          {coordinates.map((coordinate, index) => (
-            <Marker key={index} coordinate={coordinate} />
-          ))}
-          {coordinates.length > 2 && (
-            <Polygon
-              strokeColor="blue"
-              fillColor="rgba(109, 147, 253, 0.4)"
-              strokeWidth={2}
-              coordinates={coordinates}
-            />
-          )}
-        </MapView>
-      </View>
-    );
-  };
-  
-
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AreaSelect" component={AreaSelect} />
       <Stack.Screen name="CreateArea" component={CreateArea} />
       <Stack.Screen name="AreaTime" component={AreaTime} />
-      <Stack.Screen name="AreaDetail" component={AreaDetailScreen} />
-
+      <Stack.Screen name="AreaDetail" component={AreaDetail} />
     </Stack.Navigator>
   );
 }
