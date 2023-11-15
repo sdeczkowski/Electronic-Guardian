@@ -22,7 +22,7 @@ import AreaScreen from "./screens/AreaScreen";
 import ChatScreen from "./screens/ContactsScreen";
 
 //nazwy widoków
-const ChatName = "Chat";
+const ChatName = "ChatScreen";
 const LocationName = "LocationList";
 const MapName = "Map";
 const ProfileName = "Settings";

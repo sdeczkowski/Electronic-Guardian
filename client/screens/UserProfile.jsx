@@ -168,13 +168,14 @@ export default function ProfileScreen() {
       );
     };
     return (
-      <ScrollView style={{ paddingTop: 25}}>
-        <View style={[styles.index]}>
+      <View>
+        <View style={[styles.index, {marginTop: 20}]}>
           <Text>Nazwa uzytkownika</Text>
           <TouchableOpacity style={{ margin: 10 }}>
             <Ionicons1 name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
+        <ScrollView style={{ }}>
         <View>
           <View style={{padding:5}}>
             <TouchableOpacity style={{ alignItems: "center"}} onPress={pickImage}>
@@ -359,8 +360,9 @@ export default function ProfileScreen() {
             <Text style={{ color: "white" }}>Wyloguj się</Text>
           </TouchableOpacity>
         </View>
-        <View style={{height:150}}/>
+        <View style={{height: 150}}/>
       </ScrollView>
+      </View>
     );
   };
 

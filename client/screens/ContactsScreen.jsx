@@ -80,11 +80,12 @@ export default function ChatScreen() {
 
     return (
       <View style={{ flex: 1 }}>
-        <View style={[styles.index, { justifyContent: "center", paddingTop: 30, flexDirection:"row"}]}>
-          <TouchableOpacity style={{marginRight:"42%", alignContent:"flex-end"}}>
+        <View style={[styles.index, { paddingTop: 25 }]}>
+          <TouchableOpacity>
             <Ionicons name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
           </TouchableOpacity>
-          <Text style={{ textAlign: "center", justifyContent:"center", marginRight:"45%"}}>Osoba</Text>
+          <Text style={{ textAlign: "center", margin: 5 }}>Osoba</Text>
+          <View></View>
         </View>
         <FlatList data={messages} renderItem={renderMessageItem} keyExtractor={(item) => item._id} />
         <GiftedChat

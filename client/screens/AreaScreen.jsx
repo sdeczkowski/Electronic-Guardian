@@ -18,19 +18,7 @@ const Stack = createStackNavigator();
 
 export default function AreaScreen() {
   // czas obszaru
-  const AreaTime = ({ navigation }) => {
-    useEffect(() => {
-      navigation.getParent()?.setOptions({
-        tabBarStyle: {
-          display: "none",
-        },
-      });
-      return () =>
-        navigation.getParent()?.setOptions({
-          tabBarStyle: styles.tab,
-        });
-    }, [navigation]);
-
+  const AreaTime = ({ route, navigation }) => {
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const [time2, setTime2] = useState(new Date());
@@ -43,6 +31,19 @@ export default function AreaScreen() {
     const [timeReady, setTimeReady] = useState(Date());
     const [timeArea2, setTimeArea2] = useState("");
     const [timeReady2, setTimeReady2] = useState(Date());
+    let areaData = route.params.data
+    
+    useEffect(() => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: {
+          display: "none",
+        },
+      });
+      return () =>
+        navigation.getParent()?.setOptions({
+          tabBarStyle: styles.tab,
+        });
+    }, [navigation]);
 
     useEffect(() => {
       setDateReady(dateArea);
@@ -96,6 +97,15 @@ export default function AreaScreen() {
     const selectOptions = (optionId) => {
       setOption(optionId);
     };
+
+    const onSubmit = async () => {
+      console.log(areaData.cords)
+      try {
+        
+      } catch (error) {
+        
+      }
+    }
 
     return (
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
@@ -173,7 +183,7 @@ export default function AreaScreen() {
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaSelect")}>
+        <TouchableOpacity style={styles.button} onPress={() => onSubmit()}>
           <Text style={{ color: "white" }}>Zapisz</Text>
         </TouchableOpacity>
       </View>
@@ -189,6 +199,7 @@ export default function AreaScreen() {
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [mapRegionComplete, setRegionComplete] = useState([]);
     const [areaname, setAreaName] = useState();
+    const [pods, setPods] = useState([]);
 
     const checkForIntersections = (newCoordinate) => {
       if (coordinates.length < 3) return false;
@@ -260,13 +271,14 @@ export default function AreaScreen() {
         partData = [
           {
             name: areaname,
-            podname: selectedValue,
+            _podid: selectedValue,
             initRegion: {
               latitude: location.latitude,
               longitude: location.longitude,
               latitudeDelta: location.latitudeDelta,
               longitudeDelta: location.longitudeDelta,
             },
+            cords: coordinates
           },
         ];
       } else {
@@ -275,16 +287,28 @@ export default function AreaScreen() {
             name: areaname,
             podname: selectedValue,
             initRegion: mapRegionComplete,
+            cords: coordinates
           },
         ];
       }
-      console.log(partData);
-      navigation.navigate("AreaTime");
+      console.log(partData)
+      navigation.navigate("AreaTime", { data: partData });
     };
 
-    const GetLocation = async () => {
+    const Setup = async () => {
       const region = await AsyncStorage.getItem("location");
       setLocation(JSON.parse(region));
+      const id = await AsyncStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/user/getpods/" + id;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            setPods(response.data);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
     };
 
     useEffect(() => {
@@ -293,7 +317,7 @@ export default function AreaScreen() {
           display: "none",
         },
       });
-      GetLocation();
+      Setup();
       return () =>
         navigation.getParent()?.setOptions({
           tabBarStyle: styles.tab,
@@ -339,9 +363,7 @@ export default function AreaScreen() {
             }}
             selectedValue={selectedValue}
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
-            <Picker.Item label="Podopieczny/grupa" value="Podopieczny/grupa" />
-            <Picker.Item label="Anna Nowak" value="Anna Nowak" />
-            <Picker.Item label="Jan Kowalski" value="Jan Kowalski" />
+            {pods.map((pod)=>(<Picker.Item key={pod._podid} label={pod.firstname+" "+pod.lastname} value={pod._podid} />))}
           </Picker>
         </View>
         <View style={{ alignItems: "center", width: "90%" }}>
@@ -549,6 +571,7 @@ export default function AreaScreen() {
   const AreaSelect = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
+    const [error, setErr] = useState();
 
     const AreaSetup = async () => {
       try {
@@ -561,7 +584,9 @@ export default function AreaScreen() {
           }
         });
       } catch (error) {
-        console.log(error.response);
+        if (error.response.status == 404) {
+          setErr(error.response.data.message);
+        }
       }
     };
 

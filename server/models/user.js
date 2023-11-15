@@ -1,5 +1,11 @@
 const mongoose = require("mongoose")
 
+const podSchema = new mongoose.Schema({
+  _podid: String,
+  firstname: String,
+  lastname: String,
+})
+
 const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   email: { type: String, required: true },
@@ -7,6 +13,9 @@ const userSchema = new mongoose.Schema({
   lastname: { type: String, required: true },
   isActive: { type: Boolean, required: true },
   type: {type: String, required: true},
+  phoneNumber: {type: String, required: true},
+  opCode: {type: String, required: false},
+  pods: [podSchema]
 })
 const User = mongoose.model("User", userSchema);
 

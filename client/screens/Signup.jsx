@@ -32,6 +32,7 @@ const Register = ({ route, navigation }) => {
   const [firstname, setFirst] = useState("");
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordrepeat, setPasswordRepeat] = useState("");
   const { type } = route.params;
@@ -40,6 +41,7 @@ const Register = ({ route, navigation }) => {
   const [errFname, setErrFname] = useState(false);
   const [errLname, setErrLname] = useState(false);
   const [errEmail, setErrEmail] = useState(false);
+  const [errPhone, setErrPhone] = useState(false);
   const [errPass, setErrPass] = useState(false);
   const [errRPass, setErrRPass] = useState(false);
 
@@ -48,6 +50,7 @@ const Register = ({ route, navigation }) => {
     setErrFname(false);
     setErrLname(false);
     setErrEmail(false);
+    setErrPhone(false);
     setErrPass(false);
     setErrRPass(false);
     const namesRegex = /^[a-z ,.'-]+$/i;
@@ -62,13 +65,16 @@ const Register = ({ route, navigation }) => {
     } else if (!emailRegex.test(email)) {
       setErrEmail(true);
       setCheck("Niepoprawny email!");
+    } else if (phone.length < 9) {
+      setErrPhone(true);
+      setCheck("Niepoprawny numer telefonu!");
     } else if (password == "") {
-      setCheck("Wpisz hasło!");
       setErrPass(true);
+      setCheck("Wpisz hasło!");
     } else if (password != passwordrepeat) {
-      setCheck("Hasła nie są identyczne!");
       setErrPass(true);
       setErrRPass(true);
+      setCheck("Hasła nie są identyczne!");
     } else {
       try {
         console.log(type);
@@ -80,6 +86,7 @@ const Register = ({ route, navigation }) => {
           lastname: lastname,
           isActive: true,
           type: type,
+          phoneNumber: phone
         });
         navigation.navigate("Login");
       } catch (error) {
@@ -128,6 +135,15 @@ const Register = ({ route, navigation }) => {
         placeholderTextColor="rgb(145, 145, 145)"
         value={email}
         onChangeText={(text) => setEmail(text)}></TextInput>
+      <TextInput
+        style={[styles.textinput, errPhone ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+        label="phone"
+        placeholder="123456789"
+        placeholderTextColor="rgb(145, 145, 145)"
+        maxLength={9}
+        keyboardType="numeric"
+        value={phone}
+        onChangeText={(text) => setPhone(text)}></TextInput>
       <TextInput
         style={[styles.textinput, errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
         label="password"

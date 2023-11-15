@@ -18,10 +18,24 @@ const validateArea = (data) => {
   return schema.validate(data);
 };
 
+router.get("/getpods/:opid", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      _opid: req.params.opid
+    });
+    if (user) {
+      res.status(201).send(user.pods);
+    } else {
+      res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
 router.get("/get/:opid/:podid/:name", async (req, res) => {
   try {
-    console.log(req.params.opid);
-    console.log(req.params.podid);
     const area = await AreaDetails.findOne({
       _opid: req.params.opid,
       _podid: req.params.podid,
@@ -40,6 +54,8 @@ router.get("/get/:opid/:podid/:name", async (req, res) => {
 
 router.get("/getall/:_id", async (req, res) => {
   try {
+    const user = await User.findOne({_id: req.params._id})
+    if(user.type == "pod") return res.status(403).send({ message: "Forbidden" })
     const area = await AreaDetails.find({ _opid: req.params._id }, { _podid: 1, name: 1 });
     if (area) {
       res.status(201).send(area);
