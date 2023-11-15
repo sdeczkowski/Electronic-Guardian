@@ -7,11 +7,17 @@ const validateArea = (data) => {
   const schema = Joi.object({
     _opid: Joi.string().required(),
     _podid: Joi.string().required(),
-    email: Joi.string().email().required(),
     name: Joi.string().required(),
-    cords: Joi.array(),
     date: Joi.string().required(),
-    repeat: Joi.string().required(),
+    cords: Joi.array(),
+    initialRegion: Joi.object().keys({
+      latitude: Joi.number(),
+      latitudeDelta: Joi.number(),
+      longitude: Joi.number(),
+      longitudeDelta: Joi.number()
+    }),
+    isActive: Joi.boolean().required(),
+    repeat: Joi.number().required(),
     time_f: Joi.string().required(),
     time_t: Joi.string().required(),
   });
@@ -43,6 +49,77 @@ router.get("/get/:opid/:podid/:name", async (req, res) => {
     });
     if (area) {
       res.status(201).send(area);
+    } else {
+      res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.get("/getpodarealook/:podid", async (req, res) => {
+  try {
+    const area = await AreaDetails.findOne({
+      _podid: req.params.podid,
+      isActive: true,
+    });
+    if (area) {
+      res.status(201).send(area);
+    } else {
+      res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.get("/getpodarea/:opid/:podid", async (req, res) => {
+  try {
+    const area = await AreaDetails.find({
+      _opid: req.params.opid,
+      _podid: req.params.podid,
+    });
+    if (area) {
+      area.map(async(item) => {
+        const date = new Date();
+        const poddate = new Date(item.date);
+        const podTimeFrom = new Date(item.time_from);
+        const podTimeTo = new Date(item.time_to);
+
+        var formattedDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+        var podformDate = poddate.getDate() + "/" + (poddate.getMonth() + 1) + "/" + poddate.getFullYear();
+
+      if(formattedDate == podformDate && podTimeFrom.getTime() < date.getTime() && podTimeTo.getTime() > date.getTime()){
+        await AreaDetails.updateOne(
+          { _opid: item._opid,
+            _podid: item._podid,
+            name: item.name, },
+          {
+            $set: {
+              isActive: true
+            },
+          }
+        );
+      } else {
+        await AreaDetails.updateOne(
+          { _opid: item._opid,
+            _podid: item._podid,
+            name: item.name, },
+          {
+            $set: {
+              isActive: false
+            },
+          }
+        );
+      }
+      })
+      const area2 = await AreaDetails.find({
+        _opid: req.params.opid,
+        _podid: req.params.podid,
+      });
+      res.status(201).send(area2);
     } else {
       res.status(404).send({ message: "Not found" });
     }
@@ -101,9 +178,11 @@ router.post("/add", async (req, res) => {
       name: req.body.name,
       date: req.body.date,
       cords: req.body.cords,
+      initialRegion: req.body.initialRegion,
       repeat: req.body.repeat,
       time_from: req.body.time_f,
       time_to: req.body.time_t,
+      isActive: req.body.isActive,
     }).save();
     res.status(201).send({ message: "Area created successfully" });
     console.log("Baza: Dodano Obszar 🗺️");

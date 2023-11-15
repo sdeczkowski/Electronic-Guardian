@@ -29,14 +29,11 @@ import * as Location from "expo-location";
 import moment from "moment";
 import call from "react-native-phone-call";
 
-
-
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
   const Notifications = ({ navigation }) => {
     const [data, setData] = useState([]);
-
 
     const NotiSetup = async () => {
       try {
@@ -170,19 +167,20 @@ export default function MapScreen() {
     const [newNoti, setNewNoti] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
     const [type, setType] = useState("");
-    const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
+    const [selectedValue, setSelectedValue] = useState("Podopieczny");
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const [isVisible, setIsVisible] = useState(true);
-    const [modalInput, setModalInput] = useState('');
-    const [phoneNr, setPhoneNr] = useState('101000000');
+    const [modalInput, setModalInput] = useState("");
+    const [phoneNr, setPhoneNr] = useState("101000000");
     const [code, setCode] = useState();
     const [pods, setPods] = useState([]);
+    const [podArea, setPodArea] = useState([]);
 
     const Setup = async () => {
       const type = await AsyncStorage.getItem("type");
       setType(type);
       const id = await AsyncStorage.getItem("_id");
-      if(type === "op"){
+      if (type === "op") {
         try {
           const url = "http://10.0.2.2:3001/api/noti/get/" + id;
           axios.get(url).then((response) => {
@@ -192,6 +190,7 @@ export default function MapScreen() {
                   setNewNoti(true);
                 }
               });
+              console.log("powiadomienia - odebrane");
             }
           });
         } catch (error) {
@@ -202,6 +201,7 @@ export default function MapScreen() {
           axios.get(url).then((response) => {
             if (response && response.data) {
               setCode(response.data);
+              console.log("kod - odebrany");
             }
           });
         } catch (error) {
@@ -212,12 +212,97 @@ export default function MapScreen() {
           axios.get(url).then((response) => {
             if (response && response.data) {
               setPods(response.data);
+              console.log("podopieczni - odebrani");
             }
           });
         } catch (error) {
           console.log(error.response.data.message);
         }
-    
+      } else{
+        try {
+          const url = "http://10.0.2.2:3001/api/area/getpodarealook/" + id;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setPodArea(response.data);
+              console.log("podopieczni - odebrani");
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
+      }
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          return;
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
+        setMapRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.0522,
+          longitudeDelta: 0.0421,
+        });
+        setLocation(location);
+        AsyncStorage.setItem(
+          "location",
+          JSON.stringify({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0522,
+            longitudeDelta: 0.0421,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
+    };
+
+    const SendArea = async() => {
+      const id = await AsyncStorage.getItem("_id");
+      let loc = await Location.getCurrentPositionAsync({});
+      try {
+        const url = "http://10.0.2.2:3001/api/user/updateloc";
+        await axios.post(url, {
+          _id: id,
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const isPodinArea = async(_podid, cords) => {
+      try {
+        const url = "http://10.0.2.2:3001/api/user/getpods/" + _podid;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            checkIfInsidePolygon(response.data.latitude, response.data.longitude, cords);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
+    const GetPodArea = async (_podid) => {
+      const id = await AsyncStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/area/getpodarea/" + id + "/" + _podid;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            setPodArea(response.data);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
     const fade = (toValue, duration) => {
       setIsVisible(toValue === 1);
       Animated.timing(fadeAnim, {
@@ -227,21 +312,17 @@ export default function MapScreen() {
       }).start();
     };
 
-    const makeCall = () =>{
-        const args = {
-          number: phoneNr,
-          prompt: false,
-          skipCanOpen: true
-        };
-        call(args).catch(console.error);
-    };
-
-    const openModal = () => {
-      setModalVisible(true);
+    const makeCall = () => {
+      const args = {
+        number: phoneNr,
+        prompt: false,
+        skipCanOpen: true,
+      };
+      call(args).catch(console.error);
     };
 
     const handleModalConfirmation = () => {
-      console.log('Zatwierdzono kod:', modalInput);
+      console.log("Zatwierdzono kod:", modalInput);
       setModalVisible(false);
     };
 
@@ -268,8 +349,8 @@ export default function MapScreen() {
         ) {
           if (
             vertexI.latitude +
-            ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
-            (vertexJ.latitude - vertexI.latitude) <
+              ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
+                (vertexJ.latitude - vertexI.latitude) <
             point.latitude
           ) {
             oddNodes = !oddNodes;
@@ -278,16 +359,16 @@ export default function MapScreen() {
 
         j = i;
       }
-
       return oddNodes;
     };
-    const checkIfInsidePolygon = () => {
+
+    const checkIfInsidePolygon = (platitude, plongitude, cords) => {
       const point = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: platitude,
+        longitude: plongitude,
       };
 
-      const isInside = isPointInPolygon(point, coordinates);
+      const isInside = isPointInPolygon(point, cords);
 
       if (isInside) {
         console.log("Jesteś w obszarze");
@@ -303,6 +384,25 @@ export default function MapScreen() {
     useEffect(() => {
       Setup();
     }, []);
+
+    useEffect(() => {
+      const intId = setInterval(() => {
+        if (type == "op") {
+          if(podArea.length > 0){
+            podArea.map((item) => {
+              if(item.isActive){
+                isPodinArea(item._podid, item.cords);
+              }
+            });
+          }
+        } else {
+          SendArea(location)
+        }
+      }, 10000);
+      return () => {
+        clearInterval(intId);
+      };
+    }, [podArea]);
 
     if (loading) {
       return (
@@ -323,34 +423,37 @@ export default function MapScreen() {
             showsUserLocation={true}
             region={mapRegion}
             onPress={handleMapPress}>
-            {coordinates.map((coordinate, index) => (
-              <Marker
-                key={index}
-                coordinate={coordinate}
-                onPress={() => {
-                  if (
-                    selectedCoordinate &&
-                    selectedCoordinate.latitude === coordinate.latitude &&
-                    selectedCoordinate.longitude === coordinate.longitude
-                  ) {
-                    setCoordinates((prevCoordinates) =>
-                      prevCoordinates.filter(
-                        (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-                      )
-                    );
-                    setSelectedCoordinate(null);
-                  }
-                }}
+            {
+              //coordinates.map((coordinate, index) => (
+              //  <Marker
+              //    key={index}
+              //    coordinate={coordinate}
+              //    onPress={() => {
+              //      if (
+              //        selectedCoordinate &&
+              //        selectedCoordinate.latitude === coordinate.latitude &&
+              //        selectedCoordinate.longitude === coordinate.longitude
+              //      ) {
+              //        setCoordinates((prevCoordinates) =>
+              //          prevCoordinates.filter(
+              //            (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+              //          )
+              //        );
+              //        setSelectedCoordinate(null);
+              //      }
+              //    }}
+              //  />
+              //))
+            }
+            {podArea.map((item) => (
+              <Polygon
+                key={item.name}
+                strokeColor={item.isActive ? "blue" : "grey"}
+                fillColor={item.isActive ? "rgba(109, 147, 253, 0.4)" : "rgba(124, 124, 124, 0.4)"}
+                strokeWidth={2}
+                coordinates={item.cords}
               />
             ))}
-            {coordinates.length > 2 && (
-              <Polygon
-                strokeColor="blue"
-                fillColor="rgba(109, 147, 253, 0.4)"
-                strokeWidth={2}
-                coordinates={coordinates}
-              />
-            )}
           </MapView>
           <View
             style={{
@@ -360,19 +463,37 @@ export default function MapScreen() {
             }}>
             {type === "op" ? (
               <View>
-                <View style={[styles.box, { width: "75%", height: 65, backgroundColor: "white", paddingBottom: 60 }]}>
-                  <Picker
-                    style={{
-                      backgroundColor: "white",
-                      height: "12.5%",
-                      width: "95%",
-                      borderRadius: 20,
-                      marginLeft: 5,
-                    }}
-                    selectedValue={selectedValue}
-                    onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
-                    {pods.map((pod)=>(<Picker.Item key={pod._podid} label={pod.firstname+" "+pod.lastname} value={pod._podid} />))}
-                  </Picker>
+                <View
+                  style={[styles.leftbar, { width: "85%", height: 65, backgroundColor: "white", paddingBottom: 60 }]}>
+                  {pods.length != 0 ? (
+                    <Picker
+                      style={[
+                        {
+                          backgroundColor: "white",
+                          height: "12.5%",
+                          width: "85%",
+                          left: 20,
+                          borderRadius: 20,
+                        },
+                      ]}
+                      selectedValue={selectedValue}
+                      onValueChange={(itemValue) => {
+                        GetPodArea(itemValue);
+                        setSelectedValue(itemValue);
+                      }}>
+                      <Picker.Item label={"Podopieczny"} value={""} />
+                      {pods.map((pod) => (
+                        <Picker.Item
+                          style={{ borderRadius: 20 }}
+                          key={pod._podid}
+                          label={pod.firstname + " " + pod.lastname}
+                          value={pod._podid}
+                        />
+                      ))}
+                    </Picker>
+                  ) : (
+                    <Text style={{ height: 50, paddingTop: 15, width: "100%" }}> Brak podopiecznych </Text>
+                  )}
                 </View>
                 <TouchableOpacity
                   style={{
@@ -473,64 +594,64 @@ export default function MapScreen() {
               </View>
             </View>
           ) : (
-          <View>
-            {isVisible && (
-            <Animated.View
-              style={[
-                styles.fadingContainer,
-                {
-                  opacity: fadeAnim,
-                },
-              ]}>
-              <Pressable
+            <View>
+              {isVisible && (
+                <Animated.View
                   style={[
-                    styles.button,
+                    styles.fadingContainer,
                     {
-                      backgroundColor: "white",
-                      height: 65,
-                      width: 65,
-                      borderRadius: 50,
-                      alignSelf: "flex-end",
+                      opacity: fadeAnim,
                     },
-                  ]}
-                  onPress={openModal}>
-                  <Ionicons1 name="user" size={32} color="grey" />
-                </Pressable>
-              <Pressable
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: "white",
-                      height: 65,
-                      width: 65,
-                      borderRadius: 50,
-                      alignSelf: "flex-end",
-                      //marginRight:"30%",
-                    },
-                  ]}
-                    onPress={makeCall}
-                  >
-                  <Ionicons1 name="fork" size={32} color="grey" />
-                </Pressable>
-            </Animated.View>
-            )}
-            <View style={{ paddingBottom: 100 }}>
-              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                    <Pressable
-                      style={[
-                        styles.button,
-                        {
-                          backgroundColor: "white",
-                          height: 65,
-                          width: 65,
-                          borderRadius: 50,
-                          alignSelf: "flex-end",
-                        },
-                      ]}
-                      onPress={() => fade(isVisible ? 0 : 1, isVisible ? 3000 : 5000)}
-                    >
-                      <Ionicons name="alert" size={32} color="grey" />
-                    </Pressable>
+                  ]}>
+                  <Pressable
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "white",
+                        height: 65,
+                        width: 65,
+                        borderRadius: 50,
+                        alignSelf: "flex-end",
+                      },
+                    ]}
+                    onPress={() => {
+                      setModalVisible(true);
+                    }}>
+                    <Ionicons1 name="user" size={32} color="grey" />
+                  </Pressable>
+                  <Pressable
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "white",
+                        height: 65,
+                        width: 65,
+                        borderRadius: 50,
+                        alignSelf: "flex-end",
+                        //marginRight:"30%",
+                      },
+                    ]}
+                    onPress={makeCall}>
+                    <Ionicons1 name="fork" size={32} color="grey" />
+                  </Pressable>
+                </Animated.View>
+              )}
+              <View style={{ paddingBottom: 100 }}>
+                <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
+                  <Pressable
+                    style={[
+                      styles.button,
+                      {
+                        backgroundColor: "white",
+                        height: 65,
+                        width: 65,
+                        borderRadius: 50,
+                        alignSelf: "flex-end",
+                      },
+                    ]}
+                    onPress={() => fade(isVisible ? 0 : 1, isVisible ? 1000 : 3000)}>
+                    <Ionicons name="alert" size={32} color="grey" />
+                  </Pressable>
                 </View>
               </View>
               <Modal
@@ -549,20 +670,19 @@ export default function MapScreen() {
                       alignItem: "center",
                     },
                   ]}>
-                  <Text style={[styles.title, { justifyContent: "center" }]}>
-                    Wprowadź kod od opiekuna:
-                  </Text>
+                  <Text style={[styles.title, { justifyContent: "center" }]}>Wprowadź kod od opiekuna:</Text>
                   <TextInput
-                    style={{height: 40,
-                      borderColor: 'gray',
+                    style={{
+                      height: 40,
+                      borderColor: "gray",
                       borderWidth: 1,
                       marginVertical: 10,
-                      width: '100%',
-                      paddingHorizontal: 10,}}
+                      width: "100%",
+                      paddingHorizontal: 10,
+                    }}
                     value={modalInput}
                     onChangeText={(text) => {
-                      
-                      const formattedText = text.replace(/[^0-9]/g, ''); // Usuń niecyfrowe znaki
+                      const formattedText = text.replace(/[^0-9]/g, ""); // Usuń niecyfrowe znaki
                       if (formattedText.length <= 6) {
                         setModalInput(formattedText);
                       }
@@ -570,7 +690,7 @@ export default function MapScreen() {
                     maxLength={6}
                     keyboardType="numeric"
                   />
-    
+
                   <Divider />
                   <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
                     <Pressable
@@ -579,15 +699,11 @@ export default function MapScreen() {
                         width: "60%",
                         alignContent: "space-between",
                         marginLeft: "20%",
-                        
                       }}
                       onPress={() => {
                         setModalVisible(false);
                       }}>
-                      
-
                       <Text>Anuluj</Text>
-
                     </Pressable>
 
                     <Pressable
@@ -596,19 +712,15 @@ export default function MapScreen() {
                         alignContent: "space-between",
                         width: "50%",
                         marginLeft: "-5%",
-                        
                       }}
                       onPress={() => {
                         handleModalConfirmation();
                       }}>
-                      
-
                       <Text>Zatwierdź</Text>
                     </Pressable>
                   </View>
                 </View>
               </Modal>
-            </View>
             </View>
           )}
         </View>

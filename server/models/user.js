@@ -1,5 +1,10 @@
 const mongoose = require("mongoose")
 
+const podLocation = new mongoose.Schema({
+  latitude: Number,
+  longitude: Number,
+})
+
 const podSchema = new mongoose.Schema({
   _podid: String,
   firstname: String,
@@ -15,7 +20,8 @@ const userSchema = new mongoose.Schema({
   type: {type: String, required: true},
   phoneNumber: {type: String, required: true},
   opCode: {type: String, required: false},
-  pods: [podSchema]
+  pods: [podSchema],
+  location: podLocation
 })
 const User = mongoose.model("User", userSchema);
 

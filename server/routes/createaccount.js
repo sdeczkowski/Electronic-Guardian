@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
       const code = Math.floor(Math.random() * 100000) + 1
       await new User({ ...req.body, password: hashPassword, opCode: code.toString() }).save();
     } else {
-      await new User({ ...req.body, password: hashPassword }).save();
+      await new User({ ...req.body, password: hashPassword, location: {latitude: 0, longitude: 0} }).save();
     }
     
     res.status(201).send({ message: "User created successfully" });

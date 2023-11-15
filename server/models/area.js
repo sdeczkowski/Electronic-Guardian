@@ -20,8 +20,9 @@ const areaDetails = new mongoose.Schema({
   name: { type: String, required: true },
   date: { type: String, required: true },
   cords: [areaData],
-  initialRegion: {initRegion},
-  repeat: { type: String, required: true },
+  initialRegion: initRegion,
+  isActive: { type: Boolean, required: true},
+  repeat: { type: Number, required: true },
   time_from: { type: String, required: true },
   time_to: { type: String, required: true },
 });
