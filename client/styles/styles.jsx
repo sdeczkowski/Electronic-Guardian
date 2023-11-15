@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     //shadows
     shadowColor: "rgba(0, 0, 0, 0.5)",
     shadowOpacity: 0.5,
-    elevation: 1,
+    elevation: 5,
     shadowRadius: 16,
     shadowOffset: { width: 1, height: 3 },
   },

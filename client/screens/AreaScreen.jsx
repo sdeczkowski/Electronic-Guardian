@@ -11,6 +11,7 @@ import EviliconsIcon from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Divider } from "react-native-paper";
 import axios from "axios";
 import { Button } from "react-native-paper";
 
@@ -23,7 +24,8 @@ export default function AreaScreen() {
     const [time, setTime] = useState(new Date());
     const [time2, setTime2] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
-    const [showPicker2, setShowPicker2] = useState(false);
+    const [showTime, setShowTime] = useState(false);
+    const [showTime2, setShowTime2] = useState(false);
     const [option, setOption] = useState(null);
     const [dateArea, setDateArea] = useState("");
     const [dateReady, setDateReady] = useState(Date());
@@ -31,8 +33,12 @@ export default function AreaScreen() {
     const [timeReady, setTimeReady] = useState(Date());
     const [timeArea2, setTimeArea2] = useState("");
     const [timeReady2, setTimeReady2] = useState(Date());
-    let areaData = route.params.data
-    
+    const [errDate, setErrDate] = useState(false);
+    const [errTime, setErrTime] = useState(false);
+    const [errTime2, setErrTime2] = useState(false);
+    const [check, setCheck] = useState(null);
+    let areaData = route.params.data;
+
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -61,7 +67,11 @@ export default function AreaScreen() {
     };
 
     const toggleTimePicker = () => {
-      setShowPicker2(!showPicker2);
+      setShowTime(!showTime);
+    };
+
+    const toggleTimePicker2 = () => {
+      setShowTime2(!showTime2);
     };
 
     const onChange1 = ({ type }, selectedDate) => {
@@ -84,7 +94,7 @@ export default function AreaScreen() {
       const currentTime2 = selectedTime2 || date;
       setTime2(currentTime2);
       const tempDate2 = new Date(currentTime2);
-      toggleTimePicker();
+      toggleTimePicker2();
       setTimeArea2(tempDate2.getHours() + ":" + tempDate2.getMinutes());
     };
 
@@ -99,13 +109,45 @@ export default function AreaScreen() {
     };
 
     const onSubmit = async () => {
-      console.log(areaData.cords)
-      try {
-        
-      } catch (error) {
-        
+      setErrTime(false);
+      setCheck(null);
+      console.log(timeReady + " " + timeReady2)
+      const id = await AsyncStorage.getItem("_id");
+      if (dateReady === null) {
+        setErrDate(true);
+        setCheck("Wybierz date!");
+      } else if (timeReady === null) {
+        setErrTime(true);
+        setCheck("Wybierz czas rozpoczęcia!");
+      } else if (timeReady2 === null) {
+        setErrTime2(true);
+        setCheck("Wybierz czas zakończenia!");
+      } else if (time >= time2) {
+        setErrTime2(true);
+        setCheck("Czas zakończenia musi być późniejszy od czasu rozpoczęcia!");
+      } else if (option === null) {
+        setCheck("Wybierz cykliczność!");
+      } else {
+        try {
+          const url = "http://10.0.2.2:3001/api/area/add";
+          await axios.post(url, {
+            _opid: id,
+            _podid: areaData._podid,
+            name: areaData.name,
+            cords: areaData.cords,
+            initialRegion: areaData.initRegion,
+            date: date.toString(),
+            repeat: option,
+            time_f: time.toString(),
+            time_t: time2.toString(),
+            isActive: false,
+          });
+          navigation.navigate("AreaSelect");
+        } catch (error) {
+          console.log(error);
+        }
       }
-    }
+    };
 
     return (
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
@@ -121,7 +163,13 @@ export default function AreaScreen() {
         <View>
           {showPicker && <DateTimePicker mode="date" display="spinner" value={date} onChange={onChange1} />}
           {!showPicker && (
-            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleDatePicker}>
+            <Pressable
+              style={[
+                styles.box,
+                { width: "90%" },
+                errDate ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
+              ]}
+              onPress={toggleDatePicker}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
                 onPress={toggleDatePicker}
@@ -134,9 +182,15 @@ export default function AreaScreen() {
         </View>
 
         <View>
-          {showPicker2 && <DateTimePicker mode="time" display="spinner" value={time} onChange={onChange2} />}
-          {!showPicker2 && (
-            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleTimePicker}>
+          {showTime && <DateTimePicker mode="time" is24hourSource="" display="spinner" value={time} onChange={onChange2} />}
+          {!showTime && (
+            <Pressable
+              style={[
+                styles.box,
+                { width: "90%" },
+                errTime ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
+              ]}
+              onPress={toggleTimePicker}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
                 onPress={toggleTimePicker}
@@ -149,12 +203,18 @@ export default function AreaScreen() {
         </View>
 
         <View>
-          {showPicker2 && <DateTimePicker mode="time" display="spinner" value={time2} onChange={onChange3} />}
-          {!showPicker2 && (
-            <Pressable style={[styles.box, { width: "90%" }]} onPress={toggleTimePicker}>
+          {showTime2 && <DateTimePicker mode="time" display="spinner" value={time2} onChange={onChange3} />}
+          {!showTime2 && (
+            <Pressable
+              style={[
+                styles.box,
+                { width: "90%" },
+                errTime2 ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
+              ]}
+              onPress={toggleTimePicker2}>
               <TextInput
                 style={[styles.box, { width: "90%", color: "black" }]}
-                onPress={toggleTimePicker}
+                onPress={toggleTimePicker2}
                 onChangeText={setTimeArea2}
                 value={timeReady2}
                 placeholder="Chose time"
@@ -162,6 +222,7 @@ export default function AreaScreen() {
             </Pressable>
           )}
         </View>
+        <Text style={{ color: "red" }}>{check}</Text>
         <View style={{ margin: 10 }}>
           <Text style={[styles.title, { marginRight: "60%" }]}>Cykliczność:</Text>
           {opcje.map((opcja) => (
@@ -192,7 +253,7 @@ export default function AreaScreen() {
 
   // tworzenie nowego obszaru
   const CreateArea = ({ navigation }) => {
-    const [selectedValue, setSelectedValue] = useState("Podopieczny/grupa");
+    const [selectedValue, setSelectedValue] = useState();
     const [isModalVisible, setModalVisible] = useState(false);
     const [location, setLocation] = useState();
     const [coordinates, setCoordinates] = useState([]);
@@ -200,6 +261,10 @@ export default function AreaScreen() {
     const [mapRegionComplete, setRegionComplete] = useState([]);
     const [areaname, setAreaName] = useState();
     const [pods, setPods] = useState([]);
+    const [errName, setErrName] = useState();
+    const [check, setCheck] = useState(null);
+    const [checkArea, setCheckArea] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const checkForIntersections = (newCoordinate) => {
       if (coordinates.length < 3) return false;
@@ -239,12 +304,12 @@ export default function AreaScreen() {
       const { coordinate } = event.nativeEvent;
       const hasIntersections = checkForIntersections(coordinate);
 
-      if (!hasIntersections) {
-        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-      } else {
-        console.log("Przecięcie! Wyczyszczam obszar.");
-        resetCoordinates();
-      }
+      //if (!hasIntersections) {
+      setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
+      //} else {
+      //  console.log("Przecięcie! Wyczyszczam obszar.");
+      //  resetCoordinates();
+      //}
       if (
         selectedCoordinate &&
         selectedCoordinate.latitude === coordinate.latitude &&
@@ -266,33 +331,35 @@ export default function AreaScreen() {
     };
 
     const onSubmit = () => {
-      let partData = [];
-      if (mapRegionComplete.length == 0) {
-        partData = [
-          {
+      setErrName(false);
+      setCheck("");
+      if (areaname == null) {
+        setErrName(true);
+        setCheck("Podaj nazwe obszaru!");
+      } else {
+        let partData = [];
+        if (mapRegionComplete.length == 0) {
+          partData = {
             name: areaname,
             _podid: selectedValue,
             initRegion: {
               latitude: location.latitude,
-              longitude: location.longitude,
               latitudeDelta: location.latitudeDelta,
+              longitude: location.longitude,
               longitudeDelta: location.longitudeDelta,
             },
-            cords: coordinates
-          },
-        ];
-      } else {
-        partData = [
-          {
+            cords: coordinates,
+          };
+        } else {
+          partData = {
             name: areaname,
-            podname: selectedValue,
+            _podid: selectedValue,
             initRegion: mapRegionComplete,
-            cords: coordinates
-          },
-        ];
+            cords: coordinates,
+          };
+        }
+        navigation.navigate("AreaTime", { data: partData });
       }
-      console.log(partData)
-      navigation.navigate("AreaTime", { data: partData });
     };
 
     const Setup = async () => {
@@ -304,10 +371,20 @@ export default function AreaScreen() {
         axios.get(url).then((response) => {
           if (response && response.data) {
             setPods(response.data);
+            setLoading(false);
           }
         });
       } catch (error) {
         console.log(error.response.data.message);
+      }
+    };
+
+    const CheckArea = () => {
+      setCheckArea("");
+      if (coordinates.length < 3) {
+        setCheckArea("Obszar musi składać się z conajmniej 3 punktów!");
+      } else {
+        setModalVisible(false);
       }
     };
 
@@ -324,247 +401,304 @@ export default function AreaScreen() {
         });
     }, [navigation]);
 
-    return (
-      <View
-        style={{
-          alignItems: "center",
-          height: "100%",
-          paddingTop: 25,
-          flexDirection: "column",
-        }}>
-        <View style={styles.index}>
-          <TouchableOpacity>
-            <AntDesignIcon name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
-          </TouchableOpacity>
-          <Text style={{ textAlign: "center" }}>Tworzenie obszaru</Text>
-          <TouchableOpacity style={{ margin: 5 }}>
-            <AntDesignIcon name="infocirlceo" size={20} color="black" />
-          </TouchableOpacity>
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
         </View>
-        <View style={[styles.box, { alignItems: "center", width: "90%", height: "8%" }]}>
-          <TextInput
-            style={{
-              paddingLeft: 15,
-              fontWeight: "bold",
-              color: "black",
-              width: "90%",
-            }}
-            placeholder="Nazwa obszaru"
-            value={areaname}
-            onChangeText={(text) => setAreaName(text)}></TextInput>
-        </View>
-        <View View style={[styles.box, { alignItems: "center", width: "90%" }]}>
-          <Picker
-            style={{
-              backgroundColor: "rgb(219, 219, 219)",
-              height: 30,
-              width: "100%",
-              borderRadius: 20,
-            }}
-            selectedValue={selectedValue}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
-            {pods.map((pod)=>(<Picker.Item key={pod._podid} label={pod.firstname+" "+pod.lastname} value={pod._podid} />))}
-          </Picker>
-        </View>
-        <View style={{ alignItems: "center", width: "90%" }}>
-          <Modal
-            isVisible={isModalVisible}
-            transparent={true}
-            onRequestClose={() => {
-              setModalVisible(!isModalVisible);
-            }}>
-            <View
-              style={[
-                styles.box,
-                {
-                  color: "white",
-                  height: "90%",
-                  width: "98vh",
-                  flexDirection: "column",
-                  padding: 7,
-                },
-              ]}>
-              <MapView
-                style={{
-                  //...StyleSheet.absoluteFillObject,
-                  height: "90%",
-                  width: "100vh",
-                  alignItems: "center",
-                  overflow: "hidden",
-                }}
-                provider={PROVIDER_GOOGLE}
-                showsMyLocationButton={false}
-                showsCompass={false}
-                showsUserLocation={true}
-                initialRegion={location}
-                //onRegionChange={mapRegion}
-                onRegionChangeComplete={(region) => {
-                  console.log(region);
-                  setRegionComplete({
-                    latitude: region.latitude,
-                    longitude: region.longitude,
-                    latitudeDelta: region.latitudeDelta,
-                    longitudeDelta: region.longitudeDelta,
-                  });
-                }}
-                onPress={handleMapPress}>
-                {coordinates.map((coordinate, index) => (
-                  <Marker
-                    key={index}
-                    coordinate={coordinate}
-                    onPress={() => {
-                      if (
-                        selectedCoordinate &&
-                        selectedCoordinate.latitude === coordinate.latitude &&
-                        selectedCoordinate.longitude === coordinate.longitude
-                      ) {
-                        setCoordinates((prevCoordinates) =>
-                          prevCoordinates.filter(
-                            (coord) =>
-                              coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-                          )
-                        );
-                        setSelectedCoordinate(null);
-                      }
-                    }}
-                  />
-                ))}
-                {coordinates.length > 2 && (
-                  <Polygon
-                    strokeColor="blue"
-                    fillColor="rgba(109, 147, 253, 0.4)"
-                    strokeWidth={2}
-                    coordinates={coordinates}
-                  />
-                )}
-              </MapView>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}>
-                <Pressable
-                  style={{
-                    margin: 10,
-                  }}
-                  onPress={() => {
-                    resetCoordinates();
-                    setModalVisible(false);
-                  }}>
-                  <Text>Anuluj</Text>
-                </Pressable>
-                <Pressable
-                  style={{
-                    margin: 10,
-                  }}
-                  onPress={() => {
-                    resetCoordinates();
-                  }}>
-                  <Text>Reset</Text>
-                </Pressable>
-                <Pressable
-                  style={{
-                    margin: 10,
-                  }}
-                  onPress={() => {
-                    setModalVisible(false);
-                  }}>
-                  <Text>Zapisz</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-          <TouchableOpacity
-            style={{ width: "90%" }}
-            onPress={() => {
-              setModalVisible(true);
-            }}>
-            <Image
+      );
+    } else {
+      return (
+        <View
+          style={{
+            alignItems: "center",
+            height: "100%",
+            paddingTop: 25,
+            flexDirection: "column",
+          }}>
+          <View style={styles.index}>
+            <TouchableOpacity>
+              <AntDesignIcon name="arrowleft" size={20} color="black" onPress={() => navigation.goBack()} />
+            </TouchableOpacity>
+            <Text style={{ textAlign: "center" }}>Tworzenie obszaru</Text>
+            <TouchableOpacity style={{ margin: 5 }}>
+              <AntDesignIcon name="infocirlceo" size={20} color="black" />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={[
+              styles.box,
+              { alignItems: "center", width: "90%" },
+              errName ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 },
+            ]}>
+            <TextInput
               style={{
-                height: 300,
-                width: 300,
-                borderRadius: 8,
-                marginTop: 8,
-                marginBottom: 20,
+                paddingLeft: 15,
+                height: 50,
+                color: "black",
+                width: "90%",
               }}
-              source={require("../assets/map.jpg")}
-            />
-          </TouchableOpacity>
+              placeholder="Nazwa obszaru"
+              value={areaname}
+              onChangeText={(text) => setAreaName(text)}></TextInput>
+          </View>
+          <View
+            View
+            style={[
+              styles.box,
+              { alignItems: "center", width: "90%" },
+              pods.length != 0 ? { borderWidth: 0 } : { borderColor: "red", borderWidth: 1 },
+            ]}>
+            {pods.length != 0 ? (
+              <Picker
+                style={{
+                  backgroundColor: "rgb(219, 219, 219)",
+                  height: 30,
+                  width: "100%",
+                  borderRadius: 20,
+                }}
+                selectedValue={selectedValue}
+                onValueChange={(itemValue) => setSelectedValue(itemValue)}>
+                <Picker.Item label={"Podopieczny"} value={""} />
+                {pods.map((pod) => (
+                  <Picker.Item key={pod._podid} label={pod.firstname + " " + pod.lastname} value={pod._podid} />
+                ))}
+              </Picker>
+            ) : (
+              <Text style={{ height: 50, paddingTop: 15, width: "100%" }}> Brak podopiecznych </Text>
+            )}
+          </View>
+          <View style={{ alignItems: "center", width: "90%" }}>
+            <Modal
+              isVisible={isModalVisible}
+              transparent={true}
+              onRequestClose={() => {
+                setModalVisible(!isModalVisible);
+              }}>
+              <View
+                style={[
+                  styles.box,
+                  {
+                    color: "white",
+                    height: "90%",
+                    width: "98vh",
+                    flexDirection: "column",
+                    padding: 7,
+                  },
+                ]}>
+                <MapView
+                  style={{
+                    //...StyleSheet.absoluteFillObject,
+                    height: "90%",
+                    width: "100vh",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                  provider={PROVIDER_GOOGLE}
+                  showsMyLocationButton={false}
+                  showsCompass={false}
+                  showsUserLocation={true}
+                  initialRegion={location}
+                  //onRegionChange={mapRegion}
+                  onRegionChangeComplete={(region) => {
+                    console.log(region);
+                    setRegionComplete({
+                      latitude: region.latitude,
+                      longitude: region.longitude,
+                      latitudeDelta: region.latitudeDelta,
+                      longitudeDelta: region.longitudeDelta,
+                    });
+                  }}
+                  onPress={handleMapPress}>
+                  {coordinates.map((coordinate, index) => (
+                    <Marker
+                      key={index}
+                      coordinate={coordinate}
+                      onPress={() => {
+                        if (
+                          selectedCoordinate &&
+                          selectedCoordinate.latitude === coordinate.latitude &&
+                          selectedCoordinate.longitude === coordinate.longitude
+                        ) {
+                          setCoordinates((prevCoordinates) =>
+                            prevCoordinates.filter(
+                              (coord) =>
+                                coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+                            )
+                          );
+                          setSelectedCoordinate(null);
+                        }
+                      }}
+                    />
+                  ))}
+                  {coordinates.length > 2 && (
+                    <Polygon
+                      strokeColor="blue"
+                      fillColor="rgba(109, 147, 253, 0.4)"
+                      strokeWidth={2}
+                      coordinates={coordinates}
+                    />
+                  )}
+                </MapView>
+                <Text style={{ color: "red", textAlign: "center" }}>{checkArea}</Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  }}>
+                  <Pressable
+                    style={{
+                      margin: 10,
+                    }}
+                    onPress={() => {
+                      resetCoordinates();
+                      setModalVisible(false);
+                    }}>
+                    <Text>Anuluj</Text>
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      margin: 10,
+                    }}
+                    onPress={() => {
+                      resetCoordinates();
+                    }}>
+                    <Text>Reset</Text>
+                  </Pressable>
+                  <Pressable
+                    style={{
+                      margin: 10,
+                    }}
+                    onPress={() => {
+                      CheckArea();
+                    }}>
+                    <Text>Zapisz</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Modal>
+            <TouchableOpacity
+              style={{ width: "90%" }}
+              onPress={() => {
+                setModalVisible(true);
+              }}>
+              <Image
+                style={{
+                  height: 300,
+                  width: 300,
+                  borderRadius: 8,
+                  marginTop: 8,
+                  marginBottom: 20,
+                }}
+                source={require("../assets/map.jpg")}
+              />
+            </TouchableOpacity>
+          </View>
+          <Text style={{ color: "red", textAlign: "center" }}>{check}</Text>
+          <View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                onSubmit();
+              }}>
+              <Text style={{ color: "white" }}>Dalej</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              onSubmit();
-            }}>
-            <Text style={{ color: "white" }}>Dalej</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+      );
+    }
   };
 
-  const AreaDetail = ({ navigation }) => {
-    const coordinates = [
-      { latitude: 51.24433861957029, longitude: 22.558915726840496 },
-      { latitude: 51.24194190277511, longitude: 22.583090141415596 },
-      { latitude: 51.22874754520771, longitude: 22.571560330688953 },
+  const AreaDetail = ({ navigation, route }) => {
+    const [pod, setPod] = useState();
+    const [loading, setLoading] = useState(true);
+
+    const podData = async () => {
+      try {
+        const url = "http://10.0.2.2:3001/api/area/get/" + route.params._opid + "/" + route.params._podid + "/" + route.params.name;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            setPod(response.data);
+            setLoading(false);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
+    useEffect(() => {
+      podData()
+    }, []);
+
+    const opcje = [
+      { id: 1, label: "Codziennie" },
+      { id: 2, label: "Co tydzień" },
+      { id: 3, label: "Nigdy" },
     ];
 
-    return (
-      <View style={{ alignItems: "center", height: "80%", width: "100%", justifyContent: "flex-end" }}>
-
-        <MapView
-          style={{ borderRadius: 20, height: "60%", width: "90%", flex: 1, justifyContent: "flex-end" }}
-          provider={PROVIDER_GOOGLE}
-          showsMyLocationButton={false}
-          scrollEnabled={false}
-          showsCompass={false}
-          region={{
-            latitude:
-              (Math.min(...coordinates.map((coord) => coord.latitude)) +
-                Math.max(...coordinates.map((coord) => coord.latitude))) /
-              2,
-            longitude:
-              (Math.min(...coordinates.map((coord) => coord.longitude)) +
-                Math.max(...coordinates.map((coord) => coord.longitude))) /
-              2,
-            latitudeDelta:
-              Math.max(...coordinates.map((coord) => coord.latitude)) -
-              Math.min(...coordinates.map((coord) => coord.latitude)) +
-              0.01,
-            longitudeDelta:
-              Math.max(...coordinates.map((coord) => coord.longitude)) -
-              Math.min(...coordinates.map((coord) => coord.longitude)) +
-              0.01,
-          }}>
-          {coordinates.map((coordinate, index) => (
-            <Marker key={index} coordinate={coordinate} />
-          ))}
-          {coordinates.length > 2 && (
-            <Polygon
-              strokeColor="blue"
-              fillColor="rgba(109, 147, 253, 0.4)"
-              strokeWidth={2}
-              coordinates={coordinates}
-            />
-          )}
-        </MapView>
-        <View style={{ backgroundColor: "rgb(221, 222, 223)", padding: 10, width: "100%" }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Nazwa Obszaru</Text>
-          <Text>Data: DD/MM/YYYY</Text>
-          <Text>Czas od: HH:mm</Text>
-          <Text>Czas do: HH:mm</Text>
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
         </View>
-        <View style={{ alignItems: "center", paddingBottom: 20 }}>
-          <TouchableOpacity onPress={() => navigation.navigate("AreaSelect")}>
-            <View style={{ backgroundColor: 'blue', padding: 10, borderRadius: 5 }}>
-              <Text style={{ color: 'white', fontSize: 16 }}>Powrót</Text>
-            </View>
-          </TouchableOpacity>
+      );
+    } else {
+      const coordinates = pod.cords
+      return (
+        <View style={{ alignItems: "center", height: "90%", width: "100%", justifyContent: "flex-end" }}>
+          <View style={[styles.index, { marginTop: 20, height: 40 }]}>
+            <View></View>
+            <Text style={{ textAlign: "center" }}> Obszar</Text>
+            <View></View>
+          </View>
+          <MapView
+            style={{ borderRadius: 20, height: "60%", width: "90%", flex: 1, justifyContent: "flex-end" }}
+            provider={PROVIDER_GOOGLE}
+            showsMyLocationButton={false}
+            scrollEnabled={false}
+            pitchEnabled={false}
+            rotateEnabled={false}
+            zoomEnabled={false}
+            showsCompass={false}
+            region={{
+              latitude: pod.initialRegion.latitude,
+              longitude: pod.initialRegion.longitude,
+              latitudeDelta: pod.initialRegion.latitudeDelta,
+              longitudeDelta: pod.initialRegion.longitudeDelta,
+            }}>
+            {coordinates.map((coordinate, index) => (
+              <Marker key={index} coordinate={coordinate} />
+            ))}
+            {coordinates.length > 2 && (
+              <Polygon
+                strokeColor="blue"
+                fillColor="rgba(109, 147, 253, 0.4)"
+                strokeWidth={2}
+                coordinates={coordinates}
+              />
+            )}
+          </MapView>
+          <View style={{ padding: 10, width: "100%" }}>
+            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>{pod.name}</Text>
+            <Divider></Divider>
+            <Text style={{ margin: 2 }}>Podopieczny: {pod.pod_firstname + " " + pod.pod_lastname}</Text>
+            <Divider></Divider>
+            <Text style={{ margin: 2 }}>Cykliczność: {opcje[pod.repeat-1].label}</Text>
+            <Divider></Divider>
+            <Text style={{ margin: 2 }}>Data: {pod.date}</Text>
+            <Divider></Divider>
+            <Text style={{ margin: 2 }}>Czas od: {pod.time_from}</Text>
+            <Text style={{ margin: 2 }}>Czas do: {pod.time_to}</Text>
+          </View>
+          <View style={{ alignItems: "center", paddingBottom: 20 }}>
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaSelect")}>
+              <Text style={{ color: "white" }}>Powrót</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
   };
 
   // lista obszarów
@@ -572,6 +706,11 @@ export default function AreaScreen() {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
     const [error, setErr] = useState();
+
+    const AreaSelect = async (_podid, name) => {
+      const id = await AsyncStorage.getItem("_id");
+      navigation.navigate("AreaDetail", { _opid: id, _podid: _podid, name: name });
+    };
 
     const AreaSetup = async () => {
       try {
@@ -602,7 +741,7 @@ export default function AreaScreen() {
           paddingTop: 25,
         }}
         onPress={() => {
-          navigation.navigate("AreaDetail");
+          AreaSelect(item._podid, item.name);
         }}>
         <View style={{ flexDirection: "column", justifyContent: "space-between" }}>
           <Text

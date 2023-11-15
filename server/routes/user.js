@@ -24,6 +24,20 @@ router.get("/code/:_id", async (req, res) => {
   }
 });
 
+router.get("/podloc/:_id", async (req, res) => {
+  try {
+    const user = await User.findOne({_id: req.params._id})
+    if (user) {
+      res.status(201).send({latitude: user.location.latitude, longitude: user.location.longitude});
+    } else {
+      res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
 router.get("/getpods/:_id", async (req, res) => {
     try {
       const user = await User.findOne({
@@ -69,6 +83,27 @@ router.post("/addpod", async (req, res) => {
       );
     res.status(201).send({ message: "Pod added successfully" });
     console.log("Baza: Dodano Podopiecznego do Opiekuna 😇");
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.post("/updateloc", async (req, res) => {
+  try {
+    await User.updateOne(
+        { _id: req.body._id },
+        {
+          $set: {
+            location: {
+              latitude: req.body.latitude,
+              longitude: req.body.longitude,
+            },
+          },
+        }
+      );
+      res.status(201).send({ message: "Notification added successfully" });
+      console.log("Baza: Zakutalizowano lokalizacje 💫");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
