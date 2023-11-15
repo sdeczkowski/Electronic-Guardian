@@ -224,7 +224,7 @@ export default function MapScreen() {
           axios.get(url).then((response) => {
             if (response && response.data) {
               setPodArea(response.data);
-              console.log("podopieczni - odebrani");
+              console.log("podopieczny - odebranal obszar");
             }
           });
         } catch (error) {
@@ -264,15 +264,18 @@ export default function MapScreen() {
     const SendArea = async() => {
       const id = await AsyncStorage.getItem("_id");
       let loc = await Location.getCurrentPositionAsync({});
-      try {
-        const url = "http://10.0.2.2:3001/api/user/updateloc";
-        await axios.post(url, {
-          _id: id,
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-        });
-      } catch (error) {
-        console.log(error);
+      const type = await AsyncStorage.getItem("type");
+      if(type === "pod"){
+        try {
+          const url = "http://10.0.2.2:3001/api/user/updateloc";
+          await axios.post(url, {
+            _id: id,
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+          });
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
 
@@ -387,7 +390,7 @@ export default function MapScreen() {
 
     useEffect(() => {
       const intId = setInterval(() => {
-        if (type == "op") {
+        if (type === "op") {
           if(podArea.length > 0){
             podArea.map((item) => {
               if(item.isActive){
@@ -495,17 +498,6 @@ export default function MapScreen() {
                     <Text style={{ height: 50, paddingTop: 15, width: "100%" }}> Brak podopiecznych </Text>
                   )}
                 </View>
-                <TouchableOpacity
-                  style={{
-                    backgroundColor: "#007BFF",
-                    padding: 10,
-                    borderRadius: 20,
-                    width: "80%",
-                    marginLeft: 10,
-                  }}
-                  onPress={handleCheckLocation}>
-                  <Text style={styles.buttonText}>Lokalizuj</Text>
-                </TouchableOpacity>
               </View>
             ) : (
               <View></View>
@@ -590,7 +582,6 @@ export default function MapScreen() {
                   }}>
                   <Ionicons name="qr-code-outline" size={32} color="grey" />
                 </Pressable>
-                <Button title="Resetuj obszar" onPress={resetCoordinates} />
               </View>
             </View>
           ) : (

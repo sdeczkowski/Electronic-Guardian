@@ -60,7 +60,7 @@ router.get("/get/:opid/:podid/:name", async (req, res) => {
 
 router.get("/getpodarealook/:podid", async (req, res) => {
   try {
-    const area = await AreaDetails.findOne({
+    const area = await AreaDetails.find({
       _podid: req.params.podid,
       isActive: true,
     });
