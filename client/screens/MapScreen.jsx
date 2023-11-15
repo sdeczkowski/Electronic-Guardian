@@ -11,6 +11,7 @@ import {
   Alert,
   Pressable,
   Animated,
+  TextInput,
 } from "react-native";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,11 +29,14 @@ import * as Location from "expo-location";
 import moment from "moment";
 import call from "react-native-phone-call";
 
+
+
 const Stack = createStackNavigator();
 
 export default function MapScreen() {
   const Notifications = ({ navigation }) => {
     const [data, setData] = useState([]);
+
 
     const NotiSetup = async () => {
       try {
@@ -106,7 +110,7 @@ export default function MapScreen() {
         </View>
       </View>
     );
-    
+
     useEffect(() => {
       NotiSetup();
       navigation.getParent()?.setOptions({
@@ -169,6 +173,7 @@ export default function MapScreen() {
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const [isVisible, setIsVisible] = useState(true);
+    const [modalInput, setModalInput] = useState('');
     const [phoneNr, setPhoneNr] = useState('101000000');
 
     const fade = (toValue, duration) => {
@@ -189,6 +194,23 @@ export default function MapScreen() {
         call(args).catch(console.error);
     };
 
+    const openModal = () => {
+      setModalVisible(true);
+    };
+
+    const handleModalConfirmation = () => {
+      console.log('Zatwierdzono kod:', modalInput);
+      setModalVisible(false);
+    };
+
+    const fade = (toValue, duration) => {
+      setIsVisible(toValue === 1);
+      Animated.timing(fadeAnim, {
+        toValue,
+        duration,
+        useNativeDriver: true,
+      }).start();
+    };
     const NotiSetup = async () => {
       try {
         const id = await AsyncStorage.getItem("_id");
@@ -257,8 +279,8 @@ export default function MapScreen() {
         ) {
           if (
             vertexI.latitude +
-              ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
-                (vertexJ.latitude - vertexI.latitude) <
+            ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
+            (vertexJ.latitude - vertexI.latitude) <
             point.latitude
           ) {
             oddNodes = !oddNodes;
@@ -418,7 +440,7 @@ export default function MapScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              <View/>
+              <View />
             )}
           </View>
           {type === "op" ? (
@@ -503,7 +525,8 @@ export default function MapScreen() {
                       borderRadius: 50,
                       alignSelf: "flex-end",
                     },
-                  ]}>
+                  ]}
+                  onPress={openModal}>
                   <Ionicons1 name="user" size={32} color="grey" />
                 </Pressable>
               <Pressable
@@ -526,24 +549,98 @@ export default function MapScreen() {
             )}
             <View style={{ paddingBottom: 100 }}>
               <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                <View>
-                <Pressable
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: "white",
-                      height: 65,
-                      width: 65,
-                      borderRadius: 50,
-                      alignSelf: "flex-end",
-                    },
-                  ]}
-                  onPress={() => fade(isVisible ? 0 : 1, isVisible ? 3000 : 5000)}
-                  >
-                  <Ionicons name="alert" size={32} color="grey" />
-                </Pressable>
+                    <Pressable
+                      style={[
+                        styles.button,
+                        {
+                          backgroundColor: "white",
+                          height: 65,
+                          width: 65,
+                          borderRadius: 50,
+                          alignSelf: "flex-end",
+                        },
+                      ]}
+                      onPress={() => fade(isVisible ? 0 : 1, isVisible ? 3000 : 5000)}
+                    >
+                      <Ionicons name="alert" size={32} color="grey" />
+                    </Pressable>
                 </View>
               </View>
+              <Modal
+                isVisible={isModalVisible}
+                transparent={true}
+                onRequestClose={() => {
+                  setModalVisible(!isModalVisible);
+                }}>
+                <View
+                  style={[
+                    styles.box,
+                    {
+                      color: "white",
+                      height: "50%",
+                      flexDirection: "column",
+                      alignItem: "center",
+                    },
+                  ]}>
+                  <Text style={[styles.title, { justifyContent: "center" }]}>
+                    Wprowadź kod od opiekuna:
+                  </Text>
+                  <TextInput
+                    style={{height: 40,
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      marginVertical: 10,
+                      width: '100%',
+                      paddingHorizontal: 10,}}
+                    value={modalInput}
+                    onChangeText={(text) => {
+                      
+                      const formattedText = text.replace(/[^0-9]/g, ''); // Usuń niecyfrowe znaki
+                      if (formattedText.length <= 6) {
+                        setModalInput(formattedText);
+                      }
+                    }}
+                    maxLength={6}
+                    keyboardType="numeric"
+                  />
+    
+                  <Divider />
+                  <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
+                    <Pressable
+                      style={{
+                        margin: 10,
+                        width: "60%",
+                        alignContent: "space-between",
+                        marginLeft: "20%",
+                        
+                      }}
+                      onPress={() => {
+                        setModalVisible(false);
+                      }}>
+                      
+
+                      <Text>Anuluj</Text>
+
+                    </Pressable>
+
+                    <Pressable
+                      style={{
+                        margin: 10,
+                        alignContent: "space-between",
+                        width: "50%",
+                        marginLeft: "-5%",
+                        
+                      }}
+                      onPress={() => {
+                        handleModalConfirmation();
+                      }}>
+                      
+
+                      <Text>Zatwierdź</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              </Modal>
             </View>
             </View>
           )}
