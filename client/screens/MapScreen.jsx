@@ -27,6 +27,7 @@ import Ionicons1 from "react-native-vector-icons/AntDesign";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
 import moment from "moment";
+import call from "react-native-phone-call";
 
 
 
@@ -173,9 +174,25 @@ export default function MapScreen() {
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const [isVisible, setIsVisible] = useState(true);
     const [modalInput, setModalInput] = useState('');
+    const [phoneNr, setPhoneNr] = useState('101000000');
 
+    const fade = (toValue, duration) => {
+      setIsVisible(toValue === 1);
+      Animated.timing(fadeAnim, {
+        toValue,
+        duration,
+        useNativeDriver: true,
+      }).start();
+    };
 
-
+    const makeCall = () =>{
+        const args = {
+          number: phoneNr,
+          prompt: false,
+          skipCanOpen: true
+        };
+        call(args).catch(console.error);
+    };
 
     const openModal = () => {
       setModalVisible(true);
@@ -185,10 +202,6 @@ export default function MapScreen() {
       console.log('Zatwierdzono kod:', modalInput);
       setModalVisible(false);
     };
-
-
-
-
 
     const fade = (toValue, duration) => {
       setIsVisible(toValue === 1);
@@ -493,50 +506,49 @@ export default function MapScreen() {
               </View>
             </View>
           ) : (
-            <View>
-              {isVisible && (
-                <Animated.View
+          <View>
+            {isVisible && (
+            <Animated.View
+              style={[
+                styles.fadingContainer,
+                {
+                  opacity: fadeAnim,
+                },
+              ]}>
+              <Pressable
                   style={[
-                    styles.fadingContainer,
+                    styles.button,
                     {
-                      opacity: fadeAnim,
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
                     },
-                  ]}>
-                  <Pressable
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: "white",
-                        height: 65,
-                        width: 65,
-                        borderRadius: 50,
-                        alignSelf: "flex-end",
-                      },
-                    ]}
-                    onPress={openModal}>
-                    <Ionicons1 name="user" size={32} color="grey" />
-                  </Pressable>
-
-
-                  <Pressable
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: "white",
-                        height: 65,
-                        width: 65,
-                        borderRadius: 50,
-                        alignSelf: "flex-end",
-                        //marginRight:"30%",
-                      },
-                    ]}>
-                    <Ionicons1 name="fork" size={32} color="grey" />
-                  </Pressable>
-                </Animated.View>
-              )}
-              <View style={{ paddingBottom: 100 }}>
-                <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
-                  <View>
+                  ]}
+                  onPress={openModal}>
+                  <Ionicons1 name="user" size={32} color="grey" />
+                </Pressable>
+              <Pressable
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: "white",
+                      height: 65,
+                      width: 65,
+                      borderRadius: 50,
+                      alignSelf: "flex-end",
+                      //marginRight:"30%",
+                    },
+                  ]}
+                    onPress={makeCall}
+                  >
+                  <Ionicons1 name="fork" size={32} color="grey" />
+                </Pressable>
+            </Animated.View>
+            )}
+            <View style={{ paddingBottom: 100 }}>
+              <View style={{ alignSelf: "flex-end", height: 65, width: 65 }}>
                     <Pressable
                       style={[
                         styles.button,
@@ -552,9 +564,7 @@ export default function MapScreen() {
                     >
                       <Ionicons name="alert" size={32} color="grey" />
                     </Pressable>
-                  </View>
                 </View>
-
               </View>
               <Modal
                 isVisible={isModalVisible}
@@ -631,6 +641,7 @@ export default function MapScreen() {
                   </View>
                 </View>
               </Modal>
+            </View>
             </View>
           )}
         </View>
