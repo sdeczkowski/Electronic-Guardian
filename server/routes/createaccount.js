@@ -12,6 +12,7 @@ const validateSingUp = (data) => {
     lastname: Joi.string().required(),
     isActive: Joi.boolean().required(),
     type: Joi.string().required(),
+    phoneNumber: Joi.string().required()
   });
   return schema.validate(data);
 };
@@ -24,6 +25,9 @@ router.post("/", async (req, res) => {
     const email = await User.findOne({ email: req.body.email });
     if (email) return res.status(409).send({ message: "Konto z podanym emailem już istnieje" });
 
+    const phone = await User.findOne({ phoneNumber: req.body.phoneNumber });
+    if (phone) return res.status(409).send({ message: "Konto z podanym numerem telefonu już istnieje" });
+
     let complexityHandler = passwordComplexity().validate(req.body.password);
     if (complexityHandler.error)
       return res.status(409).send({
@@ -32,8 +36,14 @@ router.post("/", async (req, res) => {
 
     const salt = await bcrypt.genSalt(Number(process.env.SALT));
     const hashPassword = await bcrypt.hash(req.body.password, salt);
-
-    await new User({ ...req.body, password: hashPassword }).save();
+    
+    if (req.body.type == "op"){
+      const code = Math.floor(Math.random() * 100000) + 1
+      await new User({ ...req.body, password: hashPassword, opCode: code.toString() }).save();
+    } else {
+      await new User({ ...req.body, password: hashPassword }).save();
+    }
+    
     res.status(201).send({ message: "User created successfully" });
     console.log("Baza: Dodano użytkownika 😋");
   } catch (error) {

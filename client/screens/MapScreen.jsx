@@ -104,7 +104,7 @@ export default function MapScreen() {
         </View>
       </View>
     );
-    
+
     useEffect(() => {
       NotiSetup();
       navigation.getParent()?.setOptions({
@@ -165,50 +165,78 @@ export default function MapScreen() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [type, setType] = useState("");
     const [selectedValue, setSelectedValue] = useState("Podopieczny 1");
+    const [code, setCode] = useState();
+    const [pods, setPods] = useState([]);
 
-    const NotiSetup = async () => {
+    const Setup = async () => {
+      const type = await AsyncStorage.getItem("type");
+      setType(type);
+      const id = await AsyncStorage.getItem("_id");
+      if(type === "op"){
+        try {
+          const url = "http://10.0.2.2:3001/api/noti/get/" + id;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              response.data.notifications.map((item) => {
+                if (!item.seen) {
+                  setNewNoti(true);
+                }
+              });
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
+        try {
+          const url = "http://10.0.2.2:3001/api/user/code/" + id;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setCode(response.data);
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
+        try {
+          const url = "http://10.0.2.2:3001/api/user/getpods/" + id;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setPods(response.data);
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
+      }
       try {
-        const id = await AsyncStorage.getItem("_id");
-        const url = "http://10.0.2.2:3001/api/noti/get/" + id;
-        axios.get(url).then((response) => {
-          if (response && response.data) {
-            response.data.notifications.map((item) => {
-              if (!item.seen) {
-                setNewNoti(true);
-              }
-            });
-          }
-        });
-      } catch (error) {
-        console.log(error.response.data.message);
-      }
-    };
-
-    const LocationSetup = async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-      let location = await Location.getCurrentPositionAsync({});
-      console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
-      setLocation(location);
-      setMapRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.0522,
-        longitudeDelta: 0.0421,
-      });
-      setLocation(location);
-      AsyncStorage.setItem(
-        "location",
-        JSON.stringify({
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          return;
+        }
+        let location = await Location.getCurrentPositionAsync({});
+        console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
+        setLocation(location);
+        setMapRegion({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
           latitudeDelta: 0.0522,
           longitudeDelta: 0.0421,
-        })
-      );
+        });
+        setLocation(location);
+        AsyncStorage.setItem(
+          "location",
+          JSON.stringify({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.0522,
+            longitudeDelta: 0.0421,
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setLoading(false);
     };
 
     const handleMapPress = (event) => {
@@ -262,22 +290,12 @@ export default function MapScreen() {
       }
     };
 
-    const SetType = async () => {
-      const type = await AsyncStorage.getItem("type");
-      setType(type);
-    };
-
     const handleCheckLocation = () => {
       checkIfInsidePolygon();
     };
 
     useEffect(() => {
-      SetType();
-      NotiSetup();
-      LocationSetup();
-      if (mapRegion != {}) {
-        setLoading(false);
-      }
+      Setup();
     }, []);
 
     if (loading) {
@@ -297,14 +315,7 @@ export default function MapScreen() {
             showsMyLocationButton={false}
             showsCompass={false}
             showsUserLocation={true}
-            /* initialRegion={{
-              latitude: 51.2376267,
-              longitude: 22.5713683,
-              latitudeDelta: 0.0522,
-              longitudeDelta: 0.0421,
-            }}*/
             region={mapRegion}
-            //onRegionChange={mapRegion}
             onPress={handleMapPress}>
             {coordinates.map((coordinate, index) => (
               <Marker
@@ -354,9 +365,7 @@ export default function MapScreen() {
                     }}
                     selectedValue={selectedValue}
                     onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}>
-                    <Picker.Item label="Podopieczny 1" value="Podopieczny 1" />
-                    <Picker.Item label="Podopieczny 2" value="Podopieczny 2" />
-                    <Picker.Item label="Podopieczny 3" value="Podopieczny 3" />
+                    {pods.map((pod)=>(<Picker.Item key={pod._podid} label={pod.firstname+" "+pod.lastname} value={pod._podid} />))}
                   </Picker>
                 </View>
                 <TouchableOpacity
@@ -395,7 +404,7 @@ export default function MapScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              <View/>
+              <View />
             )}
           </View>
           {type === "op" ? (
@@ -417,9 +426,7 @@ export default function MapScreen() {
                       },
                     ]}>
                     <Text style={[styles.title, { justifyContent: "center" }]}>Kod podopiecznego</Text>
-                    <Text style={[styles.title, { justifyContent: "center", fontSize: 80 }]}>
-                      {Math.floor(Math.random() * 100000) + 1}
-                    </Text>
+                    <Text style={[styles.title, { justifyContent: "center", fontSize: 80 }]}>{code}</Text>
                     <Text
                       style={[
                         styles.title,
@@ -451,7 +458,6 @@ export default function MapScreen() {
                       alignSelf: "flex-end",
                     },
                   ]}
-                  //onPress={()=>code()}
                   onPress={() => {
                     setModalVisible(true);
                   }}>

@@ -1,5 +1,12 @@
 const mongoose = require("mongoose");
 
+const initRegion = new mongoose.Schema({
+  latitude: Number,
+  latitudeDelta: Number,
+  longitude: Number,
+  longitudeDelta: Number,
+})
+
 const areaData = new mongoose.Schema({
   latitude: Number,
   longitude: Number,
@@ -13,6 +20,7 @@ const areaDetails = new mongoose.Schema({
   name: { type: String, required: true },
   date: { type: String, required: true },
   cords: [areaData],
+  initialRegion: {initRegion},
   repeat: { type: String, required: true },
   time_from: { type: String, required: true },
   time_to: { type: String, required: true },
