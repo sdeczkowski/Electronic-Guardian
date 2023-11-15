@@ -20,6 +20,7 @@ import Ionicons2 from "react-native-vector-icons/FontAwesome";
 import Ionicons3 from "react-native-vector-icons/Feather";
 import styles from "../styles/styles";
 import Modal from "react-native-modal";
+import * as ImagePicker from 'expo-image-picker';
 
 const Stack = createStackNavigator();
 
@@ -35,6 +36,25 @@ export default function ProfileScreen() {
   const LogOut = () => {
     dispatch(Logout());
   };
+
+  const [image, setImage] = useState(null);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
 
   // zmiana hasła
   const ChangePass = ({ navigation }) => {
@@ -157,17 +177,18 @@ export default function ProfileScreen() {
         </View>
         <ScrollView style={{ }}>
         <View>
-          <View>
-            <TouchableOpacity style={{ alignItems: "center" }}>
-              <Ionicons
-                name="arrow-left"
-                size={150}
+          <View style={{padding:5}}>
+            <TouchableOpacity style={{ alignItems: "center"}} onPress={pickImage}>
+            {image ? ( <Image source={{ uri: image }} style={{ width: 120, height: 120, borderRadius:60 }} />) :(
+              <Ionicons2
+                name="user-circle-o"
+                size={120}
                 color="black"
-                style={{ height: 150 }}
-              />
+                style={{ height: 120 }}
+              />)}
             </TouchableOpacity>
           </View>
-          <Divider />
+          <Divider/>
           <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>
             Profile
           </Text>
