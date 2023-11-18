@@ -48,6 +48,12 @@ router.get("/get/:opid/:podid/:name", async (req, res) => {
       name: req.params.name,
     });
     if (area) {
+      var dateObject = new Date(area.date);
+      var timefObject = new Date(area.time_from)
+      var timetObject = new Date(area.time_to)
+      area.date = `${dateObject.getDate()}.${dateObject.getMonth() + 1}.${dateObject.getFullYear()}`;
+      area.time_from = `${timefObject.getHours()}:${timefObject.getMinutes() < 10 ? '0' : ''}${timefObject.getMinutes()}`;
+      area.time_to = `${timetObject.getHours()}:${timetObject.getMinutes() < 10 ? '0' : ''}${timetObject.getMinutes()}`;
       res.status(201).send(area);
     } else {
       res.status(404).send({ message: "Not found" });
@@ -133,7 +139,7 @@ router.get("/getall/:_id", async (req, res) => {
   try {
     const user = await User.findOne({_id: req.params._id})
     if(user.type == "pod") return res.status(403).send({ message: "Forbidden" })
-    const area = await AreaDetails.find({ _opid: req.params._id }, { _podid: 1, name: 1 });
+    const area = await AreaDetails.find({ _opid: req.params._id }, { _podid: 1, name: 1, cords: 1 ,initialRegion: 1});
     if (area) {
       res.status(201).send(area);
     } else {

@@ -5,10 +5,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import { Logout } from "../store/actions";
-import Ionicons from "react-native-vector-icons/EvilIcons";
-import Ionicons1 from "react-native-vector-icons/AntDesign";
-import Ionicons2 from "react-native-vector-icons/FontAwesome";
-import Ionicons3 from "react-native-vector-icons/Feather";
+import AntIcon from "react-native-vector-icons/AntDesign";
+import FontIcon from "react-native-vector-icons/FontAwesome";
+import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import styles from "../styles/styles";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
@@ -64,11 +63,11 @@ export default function ProfileScreen() {
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity style={{ margin: 5 }} onPress={() => navigation.goBack()}>
-            <Ionicons1 name="arrowleft" size={20} color="black" />
+            <AntIcon name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Zmiana hasła</Text>
           <TouchableOpacity style={{ margin: 5 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+            <AntIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
@@ -101,11 +100,11 @@ export default function ProfileScreen() {
       <View style={[styles.container, { paddingTop: 25 }]}>
         <View style={styles.index}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons1 name="arrowleft" size={20} color="black" />
+            <AntIcon name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Zmiana emaila</Text>
           <TouchableOpacity style={{ margin: 5 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+            <AntIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
@@ -139,7 +138,7 @@ export default function ProfileScreen() {
         <View style={[styles.index, { marginTop: 20 }]}>
           <Text>Nazwa uzytkownika</Text>
           <TouchableOpacity style={{ margin: 10 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+            <AntIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <ScrollView style={{}}>
@@ -149,7 +148,7 @@ export default function ProfileScreen() {
                 {image ? (
                   <Image source={{ uri: image }} style={{ width: 120, height: 120, borderRadius: 60 }} />
                 ) : (
-                  <Ionicons2 name="user-circle-o" size={120} color="black" style={{ height: 120 }} />
+                  <FontIcon name="user-circle-o" size={120} color="black" style={{ height: 120 }} />
                 )}
               </TouchableOpacity>
             </View>
@@ -210,7 +209,7 @@ export default function ProfileScreen() {
                   navigation.navigate("ChangePassword");
                 }}>
                 <Text style={{ marginLeft: 5 }}>Zmień hasło</Text>
-                <Ionicons1 name="right" size={20} color="black" style={{ marginLeft: 70 }} />
+                <AntIcon name="right" size={20} color="black" style={{ marginLeft: 70 }} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={{ flexDirection: "row", padding: 10 }}
@@ -218,7 +217,7 @@ export default function ProfileScreen() {
                   navigation.navigate("ChangeEmail");
                 }}>
                 <Text style={{ marginLeft: 5 }}>Zmień e-mail</Text>
-                <Ionicons1 name="right" size={20} color="black" style={{ marginLeft: 64 }} />
+                <AntIcon name="right" size={20} color="black" style={{ marginLeft: 64 }} />
               </TouchableOpacity>
             </View>
           </View>
@@ -237,54 +236,62 @@ export default function ProfileScreen() {
                     height: "50%",
                     flexDirection: "column",
                     alignItem: "center",
+                    margin: 0,
+                    padding: 0,
                   },
                 ]}>
-                <Text style={[styles.title, { justifyContent: "center" }]}>Dezaktywacja konta użytkownika</Text>
-                <Ionicons3
-                  name="alert-triangle"
-                  size={130}
-                  color="#ff0000"
+                <View
                   style={{
-                    alignContent: "center",
-                    justifyContent: "center",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
                     alignItems: "center",
-                    marginLeft: "30%",
-                  }}
-                />
-                <Text style={[styles.title, { justifyContent: "center", color: "grey", fontSize: 15 }]}>
-                  Czy na pewno chesz dezaktywować swoje konto?
-                </Text>
-                <Divider />
-                <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
-                  <Pressable
+                    height: "70%",
+                  }}>
+                  <Text style={[styles.title, { justifyContent: "center" }]}>Dezaktywacja konta użytkownika</Text>
+                  <MaterialIcon
+                    name="progress-alert"
+                    size={130}
+                    color="rgb(212, 43, 43)"
                     style={{
-                      margin: 10,
-                      width: "60%",
-                      alignContent: "space-between",
-                      marginLeft: "20%",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
-                    onPress={() => {
-                      setModalVisible(false);
-                    }}>
-                    <Text>Nie</Text>
-                  </Pressable>
-                  <Pressable
-                    style={{
-                      margin: 10,
-                      alignContent: "space-between",
-                      width: "50%",
-                      marginLeft: "50",
-                    }}
-                    onPress={() => {
-                      LogOut();
-                    }}>
-                    <Text>Tak</Text>
-                  </Pressable>
+                  />
+                  <Text style={[styles.title, { justifyContent: "center", color: "grey", fontSize: 15 }]}>
+                    Czy na pewno chesz dezaktywować swoje konto?
+                  </Text>
+                </View>
+                <View style={{ height: "20%" }}>
+                  <Divider bold={true} />
+                  <View style={{ flexDirection: "row", justifyContent: "space-around", height: "100%" }}>
+                    <Pressable
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "50%",
+                      }}
+                      onPress={() => {
+                        setModalVisible(false);
+                      }}>
+                      <Text style={{ fontSize: 20 }}>Nie</Text>
+                    </Pressable>
+                    <Divider style={{ width: 1, height: "99%" }} />
+                    <Pressable
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "50%",
+                      }}
+                      onPress={() => {}}>
+                      <Text style={{ fontSize: 20 }}>Tak</Text>
+                    </Pressable>
+                  </View>
                 </View>
               </View>
             </Modal>
             <Pressable
-              style={[styles.button, { backgroundColor: "#ff0000", alignItems: "center" }]}
+              style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
               //onPress={()=>delete_acc()}
               onPress={() => {
                 setModalVisible(true);
@@ -292,7 +299,7 @@ export default function ProfileScreen() {
               <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
             </Pressable>
             <TouchableOpacity
-              style={[styles.button, { backgroundColor: "#ff0000", alignItems: "center" }]}
+              style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
               onPress={() => {
                 LogOut();
               }}>
