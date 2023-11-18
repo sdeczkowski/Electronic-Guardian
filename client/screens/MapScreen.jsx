@@ -1,29 +1,16 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  Dimensions,
-  Button,
-  ActivityIndicator,
-  Alert,
-  Pressable,
-  Animated,
-  TextInput,
-} from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Animated, TextInput } from "react-native";
 import Modal from "react-native-modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Divider } from "react-native-paper";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { SelectList } from "react-native-dropdown-select-list";
 import { Picker } from "@react-native-picker/picker";
 import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-maps";
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Ionicons1 from "react-native-vector-icons/AntDesign";
+import AntIcon from "react-native-vector-icons/AntDesign";
+import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
 import moment from "moment";
@@ -128,11 +115,11 @@ export default function MapScreen() {
       <View style={{ alignItems: "center", height: "100%", paddingTop: 25 }}>
         <View style={styles.index}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons1 name="arrowleft" size={20} color="black" />
+            <AntIcon name="arrowleft" size={20} color="black" />
           </TouchableOpacity>
           <Text style={{ textAlign: "center" }}>Powiadomienia</Text>
           <TouchableOpacity style={{ margin: 5 }}>
-            <Ionicons1 name="infocirlceo" size={20} color="black" />
+            <AntIcon name="infocirlceo" size={20} color="black" />
           </TouchableOpacity>
         </View>
         <View style={{ width: "90%", height: "87%", margin: 5 }}>
@@ -148,7 +135,7 @@ export default function MapScreen() {
               onPress={() => {
                 deleteNoti();
               }}>
-              <Ionicons1 name="closecircleo" size={30} color="black" />
+              <AntIcon name="closecircleo" size={30} color="black" />
             </TouchableOpacity>
           </View>
         ) : (
@@ -161,6 +148,7 @@ export default function MapScreen() {
   const Map = ({ navigation }) => {
     const [mapRegion, setMapRegion] = useState({});
     const [location, setLocation] = useState();
+    const [podloc, setPodLoc] = useState(null);
     const [coordinates, setCoordinates] = useState([]);
     const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
     const [loading, setLoading] = useState(true);
@@ -218,7 +206,7 @@ export default function MapScreen() {
         } catch (error) {
           console.log(error.response.data.message);
         }
-      } else{
+      } else {
         try {
           const url = "http://10.0.2.2:3001/api/area/getpodarealook/" + id;
           axios.get(url).then((response) => {
@@ -238,7 +226,6 @@ export default function MapScreen() {
           return;
         }
         let location = await Location.getCurrentPositionAsync({});
-        console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
         setMapRegion({
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -255,17 +242,18 @@ export default function MapScreen() {
             longitudeDelta: 0.0421,
           })
         );
+        console.log("\n x: " + location.coords.latitude + "\n y: " + location.coords.longitude);
       } catch (error) {
         console.log(error);
       }
       setLoading(false);
     };
 
-    const SendArea = async() => {
+    const SendArea = async () => {
       const id = await AsyncStorage.getItem("_id");
       let loc = await Location.getCurrentPositionAsync({});
       const type = await AsyncStorage.getItem("type");
-      if(type === "pod"){
+      if (type === "pod") {
         try {
           const url = "http://10.0.2.2:3001/api/user/updateloc";
           await axios.post(url, {
@@ -279,12 +267,15 @@ export default function MapScreen() {
       }
     };
 
-    const isPodinArea = async(_podid, cords) => {
+    const isPodinArea = async (_podid, cords, active) => {
       try {
-        const url = "http://10.0.2.2:3001/api/user/getpods/" + _podid;
+        const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
         axios.get(url).then((response) => {
           if (response && response.data) {
-            checkIfInsidePolygon(response.data.latitude, response.data.longitude, cords);
+            setPodLoc(response.data);
+            if(active){
+              checkIfInsidePolygon(response.data.latitude, response.data.longitude, cords);
+            }
           }
         });
       } catch (error) {
@@ -299,6 +290,16 @@ export default function MapScreen() {
         axios.get(url).then((response) => {
           if (response && response.data) {
             setPodArea(response.data);
+          }
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+      try {
+        const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
+        axios.get(url).then((response) => {
+          if (response && response.data) {
+            setPodLoc(response.data);
           }
         });
       } catch (error) {
@@ -334,10 +335,6 @@ export default function MapScreen() {
       setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
     };
 
-    const resetCoordinates = () => {
-      setCoordinates([]);
-    };
-
     const isPointInPolygon = (point, polygon) => {
       let oddNodes = false;
       let j = polygon.length - 1;
@@ -370,18 +367,12 @@ export default function MapScreen() {
         latitude: platitude,
         longitude: plongitude,
       };
-
       const isInside = isPointInPolygon(point, cords);
-
       if (isInside) {
         console.log("Jesteś w obszarze");
       } else {
         console.log("Jesteś poza obszarem");
       }
-    };
-
-    const handleCheckLocation = () => {
-      checkIfInsidePolygon();
     };
 
     useEffect(() => {
@@ -391,15 +382,13 @@ export default function MapScreen() {
     useEffect(() => {
       const intId = setInterval(() => {
         if (type === "op") {
-          if(podArea.length > 0){
+          if (podArea.length > 0) {
             podArea.map((item) => {
-              if(item.isActive){
-                isPodinArea(item._podid, item.cords);
-              }
+              isPodinArea(item._podid, item.cords, item.isActive);
             });
           }
         } else {
-          SendArea(location)
+          SendArea(location);
         }
       }, 10000);
       return () => {
@@ -426,28 +415,6 @@ export default function MapScreen() {
             showsUserLocation={true}
             region={mapRegion}
             onPress={handleMapPress}>
-            {
-              //coordinates.map((coordinate, index) => (
-              //  <Marker
-              //    key={index}
-              //    coordinate={coordinate}
-              //    onPress={() => {
-              //      if (
-              //        selectedCoordinate &&
-              //        selectedCoordinate.latitude === coordinate.latitude &&
-              //        selectedCoordinate.longitude === coordinate.longitude
-              //      ) {
-              //        setCoordinates((prevCoordinates) =>
-              //          prevCoordinates.filter(
-              //            (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-              //          )
-              //        );
-              //        setSelectedCoordinate(null);
-              //      }
-              //    }}
-              //  />
-              //))
-            }
             {podArea.map((item) => (
               <Polygon
                 key={item.name}
@@ -457,6 +424,10 @@ export default function MapScreen() {
                 coordinates={item.cords}
               />
             ))}
+            {podloc !== null ? (<Marker coordinate={podloc}>
+                <MaterialIcon name="map-marker-account-outline" size={25} color="rgb(212, 43, 43)" />
+              </Marker>) : (<View></View>)
+            }
           </MapView>
           <View
             style={{
@@ -608,7 +579,7 @@ export default function MapScreen() {
                     onPress={() => {
                       setModalVisible(true);
                     }}>
-                    <Ionicons1 name="user" size={32} color="grey" />
+                    <AntIcon name="user" size={32} color="grey" />
                   </Pressable>
                   <Pressable
                     style={[
@@ -623,7 +594,7 @@ export default function MapScreen() {
                       },
                     ]}
                     onPress={makeCall}>
-                    <Ionicons1 name="fork" size={32} color="grey" />
+                    <AntIcon name="fork" size={32} color="grey" />
                   </Pressable>
                 </Animated.View>
               )}

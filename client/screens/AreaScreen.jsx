@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, Image, TextInput, ActivityIndicator, StyleSheet, Pressable } from "react-native";
+import { View, Text, FlatList, Image, TextInput, ActivityIndicator, Pressable } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from "react-native-maps";
 import Modal from "react-native-modal";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Picker } from "@react-native-picker/picker";
+import { Divider } from "react-native-paper";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AntDesignIcon from "react-native-vector-icons/AntDesign";
 import EntypoIcon from "react-native-vector-icons/Entypo";
 import EviliconsIcon from "react-native-vector-icons/EvilIcons";
+import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import styles from "../styles/styles";
-import { Picker } from "@react-native-picker/picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Divider } from "react-native-paper";
-import axios from "axios";
-import { Button } from "react-native-paper";
 
 const Stack = createStackNavigator();
 
@@ -111,7 +111,7 @@ export default function AreaScreen() {
     const onSubmit = async () => {
       setErrTime(false);
       setCheck(null);
-      console.log(timeReady + " " + timeReady2)
+      console.log(timeReady + " " + timeReady2);
       const id = await AsyncStorage.getItem("_id");
       if (dateReady === null) {
         setErrDate(true);
@@ -182,7 +182,9 @@ export default function AreaScreen() {
         </View>
 
         <View>
-          {showTime && <DateTimePicker mode="time" is24hourSource="" display="spinner" value={time} onChange={onChange2} />}
+          {showTime && (
+            <DateTimePicker mode="time" is24hourSource="" display="spinner" value={time} onChange={onChange2} />
+          )}
           {!showTime && (
             <Pressable
               style={[
@@ -365,6 +367,7 @@ export default function AreaScreen() {
     const Setup = async () => {
       const region = await AsyncStorage.getItem("location");
       setLocation(JSON.parse(region));
+      setRegionComplete(JSON.parse(region))
       const id = await AsyncStorage.getItem("_id");
       try {
         const url = "http://10.0.2.2:3001/api/user/getpods/" + id;
@@ -528,8 +531,9 @@ export default function AreaScreen() {
                           );
                           setSelectedCoordinate(null);
                         }
-                      }}
-                    />
+                      }}>
+                      <MaterialIcon name="map-marker" size={25} color="rgb(212, 43, 43)" />
+                    </Marker>
                   ))}
                   {coordinates.length > 2 && (
                     <Polygon
@@ -578,20 +582,40 @@ export default function AreaScreen() {
               </View>
             </Modal>
             <TouchableOpacity
-              style={{ width: "90%" }}
+              style={{ width: "90%", borderRadius: 20 }}
               onPress={() => {
                 setModalVisible(true);
               }}>
-              <Image
+              <MapView
                 style={{
-                  height: 300,
-                  width: 300,
-                  borderRadius: 8,
-                  marginTop: 8,
-                  marginBottom: 20,
+                  //...StyleSheet.absoluteFillObject,
+                  height: 350,
+                  width: 350,
+                  alignItems: "center",
+                  overflow: "hidden",
                 }}
-                source={require("../assets/map.jpg")}
-              />
+                provider={PROVIDER_GOOGLE}
+                showsMyLocationButton={false}
+                scrollEnabled={false}
+                pitchEnabled={false}
+                rotateEnabled={false}
+                zoomEnabled={false}
+                showsCompass={false}
+                region={mapRegionComplete}>
+                {coordinates.map((coordinate, index) => (
+                  <Marker key={index} coordinate={coordinate}>
+                    <MaterialIcon name="map-marker" size={25} color="rgb(212, 43, 43)" />
+                  </Marker>
+                ))}
+                {coordinates.length > 2 && (
+                  <Polygon
+                    strokeColor="blue"
+                    fillColor="rgba(109, 147, 253, 0.4)"
+                    strokeWidth={2}
+                    coordinates={coordinates}
+                  />
+                )}
+              </MapView>
             </TouchableOpacity>
           </View>
           <Text style={{ color: "red", textAlign: "center" }}>{check}</Text>
@@ -612,10 +636,17 @@ export default function AreaScreen() {
   const AreaDetail = ({ navigation, route }) => {
     const [pod, setPod] = useState();
     const [loading, setLoading] = useState(true);
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const podData = async () => {
       try {
-        const url = "http://10.0.2.2:3001/api/area/get/" + route.params._opid + "/" + route.params._podid + "/" + route.params.name;
+        const url =
+          "http://10.0.2.2:3001/api/area/get/" +
+          route.params._opid +
+          "/" +
+          route.params._podid +
+          "/" +
+          route.params.name;
         axios.get(url).then((response) => {
           if (response && response.data) {
             setPod(response.data);
@@ -627,8 +658,22 @@ export default function AreaScreen() {
       }
     };
 
+    const deleteArea = async () => {
+      try {
+        const url = "http://10.0.2.2:3001/api/area/delete";
+        await axios.post(url, {
+          _opid: route.params._opid,
+          _podid: route.params._podid,
+          name: route.params.name,
+        });
+        navigation.navigate("AreaSelect");
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
     useEffect(() => {
-      podData()
+      podData();
     }, []);
 
     const opcje = [
@@ -644,7 +689,7 @@ export default function AreaScreen() {
         </View>
       );
     } else {
-      const coordinates = pod.cords
+      const coordinates = pod.cords;
       return (
         <View style={{ alignItems: "center", height: "90%", width: "100%", justifyContent: "flex-end" }}>
           <View style={[styles.index, { marginTop: 20, height: 40 }]}>
@@ -668,7 +713,9 @@ export default function AreaScreen() {
               longitudeDelta: pod.initialRegion.longitudeDelta,
             }}>
             {coordinates.map((coordinate, index) => (
-              <Marker key={index} coordinate={coordinate} />
+              <Marker key={index} coordinate={coordinate}>
+                <MaterialIcon name="map-marker" size={25} color="rgb(212, 43, 43)" />
+              </Marker>
             ))}
             {coordinates.length > 2 && (
               <Polygon
@@ -684,7 +731,7 @@ export default function AreaScreen() {
             <Divider></Divider>
             <Text style={{ margin: 2 }}>Podopieczny: {pod.pod_firstname + " " + pod.pod_lastname}</Text>
             <Divider></Divider>
-            <Text style={{ margin: 2 }}>Cykliczność: {opcje[pod.repeat-1].label}</Text>
+            <Text style={{ margin: 2 }}>Cykliczność: {opcje[pod.repeat - 1].label}</Text>
             <Divider></Divider>
             <Text style={{ margin: 2 }}>Data: {pod.date}</Text>
             <Divider></Divider>
@@ -692,10 +739,87 @@ export default function AreaScreen() {
             <Text style={{ margin: 2 }}>Czas do: {pod.time_to}</Text>
           </View>
           <View style={{ alignItems: "center", paddingBottom: 20 }}>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
+              onPress={() => {
+                setModalVisible(true);
+              }}>
+              <Text style={{ color: "white" }}>Usuń obszar</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("AreaSelect")}>
               <Text style={{ color: "white" }}>Powrót</Text>
             </TouchableOpacity>
           </View>
+          <Modal
+            isVisible={isModalVisible}
+            transparent={true}
+            onRequestClose={() => {
+              setModalVisible(!isModalVisible);
+            }}>
+            <View
+              style={[
+                styles.box,
+                {
+                  color: "white",
+                  height: "50%",
+                  flexDirection: "column",
+                  alignItem: "center",
+                  margin: 0,
+                  padding: 0,
+                },
+              ]}>
+              <View
+                style={{
+                  flexDirection: "column",
+                  justifyContent: "space-around",
+                  alignItems: "center",
+                  height: "70%",
+                }}>
+                <Text style={[styles.title, { justifyContent: "center" }]}>Usuwanie obszaru</Text>
+                <MaterialIcon
+                  name="progress-alert"
+                  size={130}
+                  color="rgb(212, 43, 43)"
+                  style={{
+                    alignContent: "center",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                />
+                <Text style={[styles.title, { justifyContent: "center", color: "grey", fontSize: 15 }]}>
+                  Czy na pewno chesz usunąć obaszar?
+                </Text>
+              </View>
+              <View style={{ height: "20%" }}>
+                <Divider bold={true} />
+                <View style={{ flexDirection: "row", justifyContent: "space-around", height: "100%" }}>
+                  <Pressable
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "50%",
+                    }}
+                    onPress={() => {
+                      setModalVisible(false);
+                    }}>
+                    <Text style={{ fontSize: 20 }}>Nie</Text>
+                  </Pressable>
+                  <Divider style={{ width: 1, height: "99%" }} />
+                  <Pressable
+                    style={{
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "50%",
+                    }}
+                    onPress={() => {
+                      deleteArea();
+                    }}>
+                    <Text style={{ fontSize: 20 }}>Tak</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </View>
       );
     }
@@ -755,8 +879,32 @@ export default function AreaScreen() {
           </Text>
           <EviliconsIcon name="user" size={50} color="black" style={{}} />
         </View>
-        <View style={{ width: "60%", height: "60%" }}>
-          <Image style={{ width: 175, height: 150, borderRadius: 5 }} source={require("../assets/map.jpg")} />
+        <View style={{ width: "45%", height: "60%" }}>
+        <MapView
+                style={{
+                  //...StyleSheet.absoluteFillObject,
+                  height: 150,
+                  width: 150,
+                  alignItems: "center",
+                  overflow: "hidden",
+                }}
+                provider={PROVIDER_GOOGLE}
+                showsMyLocationButton={false}
+                scrollEnabled={false}
+                pitchEnabled={false}
+                rotateEnabled={false}
+                zoomEnabled={false}
+                showsCompass={false}
+                region={item.initialRegion}>
+                {item.cords.length > 2 && (
+                  <Polygon
+                    strokeColor="blue"
+                    fillColor="rgba(109, 147, 253, 0.4)"
+                    strokeWidth={2}
+                    coordinates={item.cords}
+                  />
+                )}
+              </MapView>
         </View>
       </TouchableOpacity>
     );

@@ -1,5 +1,4 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import styles from "../styles/styles";
 import axios from "axios";
@@ -86,7 +85,7 @@ const Register = ({ route, navigation }) => {
           lastname: lastname,
           isActive: true,
           type: type,
-          phoneNumber: phone
+          phoneNumber: phone,
         });
         navigation.navigate("Login");
       } catch (error) {
