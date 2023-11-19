@@ -5,48 +5,80 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import { Logout } from "../store/actions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import AntIcon from "react-native-vector-icons/AntDesign";
 import FontIcon from "react-native-vector-icons/FontAwesome";
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import styles from "../styles/styles";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 const Stack = createStackNavigator();
 
 export default function ProfileScreen() {
-  const [isEnabled1, setIsEnabled1] = useState(false);
-  const [isEnabled2, setIsEnabled2] = useState(false);
-  const toggleSwitch1 = () => setIsEnabled1((previousState) => !previousState);
-  const toggleSwitch2 = () => setIsEnabled2((previousState) => !previousState);
-
-  const dispatch = useDispatch();
-
-  // wylogowywanie
-  const LogOut = () => {
-    dispatch(Logout());
-  };
-
-  const [image, setImage] = useState(null);
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
   // zmiana hasła
   const ChangePass = ({ navigation }) => {
+    const [password, setPassword] = useState("");
+    const [newpassword, setNewPassword] = useState("");
+    const [repeatpassword, setRepeatPassword] = useState("");
+    const [check, setCheck] = useState(null);
+    const [errPass, setErrPass] = useState(false);
+    const [errNewPass, setErrNewPass] = useState(false);
+    const [errRepeatPass, setErrRepeatPass] = useState(false);
+
+    const handlePass = async () => {
+      setCheck(null);
+      setErrRepeatPass(false);
+      setErrNewPass(false);
+      setErrPass(false);
+      if (password == "") {
+        setErrPass(true);
+        setCheck("Wpisz hasło!");
+      } else if (newpassword == "") {
+        setErrNewPass(true);
+        setCheck("Wpisz nowe hasło!");
+      } else if (repeatpassword == "") {
+        setErrRepeatPass(true);
+        setCheck("Wpisz ponownie nowe hasło!");
+      } else if (repeatpassword != newpassword) {
+        setErrNewPass(true);
+        setErrRepeatPass(true);
+        setCheck("Hasła nie są identyczne!");
+      } else if (password == newpassword) {
+        setErrPass(true);
+        setErrNewPass(true);
+        setErrRepeatPass(true);
+        setCheck("Nowe i stare hasło są identyczne!");
+      } else {
+        const _id = await AsyncStorage.getItem("_id");
+        try {
+          const url = "http://10.0.2.2:3001/api/user/updatepass";
+          await axios.post(url, {
+            _id: _id,
+            password: password,
+            new_password: newpassword,
+          });
+          navigation.navigate("User");
+        } catch (error) {
+          if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+            if (error.response.status == 401) {
+              if (
+                error.response.data.message == "Nowe hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol"
+              ) {
+                setErrNewPass(true);
+                setErrRepeatPass(true);
+              }
+              if (error.response.data.message == "Błędne hasło") {
+                setErrPass(true);
+              }
+              setCheck(error.response.data.message);
+            }
+          }
+        }
+      }
+    };
+
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -72,11 +104,27 @@ export default function ProfileScreen() {
         </View>
         <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
         <Text style={styles.title}>Zmiana hasła</Text>
-        <TextInput placeholder="Stare hasło" style={styles.textinput}></TextInput>
-        <TextInput placeholder="Nowe hasło" style={styles.textinput}></TextInput>
-        <TextInput placeholder="Powtórz nowe hasło" style={styles.textinput}></TextInput>
-        <TouchableOpacity style={styles.button}>
-          <Text>Zmień</Text>
+        <Text style={{ color: "red" }}>{check}</Text>
+        <TextInput
+          placeholder="Stare hasło"
+          style={[styles.textinput, errPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={password}
+          secureTextEntry={true}
+          onChangeText={(text) => setPassword(text)}></TextInput>
+        <TextInput
+          placeholder="Nowe hasło"
+          style={[styles.textinput, errNewPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={newpassword}
+          secureTextEntry={true}
+          onChangeText={(text) => setNewPassword(text)}></TextInput>
+        <TextInput
+          placeholder="Powtórz nowe hasło"
+          style={[styles.textinput, errRepeatPass ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={repeatpassword}
+          secureTextEntry={true}
+          onChangeText={(text) => setRepeatPassword(text)}></TextInput>
+        <TouchableOpacity style={styles.button} onPress={() => handlePass()}>
+          <Text style={{ color: "white" }}>Zmień</Text>
         </TouchableOpacity>
       </View>
     );
@@ -84,6 +132,69 @@ export default function ProfileScreen() {
 
   // zmiana emaila
   const ChangeEmail = ({ navigation }) => {
+    const [email, setEmail] = useState("");
+    const [newemail, setNewEmail] = useState("");
+    const [repeatemail, setRepeatEmail] = useState("");
+    const [check, setCheck] = useState(null);
+    const [errEmail, setErrEmail] = useState(false);
+    const [errNewEmail, setErrNewEmail] = useState(false);
+    const [errRepeatEmail, setErrRepeatEmail] = useState(false);
+
+    const handleEmail = async () => {
+      setCheck(null);
+      setErrRepeatEmail(false);
+      setErrNewEmail(false);
+      setErrEmail(false);
+      const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+      if (email == "") {
+        setErrEmail(true);
+        setCheck("Wpisz email!");
+      } else if (newemail == "") {
+        setErrNewEmail(true);
+        setCheck("Wpisz nowy email!");
+      } else if (repeatemail == "") {
+        setErrRepeatEmail(true);
+        setCheck("Wpisz ponownie nowy email!");
+      } else if (repeatemail != newemail) {
+        setErrNewEmail(true);
+        setErrRepeatEmail(true);
+        setCheck("Hasła nie są identyczne!");
+      } else if (!emailRegex.test(newemail)) {
+        setErrNewEmail(true);
+        setErrRepeatEmail(true);
+        setCheck("Niepoprawny email!");
+      } else if (email == newemail) {
+        setErrEmail(true);
+        setErrNewEmail(true);
+        setErrRepeatEmail(true);
+        setCheck("Nowy i stary email są identyczne!");
+      } else {
+        const _id = await AsyncStorage.getItem("_id");
+        try {
+          const url = "http://10.0.2.2:3001/api/user/updatemail";
+          await axios.post(url, {
+            _id: _id,
+            email: email,
+            new_email: newemail,
+          });
+          navigation.navigate("User");
+        } catch (error) {
+          if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+            if (error.response.status == 401) {
+              if (error.response.data.message == "Inny użytkownik przypisał już ten email") {
+                setErrNewEmail(true);
+                setErrRepeatEmail(true);
+              }
+              if (error.response.data.message == "Błędny email") {
+                setErrEmail(true);
+              }
+              setCheck(error.response.data.message);
+            }
+          }
+        }
+      }
+    };
+
     useEffect(() => {
       navigation.getParent()?.setOptions({
         tabBarStyle: {
@@ -109,11 +220,24 @@ export default function ProfileScreen() {
         </View>
         <Image style={[styles.img, { width: 200, height: 200 }]} source={require("../assets/uni.png")} />
         <Text style={styles.title}>Zmiana e-maila</Text>
-        <TextInput placeholder="Stary e-mail" style={styles.textinput}></TextInput>
-        <TextInput placeholder="Nowy e-mail" style={styles.textinput}></TextInput>
-        <TextInput placeholder="Powtórz nowy e-mail" style={styles.textinput}></TextInput>
-        <TouchableOpacity style={styles.button}>
-          <Text>Zmień</Text>
+        <Text style={{ color: "red" }}>{check}</Text>
+        <TextInput
+          placeholder="Stary e-mail"
+          style={[styles.textinput, errEmail ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={email}
+          onChangeText={(text) => setEmail(text)}></TextInput>
+        <TextInput
+          placeholder="Nowy e-mail"
+          style={[styles.textinput, errNewEmail ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={newemail}
+          onChangeText={(text) => setNewEmail(text)}></TextInput>
+        <TextInput
+          placeholder="Powtórz nowy e-mail"
+          style={[styles.textinput, errRepeatEmail ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 0 }]}
+          value={repeatemail}
+          onChangeText={(text) => setRepeatEmail(text)}></TextInput>
+        <TouchableOpacity style={styles.button} onPress={() => handleEmail()}>
+          <Text style={{ color: "white" }}>Zmień</Text>
         </TouchableOpacity>
       </View>
     );
@@ -122,6 +246,35 @@ export default function ProfileScreen() {
   // ustawienia użytkownika
   const User = ({ navigation }) => {
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isEnabled1, setIsEnabled1] = useState(false);
+    const [isEnabled2, setIsEnabled2] = useState(false);
+    const toggleSwitch1 = () => setIsEnabled1((previousState) => !previousState);
+    const toggleSwitch2 = () => setIsEnabled2((previousState) => !previousState);
+
+    const dispatch = useDispatch();
+
+    // wylogowywanie
+    const LogOut = () => {
+      dispatch(Logout());
+    };
+
+    const [image, setImage] = useState(null);
+
+    const pickImage = async () => {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      console.log(result);
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+      }
+    };
 
     const toggleModal = () => {
       setModalVisible(!isModalVisible);
