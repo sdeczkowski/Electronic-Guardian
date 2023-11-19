@@ -163,6 +163,7 @@ export default function MapScreen() {
     const [code, setCode] = useState();
     const [pods, setPods] = useState([]);
     const [podArea, setPodArea] = useState([]);
+    const [freshLocation, setFreshLoc] = useState(false);
 
     const Setup = async () => {
       const type = await AsyncStorage.getItem("type");
@@ -268,13 +269,19 @@ export default function MapScreen() {
     };
 
     const isPodinArea = async (_podid, cords, active) => {
+      let date = new Date();
+      date = date.getTime();
       try {
         const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
         axios.get(url).then((response) => {
           if (response && response.data) {
-            setPodLoc(response.data);
-            if(active){
-              checkIfInsidePolygon(response.data.latitude, response.data.longitude, cords);
+            setPodLoc(response.data.location);
+            let poddate = Date.parse(response.data.location_date);
+            if (date < poddate + 1000000) {
+              setFreshLoc(true)
+            }
+            if (active) {
+              checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, cords);
             }
           }
         });
@@ -299,7 +306,7 @@ export default function MapScreen() {
         const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
         axios.get(url).then((response) => {
           if (response && response.data) {
-            setPodLoc(response.data);
+            setPodLoc(response.data.location);
           }
         });
       } catch (error) {
@@ -424,10 +431,13 @@ export default function MapScreen() {
                 coordinates={item.cords}
               />
             ))}
-            {podloc !== null ? (<Marker coordinate={podloc}>
-                <MaterialIcon name="map-marker-account-outline" size={25} color="rgb(212, 43, 43)" />
-              </Marker>) : (<View></View>)
-            }
+            {podloc !== null ? (
+              <Marker coordinate={podloc}>
+                <MaterialIcon name="map-marker-account-outline" size={25} color={freshLocation ? "rgb(212, 43, 43)" : "rgb(110, 110, 110)"} />
+              </Marker>
+            ) : (
+              <View></View>
+            )}
           </MapView>
           <View
             style={{

@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
   phoneNumber: {type: String, required: true},
   opCode: {type: String, required: false},
   pods: [podSchema],
-  location: podLocation
+  location: podLocation,
+  location_date: {type: Date, required: false},
 })
 const User = mongoose.model("User", userSchema);
 
