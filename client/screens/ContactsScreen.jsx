@@ -71,7 +71,6 @@ export default function ChatScreen() {
     const renderMessageItem = ({ item }) => {
       return (
         <View style={{ display: "none" }}>
-          {}
           <Text>{item.text}</Text>
           <Text style={{ color: "gray", fontSize: 12 }}>{item.user._id === 1 ? "You" : "Other User"}</Text>
         </View>
