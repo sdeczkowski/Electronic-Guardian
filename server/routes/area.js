@@ -24,6 +24,23 @@ const validateArea = (data) => {
   return schema.validate(data);
 };
 
+router.get("/getname/:opid/:name", async (req, res) => {
+  try {
+    const areaname = await AreaDetails.findOne({
+      _opid: req.params.opid,
+      name: req.params.name
+    });
+    if (areaname) {
+      res.status(201).send({ isname: true });
+    } else {
+      res.status(201).send({ isname: false});
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
 router.get("/getpods/:opid", async (req, res) => {
   try {
     const user = await User.findOne({

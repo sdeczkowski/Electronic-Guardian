@@ -87,7 +87,7 @@ export default function ChatScreen() {
           <Text style={{ textAlign: "center", margin: 5 }}>Osoba</Text>
           <View></View>
         </View>
-        <FlatList data={messages} renderItem={renderMessageItem} keyExtractor={(item) => item._id} />
+        <FlatList nestedScrollEnabled data={messages} renderItem={renderMessageItem} keyExtractor={(item) => item._id} />
         <GiftedChat
           messages={messages}
           onSend={(messages) => onSend(messages)}
