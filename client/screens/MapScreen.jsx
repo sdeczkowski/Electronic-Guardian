@@ -37,10 +37,10 @@ export default function MapScreen() {
     };
 
     const deleteNoti = async () => {
-      const email = await AsyncStorage.getItem("email");
+      const id = await AsyncStorage.getItem("_id");
       try {
         const url = "http://10.0.2.2:3001/api/noti/delete";
-        axios.post(url, { email: email });
+        axios.post(url, { _opid: id });
         setData(null);
       } catch (error) {
         console.log(error.response.data.message);
@@ -48,10 +48,10 @@ export default function MapScreen() {
     };
 
     const sendSeen = async () => {
-      const email = await AsyncStorage.getItem("email");
+      const id = await AsyncStorage.getItem("_id");
       try {
         const url = "http://10.0.2.2:3001/api/noti/seen";
-        axios.post(url, { email: email });
+        axios.post(url, { _opid: id });
       } catch (error) {
         console.log(error.response.data.message);
       }
@@ -221,11 +221,11 @@ export default function MapScreen() {
         }
       }
       try {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          return;
-        }
+        // let { status } = await Location.requestForegroundPermissionsAsync();
+        // if (status !== "granted") {
+        //   setErrorMsg("Permission to access location was denied");
+        //   return;
+        // }
         let location = await Location.getCurrentPositionAsync({});
         setMapRegion({
           latitude: location.coords.latitude,
@@ -268,7 +268,7 @@ export default function MapScreen() {
       }
     };
 
-    const isPodinArea = async (_podid, cords, active) => {
+    const isPodinArea = async (_podid, name, cords, active) => {
       let date = new Date();
       date = date.getTime();
       try {
@@ -281,7 +281,7 @@ export default function MapScreen() {
               setFreshLoc(true)
             }
             if (active) {
-              checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, cords);
+              checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, cords, _podid, name);
             }
           }
         });
@@ -289,6 +289,62 @@ export default function MapScreen() {
         console.log(error.response.data.message);
       }
     };
+
+    const isPointInPolygon = (point, polygon) => {
+      let oddNodes = false;
+      let j = polygon.length - 1;
+
+      for (let i = 0; i < polygon.length; i++) {
+        const vertexI = polygon[i];
+        const vertexJ = polygon[j];
+
+        if (
+          (vertexI.longitude < point.longitude && vertexJ.longitude >= point.longitude) ||
+          (vertexJ.longitude < point.longitude && vertexI.longitude >= point.longitude)
+        ) {
+          if (
+            vertexI.latitude +
+              ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
+                (vertexJ.latitude - vertexI.latitude) <
+            point.latitude
+          ) {
+            oddNodes = !oddNodes;
+          }
+        }
+
+        j = i;
+      }
+      return oddNodes;
+    };
+
+    const checkIfInsidePolygon = (platitude, plongitude, cords, _podid, name) => {
+      const point = {
+        latitude: platitude,
+        longitude: plongitude,
+      };
+      const isInside = isPointInPolygon(point, cords);
+      if (isInside) {
+        console.log("Jesteś w obszarze");
+      } else {
+        console.log("Jesteś poza obszarem");
+      }
+    };
+
+    const NotiSend = async ( _podid, name) => {
+      const id = await AsyncStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/noti/add";
+        axios.post(url, { 
+          _opid: id,
+          title: "Podopieczny opuścił obszar",
+          _podid: _podid,
+          details: "Podopieczny opuścił obszar: "+ name,
+          date: (new Date()).toISOString()
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    }
 
     const GetPodArea = async (_podid) => {
       const id = await AsyncStorage.getItem("_id");
@@ -342,46 +398,6 @@ export default function MapScreen() {
       setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
     };
 
-    const isPointInPolygon = (point, polygon) => {
-      let oddNodes = false;
-      let j = polygon.length - 1;
-
-      for (let i = 0; i < polygon.length; i++) {
-        const vertexI = polygon[i];
-        const vertexJ = polygon[j];
-
-        if (
-          (vertexI.longitude < point.longitude && vertexJ.longitude >= point.longitude) ||
-          (vertexJ.longitude < point.longitude && vertexI.longitude >= point.longitude)
-        ) {
-          if (
-            vertexI.latitude +
-              ((point.longitude - vertexI.longitude) / (vertexJ.longitude - vertexI.longitude)) *
-                (vertexJ.latitude - vertexI.latitude) <
-            point.latitude
-          ) {
-            oddNodes = !oddNodes;
-          }
-        }
-
-        j = i;
-      }
-      return oddNodes;
-    };
-
-    const checkIfInsidePolygon = (platitude, plongitude, cords) => {
-      const point = {
-        latitude: platitude,
-        longitude: plongitude,
-      };
-      const isInside = isPointInPolygon(point, cords);
-      if (isInside) {
-        console.log("Jesteś w obszarze");
-      } else {
-        console.log("Jesteś poza obszarem");
-      }
-    };
-
     useEffect(() => {
       Setup();
     }, []);
@@ -391,7 +407,7 @@ export default function MapScreen() {
         if (type === "op") {
           if (podArea.length > 0) {
             podArea.map((item) => {
-              isPodinArea(item._podid, item.cords, item.isActive);
+              isPodinArea(item._podid, item.name, item.cords, item.isActive);
             });
           }
         } else {
@@ -476,7 +492,7 @@ export default function MapScreen() {
                       ))}
                     </Picker>
                   ) : (
-                    <Text style={{ height: 50, paddingTop: 15, width: "100%" }}> Brak podopiecznych </Text>
+                    <Text style={{ height: 50, paddingTop: 15 }}> Brak podopiecznych </Text>
                   )}
                 </View>
               </View>
@@ -621,7 +637,7 @@ export default function MapScreen() {
                         alignSelf: "flex-end",
                       },
                     ]}
-                    onPress={() => fade(isVisible ? 0 : 1, isVisible ? 1000 : 3000)}>
+                    onPress={() => fade(isVisible ? 0 : 1, isVisible ? 100 : 200)}>
                     <Ionicons name="alert" size={32} color="grey" />
                   </Pressable>
                 </View>
@@ -651,11 +667,12 @@ export default function MapScreen() {
                       marginVertical: 10,
                       width: "100%",
                       paddingHorizontal: 10,
+                      borderRadius: 10
                     }}
                     value={modalInput}
                     onChangeText={(text) => {
                       const formattedText = text.replace(/[^0-9]/g, ""); // Usuń niecyfrowe znaki
-                      if (formattedText.length <= 6) {
+                      if (formattedText.length == 6) {
                         setModalInput(formattedText);
                       }
                     }}
