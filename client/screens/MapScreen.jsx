@@ -234,7 +234,7 @@ export default function MapScreen() {
           longitudeDelta: 0.0421,
         });
         setLocation(location);
-        AsyncStorage.setItem(
+        await AsyncStorage.setItem(
           "location",
           JSON.stringify({
             latitude: location.coords.latitude,
@@ -268,11 +268,11 @@ export default function MapScreen() {
       }
     };
 
-    const isPodinArea = async (_podid, name, cords, active) => {
+    const isPodinArea = async (item) => {
       let date = new Date();
       date = date.getTime();
       try {
-        const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
+        const url = "http://10.0.2.2:3001/api/user/podloc/" + item._podid;
         axios.get(url).then((response) => {
           if (response && response.data) {
             setPodLoc(response.data.location);
@@ -280,8 +280,8 @@ export default function MapScreen() {
             if (date < poddate + 1000000) {
               setFreshLoc(true)
             }
-            if (active) {
-              checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, cords, _podid, name);
+            if (item.isActive) {
+              checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, item);
             }
           }
         });
@@ -317,29 +317,38 @@ export default function MapScreen() {
       return oddNodes;
     };
 
-    const checkIfInsidePolygon = (platitude, plongitude, cords, _podid, name) => {
+    const checkIfInsidePolygon = async (platitude, plongitude, item) => {
       const point = {
         latitude: platitude,
         longitude: plongitude,
       };
-      const isInside = isPointInPolygon(point, cords);
+      const isInside = isPointInPolygon(point, item.cords);
       if (isInside) {
-        console.log("Jesteś w obszarze");
+        if(!item.loc_status){
+          console.log("Jesteś w obszarze");
+          item.loc_status = true;
+        }
       } else {
-        console.log("Jesteś poza obszarem");
+        if(item.loc_status){
+          console.log("Jesteś poza obszarem");
+          await NotiSend(item._podid, item.name);
+          item.loc_status = false;
+        }
       }
     };
 
     const NotiSend = async ( _podid, name) => {
       const id = await AsyncStorage.getItem("_id");
+      const date = new Date()
       try {
         const url = "http://10.0.2.2:3001/api/noti/add";
         axios.post(url, { 
           _opid: id,
-          title: "Podopieczny opuścił obszar",
           _podid: _podid,
+          title: "Podopieczny opuścił obszar",
           details: "Podopieczny opuścił obszar: "+ name,
-          date: (new Date()).toISOString()
+          areaname: name,
+          date: date.toISOString()
         });
       } catch (error) {
         console.log(error.response.data.message);
@@ -407,7 +416,7 @@ export default function MapScreen() {
         if (type === "op") {
           if (podArea.length > 0) {
             podArea.map((item) => {
-              isPodinArea(item._podid, item.name, item.cords, item.isActive);
+              isPodinArea(item);
             });
           }
         } else {

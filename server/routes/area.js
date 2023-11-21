@@ -206,6 +206,7 @@ router.post("/add", async (req, res) => {
       time_from: req.body.time_f,
       time_to: req.body.time_t,
       isActive: req.body.isActive,
+      loc_status: false
     }).save();
     res.status(201).send({ message: "Area created successfully" });
     console.log("Baza: Dodano Obszar 🗺️");
