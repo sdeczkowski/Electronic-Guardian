@@ -112,10 +112,7 @@ export default function AreaScreen() {
       setErrTime(false);
       setErrDate(false);
       setCheck(null);
-      console.log(time2)
-      console.log(timeReady + " : " + timeReady2);
       const id = await AsyncStorage.getItem("_id");
-      console.log(dateReady);
       if (dateReady === "") {
         setErrDate(true);
         setCheck("Wybierz date!");
@@ -381,7 +378,6 @@ export default function AreaScreen() {
                 }
                 navigation.navigate("AreaTime", { data: partData });
               }
-              console.log(response.data);
             }
           });
         } catch (error) {
