@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, FlatList, TextInput } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
-import { GiftedChat, MessageContainer } from "react-native-gifted-chat";
+import { Bubble ,GiftedChat, MessageContainer,MessageText } from "react-native-gifted-chat";
 import Ionicons from "react-native-vector-icons/AntDesign";
 import Ionicons1 from "react-native-vector-icons/EvilIcons";
 import styles from "../styles/styles";
@@ -76,6 +76,37 @@ export default function ChatScreen() {
         </View>
       );
     };
+    const renderBubble = (props) => {
+      return (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#007AFF', 
+            },
+            left: {
+              backgroundColor: '#CECED2', 
+            },
+          }}
+        />
+      );
+    };
+  
+    const renderMessageText = (props) => {
+      return (
+        <MessageText
+          {...props}
+          textStyle={{
+            right: {
+              color: '#FFFFFF', 
+            },
+            left: {
+              color: '#000000', 
+            },
+          }}
+        />
+      );
+    };
 
     return (
       <View style={{ flex: 1 }}>
@@ -91,6 +122,8 @@ export default function ChatScreen() {
           messages={messages}
           onSend={(messages) => onSend(messages)}
           user={{ _id: 1 }} // Bieżący użytkownik
+          renderBubble={renderBubble} 
+          renderMessageText={renderMessageText} 
         />
       </View>
     );
