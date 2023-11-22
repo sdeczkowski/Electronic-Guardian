@@ -100,6 +100,15 @@ export default function ChatScreen() {
       );
     };
 
+    useEffect(() => {
+      const intId = setInterval(() => {
+        Setup();
+      }, 5000);
+      return () => {
+        clearInterval(intId);
+      };
+    }, [messages]);
+
     const onSend = useCallback((messages = []) => {
       setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
     }, []);
