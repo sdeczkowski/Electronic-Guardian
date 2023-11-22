@@ -94,7 +94,7 @@ router.post("/addpod", async (req, res) => {
       {
         $push: {
           pods: {
-            _podid: req.body._id,
+            _id: req.body._id,
             firstname: firstname,
             lastname: lastname,
           },

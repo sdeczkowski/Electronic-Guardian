@@ -356,7 +356,11 @@ export default function MapScreen() {
     }
 
     const GetPodArea = async (_podid) => {
-      const id = await AsyncStorage.getItem("_id");
+      if(_podid == ""){
+        setPodArea([])
+        setPodLoc(null)
+      } else {
+        const id = await AsyncStorage.getItem("_id");
       try {
         const url = "http://10.0.2.2:3001/api/area/getpodarea/" + id + "/" + _podid;
         axios.get(url).then((response) => {
@@ -376,6 +380,7 @@ export default function MapScreen() {
         });
       } catch (error) {
         console.log(error.response.data.message);
+      }
       }
     };
 
@@ -447,7 +452,7 @@ export default function MapScreen() {
             showsUserLocation={true}
             region={mapRegion}
             onPress={handleMapPress}>
-            {podArea.map((item) => (
+            {podArea.length > 0 ? podArea.map((item) => (
               <Polygon
                 key={item.name}
                 strokeColor={item.isActive ? "blue" : "grey"}
@@ -455,7 +460,7 @@ export default function MapScreen() {
                 strokeWidth={2}
                 coordinates={item.cords}
               />
-            ))}
+            )) : <></>}
             {podloc !== null ? (
               <Marker coordinate={podloc}>
                 <MaterialIcon name="map-marker-account-outline" size={25} color={freshLocation ? "rgb(212, 43, 43)" : "rgb(110, 110, 110)"} />
@@ -490,13 +495,13 @@ export default function MapScreen() {
                         GetPodArea(itemValue);
                         setSelectedValue(itemValue);
                       }}>
-                      <Picker.Item label={"Podopieczny"} value={""} />
+                      <Picker.Item label={"Podopieczny"} key={"xd"} value={""} />
                       {pods.map((pod) => (
                         <Picker.Item
                           style={{ borderRadius: 20 }}
-                          key={pod._podid}
+                          key={pod._id}
                           label={pod.firstname + " " + pod.lastname}
-                          value={pod._podid}
+                          value={pod._id}
                         />
                       ))}
                     </Picker>

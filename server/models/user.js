@@ -6,7 +6,7 @@ const podLocation = new mongoose.Schema({
 })
 
 const podSchema = new mongoose.Schema({
-  _podid: String,
+  _id: String,
   firstname: String,
   lastname: String,
 })
