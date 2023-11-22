@@ -11,7 +11,7 @@ const validateSingUp = (data) => {
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
     isActive: Joi.boolean().required(),
-    type: Joi.boolean().required(),
+    type: Joi.string().required(),
     phoneNumber: Joi.string().required()
   });
   return schema.validate(data);

@@ -35,7 +35,7 @@ export default function ChatScreen() {
     };
 
     const Send = async (messages) => {
-      console.log(messages);
+      //console.log(messages);
       try {
         const url = "http://10.0.2.2:3001/api/chat/send";
         await axios.post(url, {

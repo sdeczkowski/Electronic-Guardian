@@ -221,6 +221,17 @@ export default function MapScreen() {
         } catch (error) {
           console.log(error.response.data.message);
         }
+        try {
+          const url = "http://10.0.2.2:3001/api/user/getphone/" + id;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setPhoneNr(response.data.phoneNumber);
+              console.log("podopieczny - odebranal telefon");
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
       }
       try {
         // let { status } = await Location.requestForegroundPermissionsAsync();

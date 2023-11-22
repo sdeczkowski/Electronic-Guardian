@@ -487,7 +487,7 @@ export default function AreaScreen() {
                 onValueChange={(itemValue) => setSelectedValue(itemValue)}>
                 <Picker.Item label={"Podopieczny"} value={""} />
                 {pods.map((pod) => (
-                  <Picker.Item key={pod._podid} label={pod.firstname + " " + pod.lastname} value={pod._podid} />
+                  <Picker.Item key={pod._id} label={pod.firstname + " " + pod.lastname} value={pod._id} />
                 ))}
               </Picker>
             ) : (

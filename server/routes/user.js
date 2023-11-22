@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const User = require("../models/user.js");
+const AreaDetails = require("../models/area.js");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const passwordComplexity = require("joi-password-complexity");
@@ -67,6 +68,26 @@ router.get("/getpods/:_id", async (req, res) => {
       res.status(201).send(user.pods);
     } else {
       res.status(404).send({ message: "Not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.get("/getphone/:_id", async (req, res) => {
+  try {
+    const area = await AreaDetails.findOne({
+      _podid: req.params._id,
+      isActive: true,
+    });
+    if (area) {
+      const user = await User.findOne({
+        _id: area._opid,
+      }, {phoneNumber:1})
+      res.status(201).send(user);
+    } else {
+      res.status(201).send({ message: "Not found" });
     }
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
