@@ -41,22 +41,6 @@ router.get("/getname/:opid/:name", async (req, res) => {
   }
 });
 
-router.get("/getpods/:opid", async (req, res) => {
-  try {
-    const user = await User.findOne({
-      _opid: req.params.opid
-    });
-    if (user) {
-      res.status(201).send(user.pods);
-    } else {
-      res.status(404).send({ message: "Not found" });
-    }
-  } catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
-    console.log(error);
-  }
-});
-
 router.get("/get/:opid/:podid/:name", async (req, res) => {
   try {
     const area = await AreaDetails.findOne({

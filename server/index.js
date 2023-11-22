@@ -7,6 +7,7 @@ const signup = require("./routes/createaccount.js");
 const notification = require("./routes/notifications.js");
 const area = require("./routes/area.js");
 const user = require("./routes/user.js");
+const chat = require("./routes/chat.js");
 const connectDB = require("./database/DB.js");
 
 const port = process.env.PORT || "3001";
@@ -24,5 +25,6 @@ app.use("/api/signup", signup);
 app.use("/api/auth", auth);
 app.use("/api/area", area);
 app.use("/api/user", user);
+app.use("/api/chat", chat);
 
 app.listen(port, () => console.log(`Serwer: Nasłuchiwanie na porcie ${port} 👌`));
