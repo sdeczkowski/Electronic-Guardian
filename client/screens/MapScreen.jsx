@@ -164,6 +164,8 @@ export default function MapScreen() {
     const [pods, setPods] = useState([]);
     const [podArea, setPodArea] = useState([]);
     const [freshLocation, setFreshLoc] = useState(false);
+    const [check, setCheck] = useState("");
+    const [errCode, setErrCode] = useState(false);
 
     const Setup = async () => {
       const type = await AsyncStorage.getItem("type");
@@ -402,9 +404,27 @@ export default function MapScreen() {
       call(args).catch(console.error);
     };
 
-    const handleModalConfirmation = () => {
-      console.log("Zatwierdzono kod:", modalInput);
-      setModalVisible(false);
+    const handleModalConfirmation = async () => {
+      const id = await AsyncStorage.getItem('_id');
+      setErrCode(false);
+      try {
+        const url = "http://10.0.2.2:3001/api/user/addpod";
+        await axios.post(url, { 
+          _id: id,
+          code: modalInput
+        });
+        setModalVisible(false);
+      } catch (error) {
+        if (error.response.status == 401) {
+          if (error.response.data.message == "Błędny kod") {
+            setErrCode(true);
+          }
+          if (error.response.data.message == "Jesteś przypisany do podanego użytkownika") {
+            setErrCode(true);
+          }
+          setCheck(error.response.data.message);
+        }
+      }
     };
 
     const handleMapPress = (event) => {
@@ -674,26 +694,28 @@ export default function MapScreen() {
                   ]}>
                   <Text style={[styles.title, { justifyContent: "center" }]}>Wprowadź kod od opiekuna:</Text>
                   <TextInput
-                    style={{
+                    style={[{
                       height: 40,
                       borderColor: "gray",
                       borderWidth: 1,
                       marginVertical: 10,
                       width: "100%",
                       paddingHorizontal: 10,
-                      borderRadius: 10
-                    }}
+                      borderRadius: 10,
+                    },
+                    errCode ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 1 }
+                    ]}
                     value={modalInput}
                     onChangeText={(text) => {
                       const formattedText = text.replace(/[^0-9]/g, ""); // Usuń niecyfrowe znaki
-                      if (formattedText.length == 6) {
+                      if (formattedText.length <= 5) {
                         setModalInput(formattedText);
                       }
                     }}
-                    maxLength={6}
+                    maxLength={5}
                     keyboardType="numeric"
                   />
-
+                  <Text style={{ color: "red", textAlign: "center" }}>{check}</Text>
                   <Divider />
                   <View style={{ flexDirection: "row", width: "80%", margin: 10 }}>
                     <Pressable

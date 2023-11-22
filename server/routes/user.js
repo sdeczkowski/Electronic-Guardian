@@ -85,7 +85,7 @@ router.post("/addpod", async (req, res) => {
 
     const user = await User.findOne({ opCode: req.body.code });
     if (!user) return res.status(401).send({ message: "Błędny kod" });
-    const user_code = await User.findOne({ opCode: req.body.code, "pods._podid": req.body._id });
+    const user_code = await User.findOne({ opCode: req.body.code, "pods._id": req.body._id });
     console.log(user_code);
     if (user_code) return res.status(401).send({ message: "Jesteś przypisany do podanego użytkownika" });
 
