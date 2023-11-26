@@ -6,15 +6,19 @@ import "../styles/style.css";
 
 function MapScreen() {
   return (
-    <Row className='bg-dark'>
-        <Col md={6} className="d-flex bg-dark text-light flex-direction-column align-items-center justify-content-center ">
+    <div className='d-flex flex-row justify-content-end'>
+        <div className="d-flex bg-dark text-light align-items-center justify-content-end ">
+          <Button className='button roundbutton'>xd</Button>
             <h1>Todos</h1>
             <p>Keep your tasks organized</p>
             <LinkContainer to="/Signup">
               <Button variant='info'>Get Started <Check size={25} /><i className='fas fa-comments home-message-icon'></i></Button>
             </LinkContainer>
-        </Col>
-    </Row>
+        </div>
+        <div>
+        <h1>xd</h1>
+        </div>
+    </div>
   )
 }
 

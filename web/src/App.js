@@ -7,7 +7,7 @@ import "./App.css";
 function App() {
   return (
     <BrowserRouter>
-      <div className="container">
+      <div className="appcontainer">
         <Navi />
         <div className="app">
         <Routes>
