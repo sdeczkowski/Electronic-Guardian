@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Switch from "react-switch";
 import { FaRegUserCircle } from "react-icons/fa";
-import "../styles/style.css"; // Import your custom styles if needed
+import "../styles/style.css";
+import { BsChevronRight } from "react-icons/bs";
 
 const Profile = () => {
   const [checked, setChecked] = useState(false);
@@ -64,8 +65,20 @@ const Profile = () => {
         <hr />
         <h6>Account</h6>
         <hr />
-        <div>Zmień hasło</div>
-        <div>Zmień e-mail</div>
+        <div className="swi">
+          <div >Zmień hasło</div>
+          <BsChevronRight size={20} className="react-switch3"/>
+        </div>
+        <div className="swi">
+          <div>Zmień e-mail</div>
+          <BsChevronRight size={20} className="react-switch2"/>
+        </div>
+        <div className="xd2">
+        <div>
+          <button className="button">Dezaktywuj konto</button>
+          <button className="button">Wyloguj się</button>
+        </div>
+        </div>
       </div>
     </div>
   );

@@ -53,6 +53,33 @@
 .xd{
   width: 95.5vw;
   height: 100vh;
+  justify-content: center;
+  justify-items: center;
+}
+
+.button{
+  width:20vw;
+  height:2vw;
+  justify-content: center;
+  justify-items: center;
+  margin-left: 10%;
+  margin: 2%;
+  border-radius: 20vh;
+  color: white;
+  background-color: firebrick;
+  border-color:firebrick;
+}
+
+.button1{
+  width:20vw;
+  height:2vw;
+  justify-content: center;
+  justify-items: center;
+  margin: 2%;
+  border-radius: 20vh;
+  color: white;
+  background-color: deepskyblue;
+  border-color:deepskyblue ;
 }
 
 .xd2{
@@ -91,8 +118,36 @@
   margin-left: 32px;
 }
 
+.react-switch3 {
+  margin-left: 40px;
+}
+
 .app{
   display: flex;
   flex-direction: column;
   width: auto;
+}
+
+.title{
+  display: flex;
+  margin-top: 0%;
+  margin: 2%;
+  margin-left: 48%;
+  flex-direction: column;
+  justify-content: center;
+  justify-items: center;
+  padding: 10;
+  font-size: 16px;
+}
+.input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px; /* Add the unit (e.g., px) for padding */
+  font-size: 16px;
+  margin: 1%;
+  margin-right: 10%;
+  width: 200px; /* Set a fixed width for the input */
+  height: 100px; /* Set a fixed height for the input */
+  box-sizing: border-box; /* Include padding in the total width and height */
 }
