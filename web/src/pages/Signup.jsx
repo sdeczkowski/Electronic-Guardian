@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import Particles from "../components/ParticleBackground";
 import "./css/Signup.css";
-import axios from "axios";
 
 const Signup = () => {
   const [data, setData] = useState({
@@ -78,8 +76,6 @@ const Signup = () => {
           </Col>
         </Row>
       </Row>
-      <Particles />
-      
     </Container>
   );
 }

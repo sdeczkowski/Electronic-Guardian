@@ -50,6 +50,47 @@
   flex-direction: row;
 }
 
+.xd{
+  width: 92dvw;
+  height: 100dvh;
+}
+
+.xd2{
+  width: 20vw;
+  height: 40vh;
+  display: flex;
+  margin-left: 40%;
+  margin-top: 2%;
+}
+.chat{
+  width: 100dvw;
+  height: 100dvh;
+}
+.xd3{
+  width: 92vw;
+  height: 50vh;
+  display: flex;
+  margin-top: 0%;
+  margin-left: 2%;
+  flex-direction: column;
+  padding: 10;
+  font-size: 16px;
+}
+
+.swi {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px; /* Dodaj margines między powiadomieniem a przełącznikiem */
+}
+
+.react-switch {
+  margin-left: 10px; /* Dodaj odstęp między tekstem a przełącznikiem */
+}
+
+.react-switch2 {
+  margin-left: 32px;
+}
+
 .app{
   display: flex;
   flex-direction: column;
