@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import Form from 'react-bootstrap/Form';
 import uni from '../assets/uni.png';
 import "../styles/style.css";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
 
 const Signup = () => {
   const [data, setData] = useState({

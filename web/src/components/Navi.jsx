@@ -15,8 +15,7 @@ function Navi() {
   return (
     <Nav
       className="sidebar"
-      activeKey="/home"
-      onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}>
+      activeKey="/home">
       <Nav.Item>
         <Nav.Link href="/profile">
         <FaRegCircleUser style={{color: "blue", fontSize: '4vh'}}/>

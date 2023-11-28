@@ -6,7 +6,7 @@ import "../styles/style.css";
 
 function MapScreen() {
   return (
-    <div className="xd" style={{display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+    <div className="mojenieruszac" style={{display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
       <div style={{display: "flex", justifyContent:"flex-end"}}>
         <Button className="rounded-circle roundbutton bg-light">xd</Button>
       </div>

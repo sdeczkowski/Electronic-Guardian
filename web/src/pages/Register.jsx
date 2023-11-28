@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import "../styles/style.css"; // Import your custom styles if needed
+import axios from "axios";
 
-const Register = ({ match, history }) => {
+const Register = () => {
   const [firstname, setFirst] = useState("");
   const [lastname, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordrepeat, setPasswordRepeat] = useState("");
- // const type = match.params.type;
+  const type = "xd";
 
   const [check, setCheck] = useState(null);
   const [errFname, setErrFname] = useState(false);
@@ -60,7 +61,7 @@ const Register = ({ match, history }) => {
           type: type,
           phoneNumber: phone,
         });
-        history.push("/login");
+        //history.push("/login");
       } catch (error) {
         if (error.response && error.response.status >= 400 && error.response.status <= 500) {
           if (error.response.status === 409) {
@@ -78,7 +79,7 @@ const Register = ({ match, history }) => {
   };
 
   return (
-    <div className=" register-container" >
+    <div className=" register-container mojenieruszac" >
     <img className="img" style={{ width: 150, height: 150 }} src={require("../../src/public/uni.png")} alt="Uni Logo" />
       <h1>Rejestracja</h1>
       <p style={{ color: "red" }}>{check}</p>
