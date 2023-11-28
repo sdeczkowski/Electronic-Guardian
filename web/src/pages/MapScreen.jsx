@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Check } from 'react-bootstrap-icons';
@@ -22,23 +22,19 @@ function MapScreen() {
 
 
   return (
-    <div className='d-flex flex-row justify-content-end'>
-      <div className="d-flex bg-dark text-light align-items-center justify-content-end ">
-        <Button className='button roundbutton'>xd</Button>
-        <h1>Todos</h1>
-        <p>Keep your tasks organized</p>
-        <LinkContainer to="/Signup">
-          <Button variant='info'>Get Started <Check size={25} /><i className='fas fa-comments home-message-icon'></i></Button>
-        </LinkContainer>
+    <div className="mojenieruszac" style={{display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+      <div style={{display: "flex", justifyContent:"flex-end"}}>
+        <Button className="rounded-circle roundbutton bg-light">xd</Button>
       </div>
-      <LoadScript googleMapsApiKey={googleMapsApiKey}>
-      <GoogleMap mapContainerStyle={mapStyles} zoom={13} center={defaultCenter} />
-    </LoadScript>
-      <div>
-        <h1>xd</h1>
+      <div className="d-flex flex-row-reverse bd-highlight" style={{justifyContent: "space-between"}}>
+        <LoadScript googleMapsApiKey={googleMapsApiKey}>
+        <GoogleMap mapContainerStyle={mapStyles} zoom={13} center={defaultCenter} />
+        </LoadScript>
+        <Button className="rounded-circle roundbutton bg-light">xd</Button>
+        <Button className="rounded-circle roundbutton bg-light">xd</Button>
       </div>
     </div>
-  )
+  );
 }
 
-export default MapScreen
+export default MapScreen;

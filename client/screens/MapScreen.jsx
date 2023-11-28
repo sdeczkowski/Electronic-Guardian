@@ -10,6 +10,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, Circle, Polygon } from "react-native-
 import axios from "axios";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import AntIcon from "react-native-vector-icons/AntDesign";
+import FontIcon from "react-native-vector-icons/FontAwesome";
 import MaterialIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import styles from "../styles/styles";
 import * as Location from "expo-location";
@@ -234,11 +235,11 @@ export default function MapScreen() {
         }
       }
       try {
-        // let { status } = await Location.requestForegroundPermissionsAsync();
-        // if (status !== "granted") {
-        //   setErrorMsg("Permission to access location was denied");
-        //   return;
-        // }
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setErrorMsg("Permission to access location was denied");
+          return;
+        }
         let location = await Location.getCurrentPositionAsync({});
         setMapRegion({
           latitude: location.coords.latitude,
@@ -291,7 +292,7 @@ export default function MapScreen() {
             setPodLoc(response.data.location);
             let poddate = Date.parse(response.data.location_date);
             if (date < poddate + 1000000) {
-              setFreshLoc(true)
+              setFreshLoc(true);
             }
             if (item.isActive) {
               checkIfInsidePolygon(response.data.location.latitude, response.data.location.longitude, item);
@@ -337,12 +338,12 @@ export default function MapScreen() {
       };
       const isInside = isPointInPolygon(point, item.cords);
       if (isInside) {
-        if(!item.loc_status){
+        if (!item.loc_status) {
           console.log("Jesteś w obszarze");
           item.loc_status = true;
         }
       } else {
-        if(item.loc_status){
+        if (item.loc_status) {
           console.log("Jesteś poza obszarem");
           await NotiSend(item._podid, item.name);
           item.loc_status = false;
@@ -350,50 +351,50 @@ export default function MapScreen() {
       }
     };
 
-    const NotiSend = async ( _podid, name) => {
+    const NotiSend = async (_podid, name) => {
       const id = await AsyncStorage.getItem("_id");
-      const date = new Date()
+      const date = new Date();
       try {
         const url = "http://10.0.2.2:3001/api/noti/add";
-        axios.post(url, { 
+        axios.post(url, {
           _opid: id,
           _podid: _podid,
           title: "Podopieczny opuścił obszar",
-          details: "Podopieczny opuścił obszar: "+ name,
+          details: "Podopieczny opuścił obszar: " + name,
           areaname: name,
-          date: date.toISOString()
+          date: date.toISOString(),
         });
       } catch (error) {
         console.log(error.response.data.message);
       }
-    }
+    };
 
     const GetPodArea = async (_podid) => {
-      if(_podid == ""){
-        setPodArea([])
-        setPodLoc(null)
+      if (_podid == "") {
+        setPodArea([]);
+        setPodLoc(null);
       } else {
         const id = await AsyncStorage.getItem("_id");
-      try {
-        const url = "http://10.0.2.2:3001/api/area/getpodarea/" + id + "/" + _podid;
-        axios.get(url).then((response) => {
-          if (response && response.data) {
-            setPodArea(response.data);
-          }
-        });
-      } catch (error) {
-        console.log(error.response.data.message);
-      }
-      try {
-        const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
-        axios.get(url).then((response) => {
-          if (response && response.data) {
-            setPodLoc(response.data.location);
-          }
-        });
-      } catch (error) {
-        console.log(error.response.data.message);
-      }
+        try {
+          const url = "http://10.0.2.2:3001/api/area/getpodarea/" + id + "/" + _podid;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setPodArea(response.data);
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
+        try {
+          const url = "http://10.0.2.2:3001/api/user/podloc/" + _podid;
+          axios.get(url).then((response) => {
+            if (response && response.data) {
+              setPodLoc(response.data.location);
+            }
+          });
+        } catch (error) {
+          console.log(error.response.data.message);
+        }
       }
     };
 
@@ -406,9 +407,9 @@ export default function MapScreen() {
       }).start();
     };
 
-    const makeCall = () => {
+    const makeCall = (phone) => {
       const args = {
-        number: phoneNr,
+        number: phone,
         prompt: false,
         skipCanOpen: true,
       };
@@ -416,13 +417,13 @@ export default function MapScreen() {
     };
 
     const handleModalConfirmation = async () => {
-      const id = await AsyncStorage.getItem('_id');
+      const id = await AsyncStorage.getItem("_id");
       setErrCode(false);
       try {
         const url = "http://10.0.2.2:3001/api/user/addpod";
-        await axios.post(url, { 
+        await axios.post(url, {
           _id: id,
-          code: modalInput
+          code: modalInput,
         });
         setModalVisible(false);
       } catch (error) {
@@ -483,18 +484,26 @@ export default function MapScreen() {
             showsUserLocation={true}
             region={mapRegion}
             onPress={handleMapPress}>
-            {podArea.length > 0 ? podArea.map((item) => (
-              <Polygon
-                key={item.name}
-                strokeColor={item.isActive ? "blue" : "grey"}
-                fillColor={item.isActive ? "rgba(109, 147, 253, 0.4)" : "rgba(124, 124, 124, 0.4)"}
-                strokeWidth={2}
-                coordinates={item.cords}
-              />
-            )) : <></>}
+            {podArea.length > 0 ? (
+              podArea.map((item) => (
+                <Polygon
+                  key={item.name}
+                  strokeColor={item.isActive ? "blue" : "grey"}
+                  fillColor={item.isActive ? "rgba(109, 147, 253, 0.4)" : "rgba(124, 124, 124, 0.4)"}
+                  strokeWidth={2}
+                  coordinates={item.cords}
+                />
+              ))
+            ) : (
+              <></>
+            )}
             {podloc !== null ? (
               <Marker coordinate={podloc}>
-                <MaterialIcon name="map-marker-account-outline" size={25} color={freshLocation ? "rgb(212, 43, 43)" : "rgb(110, 110, 110)"} />
+                <MaterialIcon
+                  name="map-marker-account-outline"
+                  size={25}
+                  color={freshLocation ? "rgb(212, 43, 43)" : "rgb(110, 110, 110)"}
+                />
               </Marker>
             ) : (
               <View></View>
@@ -636,37 +645,60 @@ export default function MapScreen() {
                       opacity: fadeAnim,
                     },
                   ]}>
-                  <Pressable
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: "white",
-                        height: 65,
-                        width: 65,
-                        borderRadius: 50,
-                        alignSelf: "flex-end",
-                      },
-                    ]}
-                    onPress={() => {
-                      setModalVisible(true);
-                    }}>
-                    <AntIcon name="user" size={32} color="grey" />
-                  </Pressable>
-                  <Pressable
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: "white",
-                        height: 65,
-                        width: 65,
-                        borderRadius: 50,
-                        alignSelf: "flex-end",
-                        //marginRight:"30%",
-                      },
-                    ]}
-                    onPress={makeCall}>
-                    <AntIcon name="fork" size={32} color="grey" />
-                  </Pressable>
+                  <View style={{ flex: 1, flexDirection: "row", justifyContent: "flex-end" }}>
+                    <Pressable
+                      style={[
+                        styles.button,
+                        {
+                          backgroundColor: "white",
+                          top: 89,
+                          left: 90,
+                          height: 65,
+                          width: 65,
+                          borderRadius: 50,
+                          alignSelf: "flex-end",
+                        },
+                      ]}
+                      onPress={()=> {makeCall(phoneNr)}}>
+                      <AntIcon name="user" size={32} color="grey" />
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.button,
+                        {
+                          backgroundColor: "white",
+                          height: 65,
+                          top: 20,
+                          left: 20,
+                          width: 65,
+                          borderRadius: 50,
+                          alignSelf: "flex-end",
+                          //marginRight:"30%",
+                        },
+                      ]}
+                      onPress={()=> {makeCall("112")}}>
+                      <FontIcon name="ambulance" size={32} color="grey" />
+                    </Pressable>
+                    <Pressable
+                      style={[
+                        styles.button,
+                        {
+                          backgroundColor: "white",
+                          height: 65,
+                          width: 65,
+                          bottom: 1,
+                          left: 5,
+                          borderRadius: 50,
+                          alignSelf: "flex-end",
+                          //marginRight:"30%",
+                        },
+                      ]}
+                      onPress={() => {
+                        setModalVisible(true);
+                      }}>
+                      <AntIcon name="fork" size={32} color="grey" />
+                    </Pressable>
+                  </View>
                 </Animated.View>
               )}
               <View style={{ paddingBottom: 100 }}>
@@ -705,16 +737,17 @@ export default function MapScreen() {
                   ]}>
                   <Text style={[styles.title, { justifyContent: "center" }]}>Wprowadź kod od opiekuna:</Text>
                   <TextInput
-                    style={[{
-                      height: 40,
-                      borderColor: "gray",
-                      borderWidth: 1,
-                      marginVertical: 10,
-                      width: "100%",
-                      paddingHorizontal: 10,
-                      borderRadius: 10,
-                    },
-                    errCode ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 1 }
+                    style={[
+                      {
+                        height: 40,
+                        borderColor: "gray",
+                        borderWidth: 1,
+                        marginVertical: 10,
+                        width: "100%",
+                        paddingHorizontal: 10,
+                        borderRadius: 10,
+                      },
+                      errCode ? { borderColor: "red", borderWidth: 1 } : { borderWidth: 1 },
                     ]}
                     value={modalInput}
                     onChangeText={(text) => {
