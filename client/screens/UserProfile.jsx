@@ -158,7 +158,7 @@ export default function ProfileScreen() {
       } else if (repeatemail != newemail) {
         setErrNewEmail(true);
         setErrRepeatEmail(true);
-        setCheck("Hasła nie są identyczne!");
+        setCheck("Emaile nie są identyczne!");
       } else if (!emailRegex.test(newemail)) {
         setErrNewEmail(true);
         setErrRepeatEmail(true);
