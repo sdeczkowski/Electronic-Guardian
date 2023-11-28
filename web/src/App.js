@@ -4,6 +4,7 @@ import MapScreen from "./pages/MapScreen";
 import "./styles/style.css";
 import "./App.css";
 import { Register } from "./pages/Register";
+
 function App() {
   return (
     <BrowserRouter>
@@ -21,6 +22,7 @@ function App() {
 
           <Route path="/" element={<MapScreen />} />
           <Route path="/register" element={<Register />} />
+          
         </Routes>
         </div>
       </div>
