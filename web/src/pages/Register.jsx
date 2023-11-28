@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import "../styles/style.css"; // Import your custom styles if needed
 
 const Register = ({ match, history }) => {
   const [firstname, setFirst] = useState("");
@@ -140,11 +140,11 @@ const Register = ({ match, history }) => {
         onChange={(e) => setPasswordRepeat(e.target.value)}
       />
       
-      <button className="button" onClick={handleSignUp}>
+      <button className="button2" onClick={handleSignUp}>
         Zarejestruj się
       </button>
     </div>
   );
 };
 
-export { Register };
+export default Register;
