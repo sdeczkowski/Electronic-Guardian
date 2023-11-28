@@ -18,22 +18,22 @@ function Navi() {
       activeKey="/home"
       onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}>
       <Nav.Item>
-        <Nav.Link href="/home">
+        <Nav.Link href="/profile">
         <FaRegCircleUser style={{color: "blue", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="link-1">
+        <Nav.Link eventKey="link-1" href="/home">
         <FaMap style={{color: "blue", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="link-2">
+        <Nav.Link eventKey="link-2" href="">
         <FaLocationDot style={{color: "blue", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="disabled" disabled>
+        <Nav.Link eventKey="disabled"  href="chat" >
         <FaMessage style={{color: "blue", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>

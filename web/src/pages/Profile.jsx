@@ -17,8 +17,8 @@ const Profile = () => {
 
   return (
     <div className="xd">
-      <div className="xd2">
-        <FaRegUserCircle size={300} />
+      <div className="xd2 input-container">
+        <FaRegUserCircle size={300}/>
       </div>
       <div className="xd3">
         <hr />
@@ -73,7 +73,7 @@ const Profile = () => {
           <div>Zmień e-mail</div>
           <BsChevronRight size={20} className="react-switch2"/>
         </div>
-        <div className="xd2">
+        <div className="xd2 input-container">
         <div>
           <button className="button">Dezaktywuj konto</button>
           <button className="button">Wyloguj się</button>
