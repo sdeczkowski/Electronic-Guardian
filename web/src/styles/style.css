@@ -51,6 +51,8 @@
 }
 
 .xd{
+  align-items: center;
+  flex-direction: column;
   width: 92dvw;
   height: 100dvh;
   justify-content: center;
@@ -80,19 +82,18 @@
   color: white;
   background-color: deepskyblue;
   border-color:deepskyblue ;
+  margin-right: 40%;
 }
 
 .xd2{
   width: 20vw;
   height: 40vh;
-  display: flex;
   margin-left: 40%;
   margin-top: 2%;
 }
-
 .chat{
-  width: 100dvw;
-  height: 100dvh;
+  width: 100vw;
+  height: 100vh;
 }
 
 .xd3{
@@ -134,22 +135,25 @@
   display: flex;
   margin-top: 0%;
   margin: 2%;
-  margin-left: 48%;
+  margin-left: 46.5%;
   flex-direction: column;
   justify-content: center;
   justify-items: center;
   padding: 10;
   font-size: 16px;
 }
-.input {
+
+.input-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px; /* Add the unit (e.g., px) for padding */
-  font-size: 16px;
-  margin: 1%;
-  margin-right: 10%;
-  width: 200px; /* Set a fixed width for the input */
-  height: 100px; /* Set a fixed height for the input */
-  box-sizing: border-box; /* Include padding in the total width and height */
+  justify-content: center;
+}
+
+.input {
+  width: 40%;
+  margin: 10px;
+  border-radius: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
