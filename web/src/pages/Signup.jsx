@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Form from 'react-bootstrap/Form';
 import uni from '../assets/uni.png';
+
 const Signup = () => {
   const [data, setData] = useState({
     name: "",

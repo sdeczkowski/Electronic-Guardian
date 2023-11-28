@@ -51,8 +51,8 @@
 }
 
 .xd{
-  width: 95.5vw;
-  height: 100vh;
+  width: 92dvw;
+  height: 100dvh;
   justify-content: center;
   justify-items: center;
 }
@@ -89,10 +89,12 @@
   margin-left: 40%;
   margin-top: 2%;
 }
+
 .chat{
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
 }
+
 .xd3{
   width: 92vw;
   height: 50vh;
