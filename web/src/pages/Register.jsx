@@ -141,7 +141,9 @@ const Register = () => {
         onChange={(e) => setPasswordRepeat(e.target.value)}
       />
       
+
       <button className="button2" onClick={handleSignUp}>
+
         Zarejestruj się
       </button>
     </div>
