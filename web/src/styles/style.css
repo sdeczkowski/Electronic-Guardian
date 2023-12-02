@@ -175,7 +175,7 @@
 
 .textinput {
   /* Dodaj odpowiednie style dla textinput */
-  border-radius: 20px;
+  border-radius: 20px !important;
   margin: 10px;
   padding: 8px;
   background-color: #dbdada;
@@ -196,9 +196,35 @@
 }
 
 .input {
+  display: flex;
   width: 40%;
   margin: 10px;
   border-radius: 20px;
   margin-left: auto;
   margin-right: auto;
+}
+.rc-time-picker-clear {
+  line-height: 15px !important;
+}
+.time{
+  border-radius: 20vh !important;
+}
+.react-time-picker__wrapper {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  border: thin solid gray;
+  border-radius: 20px;
+}
+.checkbox-round {
+  width: 1.3em;
+  height: 1.3em;
+  background-color: white;
+  border-radius: 50%;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  cursor: pointer;
 }
