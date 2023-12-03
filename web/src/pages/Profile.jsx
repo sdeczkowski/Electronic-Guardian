@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Switch from "react-switch";
-import { Nav } from "react-bootstrap";
+import { Nav, Button } from "react-bootstrap";
+import uni from "../assets/uni.png";
 import { FaRegUserCircle } from "react-icons/fa";
 import "../styles/style.css";
 import { FaMap, FaRegMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
@@ -18,8 +19,12 @@ const Profile = () => {
 
   return (
     <div>
-      <div style={{ position: "absolute", zIndex: 3 }}>
-        <Nav className="sidebar">
+      <div style={{ position: "fixed", zIndex: 3, height: "100vh", backgroundColor: "#979797", overflow: "hidden" }}>
+        <Nav style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+          <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 1, borderColor: "#979797", backgroundColor: "white", width: "80px", height: "80px" }}>
+            <img src={uni} alt="logo" style={{width: "50px", height: "50px"}} />
+          </Button>
+          <div className="sidebar">
           <Nav.Item>
             <Nav.Link href="/profile">
               <FaRegCircleUser style={{ color: "#2699c7", fontSize: "4vh" }} />
@@ -31,7 +36,7 @@ const Profile = () => {
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
-            <Nav.Link eventKey="link-2" href="">
+            <Nav.Link eventKey="link-2" href="/list">
               <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
             </Nav.Link>
           </Nav.Item>
@@ -40,9 +45,10 @@ const Profile = () => {
               <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
             </Nav.Link>
           </Nav.Item>
+          </div>
         </Nav>
       </div>
-      <div className="xd" style={{ position: "relative", left: "6dvw" }}>
+      <div className="xd" style={{ position: "relative", left: "120px" }}>
         <div className="xd2 input-container">
           <FaRegUserCircle size={300} />
         </div>
