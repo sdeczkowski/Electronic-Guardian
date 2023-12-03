@@ -14,26 +14,25 @@ function Navi() {
   const user = localStorage.getItem("token");
   return (
     <Nav
-      className="sidebar"
-      activeKey="/home">
+      className="sidebar">
       <Nav.Item>
         <Nav.Link href="/profile">
-        <FaRegCircleUser style={{color: "blue", fontSize: '4vh'}}/>
+        <FaRegCircleUser style={{color: "#2699c7", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="link-1" href="/home">
-        <FaMap style={{color: "blue", fontSize: '4vh'}}/>
+        <Nav.Link eventKey="link-1" href="/mapscreen">
+        <FaMap style={{color: "#2699c7", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
         <Nav.Link eventKey="link-2" href="">
-        <FaLocationDot style={{color: "blue", fontSize: '4vh'}}/>
+        <FaLocationDot style={{color: "#2699c7", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>
-        <Nav.Link eventKey="disabled"  href="chat" >
-        <FaMessage style={{color: "blue", fontSize: '4vh'}}/>
+        <Nav.Link eventKey="disabled"  href="/chat" >
+        <FaMessage style={{color: "#2699c7", fontSize: '4vh'}}/>
         </Nav.Link>
       </Nav.Item>
     </Nav>

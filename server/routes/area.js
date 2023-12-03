@@ -98,7 +98,7 @@ router.get("/getpodarea/:opid/:podid", async (req, res) => {
         var formattedDate = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
         var podformDate = poddate.getDate() + "/" + (poddate.getMonth() + 1) + "/" + poddate.getFullYear();
 
-      if(formattedDate == podformDate && podTimeFrom.getTime() < date.getTime() && podTimeTo.getTime() > date.getTime()){
+      if(podTimeFrom.getTime() < date.getTime() && podTimeTo.getTime() > date.getTime()){
         await AreaDetails.updateOne(
           { _opid: item._opid,
             _podid: item._podid,
