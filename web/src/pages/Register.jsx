@@ -79,8 +79,13 @@ const Register = () => {
   };
 
   return (
-    <div className=" register-container mojenieruszac" >
-    <img className="img" style={{ width: 150, height: 150 }} src={require("../../src/public/uni.png")} alt="Uni Logo" />
+    <div className=" register-container mojenieruszac">
+      <img
+        className="img"
+        style={{ width: 150, height: 150 }}
+        src={require("../../src/public/uni.png")}
+        alt="Uni Logo"
+      />
       <h1>Rejestracja</h1>
       <p style={{ color: "red" }}>{check}</p>
       <input
@@ -140,10 +145,8 @@ const Register = () => {
         value={passwordrepeat}
         onChange={(e) => setPasswordRepeat(e.target.value)}
       />
-      
 
       <button className="button2" onClick={handleSignUp}>
-
         Zarejestruj się
       </button>
     </div>

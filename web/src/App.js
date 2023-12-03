@@ -13,16 +13,16 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-          <Route path="/" element={<MapScreen />} />
-          <Route path="/profile" element={<Profile />} />
-          {
+        <Route path="/" element={<MapScreen />} />
+        <Route path="/profile" element={<Profile />} />
+        {
           //<Route path="/chat" element={<Chat />} />
-          }
-          <Route path="/register" element={<Register />} />
-          <Route path="/log" element={<Signup />} />
-          <Route path="/area" element={<AreaScreen />} />
-          <Route path="/list" element={<AreaList />} />
-        </Routes>
+        }
+        <Route path="/register" element={<Register />} />
+        <Route path="/log" element={<Signup />} />
+        <Route path="/area" element={<AreaScreen />} />
+        <Route path="/list" element={<AreaList />} />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Form from 'react-bootstrap/Form';
-import uni from '../assets/uni.png';
+import Form from "react-bootstrap/Form";
+import uni from "../assets/uni.png";
 import "../styles/style.css";
 
 const Signup = () => {
@@ -22,7 +22,7 @@ const Signup = () => {
 
   return (
     <div className="xd">
-      <img src={uni} alt='logo' className="xd2" />
+      <img src={uni} alt="logo" className="xd2" />
       <div className="xd3">
         <h5 className="title">Logowanie</h5>
         <br />
@@ -32,7 +32,7 @@ const Signup = () => {
           name="email"
           onChange={handleChange}
           className="input"
-          style={{width:"40%", borderRadius:"20vh"}}
+          style={{ width: "40%", borderRadius: "20vh" }}
         />
         <br />
         <Form.Control
@@ -41,7 +41,7 @@ const Signup = () => {
           name="password"
           onChange={handleChange}
           className="input input-container"
-          style={{width:"40%", borderRadius:"20vh"}}
+          style={{ width: "40%", borderRadius: "20vh" }}
         />
         <br />
         <div className="xd2 input input-container">

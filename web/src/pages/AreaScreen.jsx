@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
-import Form from 'react-bootstrap/Form';
-import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
-import Dropdown from 'react-bootstrap/Dropdown';
+import Form from "react-bootstrap/Form";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
+import Dropdown from "react-bootstrap/Dropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import TimePicker from 'react-time-picker';
+import TimePicker from "react-time-picker";
 
 function AreaScreen() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const [startDate, setStartDate] = useState(new Date());
-  const [value, onChange] = useState('10:00');
-  const [value2, onChange2] = useState('10:00');
+  const [value, onChange] = useState("10:00");
+  const [value2, onChange2] = useState("10:00");
   const mapStyles = {
     height: "100vh",
     width: "100%",
@@ -27,7 +27,7 @@ function AreaScreen() {
     <div className="mojenieruszac" style={{ display: "flex", flexDirection: "column" }}>
       <div className="d-flex flex-row bd-highlight" style={{ justifyContent: "space-between" }}>
         <LoadScript googleMapsApiKey={googleMapsApiKey}>
-          <div style={{ backgroundColor: "white", height: "100vh", width: "30%"}}>
+          <div style={{ backgroundColor: "white", height: "100vh", width: "30%" }}>
             <Form.Control
               type="text"
               placeholder="Nazwa obszaru"
@@ -40,7 +40,14 @@ function AreaScreen() {
                 onChange={onChange}
                 value={value}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh", marginTop: "20%",display:"flex", justifyContent: "center", margin: 10 }}
+                style={{
+                  width: "60%",
+                  borderRadius: "20vh",
+                  marginTop: "20%",
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: 10,
+                }}
               />
               <TimePicker
                 onChange={onChange2}
@@ -49,7 +56,10 @@ function AreaScreen() {
                 style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
               />
               <Dropdown className="input">
-                <Dropdown.Toggle variant="success" id="dropdown-basic" style={{ backgroundColor: "deepskyblue", borderRadius:"20px" }}>
+                <Dropdown.Toggle
+                  variant="success"
+                  id="dropdown-basic"
+                  style={{ backgroundColor: "deepskyblue", borderRadius: "20px" }}>
                   Dropdown List
                 </Dropdown.Toggle>
 
@@ -59,26 +69,35 @@ function AreaScreen() {
                   <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
-              <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} className="input" style={{ display: "flex", justifyContent: "center",width: "60%" }} />
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                className="input"
+                style={{ display: "flex", justifyContent: "center", width: "60%" }}
+              />
 
               {/* Checkboxes */}
-              <div style={{display:"flex", flexDirection:"column", margin:"2%", justifyContent: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
                 <label>
                   <input type="checkbox" className="checkbox-round" />
-                    Codziennie
+                  Codziennie
                 </label>
                 <label>
                   <input type="checkbox" className="checkbox-round" />
-                    Co tydzień
+                  Co tydzień
                 </label>
                 <label>
                   <input type="checkbox" className="checkbox-round" />
-                    Nigdy
+                  Nigdy
                 </label>
               </div>
 
               {/* Button */}
-              <button className="button1" style={{ width: "60%", display: "flex", justifyContent: "center", marginLeft: "22%" }}>Zatwierdź</button>
+              <button
+                className="button1"
+                style={{ width: "60%", display: "flex", justifyContent: "center", marginLeft: "22%" }}>
+                Zatwierdź
+              </button>
             </div>
           </div>
 

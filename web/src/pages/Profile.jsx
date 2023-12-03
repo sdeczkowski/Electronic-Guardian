@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import Switch from "react-switch";
-import {Nav} from "react-bootstrap";
+import { Nav } from "react-bootstrap";
 import { FaRegUserCircle } from "react-icons/fa";
 import "../styles/style.css";
-import { FaMap, FaRegMap, FaRegCircleUser, FaLocationDot, FaMessage  } from "react-icons/fa6";
+import { FaMap, FaRegMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { BsChevronRight } from "react-icons/bs";
 
 const Profile = () => {
@@ -100,8 +100,8 @@ const Profile = () => {
             <BsChevronRight size={20} className="react-switch2" />
           </div>
           <div className="xd2 input-container">
-              <button className="button">Dezaktywuj konto</button>
-              <button className="button">Wyloguj się</button>
+            <button className="button">Dezaktywuj konto</button>
+            <button className="button">Wyloguj się</button>
           </div>
         </div>
       </div>
