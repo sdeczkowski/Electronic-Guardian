@@ -22,6 +22,7 @@ function App() {
         <Route path="/log" element={<Signup />} />
         <Route path="/area" element={<AreaScreen />} />
         <Route path="/list" element={<AreaList />} />
+        <Route path="/chat" element={<Chat />} />
       </Routes>
     </BrowserRouter>
   );
