@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav, Card } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Check } from "react-bootstrap-icons";
+import uni from "../assets/uni.png";
 import "../styles/style.css";
 import { Bell, QrCode } from "react-bootstrap-icons";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
@@ -23,37 +24,44 @@ function MapScreen() {
   };
 
   const ShowNoti = () => {
-    if(displayNoti){
-      setDisplayNoti(false)
+    if (displayNoti) {
+      setDisplayNoti(false);
     } else {
-      setDisplayNoti(true)
+      setDisplayNoti(true);
     }
-  }
+  };
 
   return (
     <div>
       <div style={{ position: "absolute", zIndex: 3 }}>
-        <Nav className="sidebar">
-          <Nav.Item>
-            <Nav.Link href="/profile">
-              <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-1" href="/">
-              <FaMap style={{ color: "#2699c7", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-2" href="">
-              <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="disabled" href="/chat">
-              <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
+        <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Button
+            className="rounded-circle roundbutton bg-light"
+            style={{ borderWidth: 0, borderColor: "#979797", backgroundColor: "white", width: "80px", height: "80px" }}>
+            <img src={uni} alt="logo" style={{ width: "50px", height: "50px" }} />
+          </Button>
+          <div className="sidebar">
+            <Nav.Item>
+              <Nav.Link href="/profile">
+                <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-1" href="/">
+                <FaMap style={{ color: "#2699c7", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-2" href="/list">
+                <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="disabled" href="/chat">
+                <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+          </div>
         </Nav>
       </div>
 
@@ -89,13 +97,18 @@ function MapScreen() {
               height: "100vh",
             }}>
             <div style={{ display: "flex", justifyContent: "flex-start", flexDirection: "row-reverse" }}>
-              <Button className="rounded-circle roundbutton bg-light" style={{ color: "black", zIndex: 2, borderWidth: 0 }} onClick={ShowNoti}>
+              <Button
+                className="rounded-circle roundbutton bg-light"
+                style={{ color: "black", zIndex: 2, borderWidth: 0 }}
+                onClick={ShowNoti}>
                 <Bell size={35} color="#979797" />
               </Button>
-              {displayNoti && <Card className="shadow noti">
-                <Card style={{width: "30vw", height: "15vh", backgroundColor: "#979797"}}></Card>
-                <Card style={{width: "30vw", height: "15vh", backgroundColor: "#979797"}}></Card>
-                </Card>}
+              {displayNoti && (
+                <Card className="shadow noti">
+                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
+                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
+                </Card>
+              )}
             </div>
             <div
               className="d-flex flex-row-reverse bd-highlight"
