@@ -63,7 +63,7 @@ const Register = () => {
           type: "op",
           phoneNumber: phone,
         });
-        navigate("/login")
+        navigate("/")
       } catch (error) {
         if (error.response && error.response.status >= 400 && error.response.status <= 500) {
           if (error.response.status === 409) {
