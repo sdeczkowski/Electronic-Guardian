@@ -132,7 +132,7 @@ function MapScreen() {
                 </Modal.Header>
                 <Modal.Body style={{display:"flex", justifyContent:"center",fontSize:"100px"}}>{code}</Modal.Body>
                 <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
-                  <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center"}}>
+                  <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center", textDecoration: "none", color: "black"}}>
                     Zamknij
                   </Button>
                 </Modal.Footer>

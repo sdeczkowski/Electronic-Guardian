@@ -69,7 +69,14 @@ function AreaList() {
               <GoogleMap
                 mapContainerStyle={{ height: "300px", width: "100%" }}
                 zoom={13}
-                center={defaultCenter}></GoogleMap>
+                center={defaultCenter}
+                options={{
+                  fullscreenControl: false,
+                  streetViewControl: false,
+                  mapTypeControl: false,
+                  zoomControl: false,
+                  controlSize: false
+                }}></GoogleMap>
             </LoadScript>
             <Card.Body>
               <Card.Title>Nazwa obszaru</Card.Title>
