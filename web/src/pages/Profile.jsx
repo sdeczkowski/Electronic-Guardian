@@ -10,6 +10,9 @@ import { BsChevronRight } from "react-icons/bs";
 const Profile = () => {
   const [checked, setChecked] = useState(false);
   const [checked2, setChecked2] = useState(false);
+  const [password, setPassword] = useState("");
+  const [newpassword, setNewPassword] = useState("");
+  const [repeatpassword, setRepeatPassword] = useState("");
   const handleChange = (checked) => {
     setChecked(checked);
   };
