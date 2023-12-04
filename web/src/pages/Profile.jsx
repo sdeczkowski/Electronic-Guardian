@@ -292,9 +292,7 @@ const Profile = () => {
                 </Button>
               </Modal.Footer>
             </Modal>
-            <button className="button" onClick={LogOut}>
-              Wyloguj się
-            </button>
+            <button className="button" onClick={LogOut}>Wyloguj się</button>
           </div>
         </div>
       </div>
