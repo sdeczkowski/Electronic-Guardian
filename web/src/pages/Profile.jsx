@@ -14,6 +14,9 @@ import Form from "react-bootstrap/Form";
 const Profile = () => {
   const [checked, setChecked] = useState(false);
   const [checked2, setChecked2] = useState(false);
+  const [password, setPassword] = useState("");
+  const [newpassword, setNewPassword] = useState("");
+  const [repeatpassword, setRepeatPassword] = useState("");
   const [show, setShow] = useState(false);
   const [show1, setShow1] = useState(false);
   const [show2, setShow2] = useState(false);
@@ -23,6 +26,7 @@ const Profile = () => {
   const handleShow1 = () => setShow1(true);
   const handleClose2 = () => setShow2(false);
   const handleShow2 = () => setShow2(true);
+  
   const handleChange = (checked) => {
     setChecked(checked);
   };

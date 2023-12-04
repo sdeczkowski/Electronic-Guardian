@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav, Card } from "react-bootstrap";
+import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav, Card, Modal } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Check } from "react-bootstrap-icons";
 import uni from "../assets/uni.png";
@@ -10,6 +10,9 @@ import { LoadScript, GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 
 function MapScreen() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const [path, setPath] = useState([
     { lat: 52.52549080781086, lng: 13.398118538856465 },
@@ -30,6 +33,13 @@ function MapScreen() {
       setDisplayNoti(true);
     }
   };
+
+  const generateCode = () => {
+    const code = Math.floor(Math.random() * 900000) + 100000;
+    return code;
+  };
+
+  const [code, setCode] = useState(generateCode());
 
   return (
     <div>
@@ -113,9 +123,20 @@ function MapScreen() {
             <div
               className="d-flex flex-row-reverse bd-highlight"
               style={{ justifyContent: "space-between", zIndex: 2 }}>
-              <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }}>
+              <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }}  onClick={handleShow}>
                 <QrCode size={35} color="#979797" />
               </Button>
+              <Modal show={show} onHide={handleClose}>
+                <Modal.Header style={{display:"flex", flexDirection:"column"}}>
+                  <Modal.Title>Kod podopiecznego</Modal.Title>
+                </Modal.Header>
+                <Modal.Body style={{display:"flex", justifyContent:"center",fontSize:"100px"}}>{code}</Modal.Body>
+                <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
+                  <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center"}}>
+                    Zamknij
+                  </Button>
+                </Modal.Footer>
+              </Modal>
               <Dropdown as={ButtonGroup}>
                 <Dropdown.Toggle
                   id="dropdown-custom-1"
