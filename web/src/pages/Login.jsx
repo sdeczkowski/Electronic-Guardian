@@ -3,44 +3,91 @@ import { Link, useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import uni from "../assets/uni.png";
 import "../styles/style.css";
+import axios from "axios";
 
 const Signup = () => {
-  const [data, setData] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  // zmienne
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleChange = ({ currentTarget: input }) => {
-    setData({ ...data, [input.name]: input.value });
-  };
+  // walidatory
+  const [check, setCheck] = useState(null);
+  const [errEmail, setErrEmail] = useState(false);
+  const [errPass, setErrPass] = useState(false);
 
-  const handleSubmit = async () => {
-    // Your submission logic goes here
+  const handleLogin = async () => {
+    setCheck(null);
+    setErrEmail(false);
+    setErrPass(false);
+    if (email == "") {
+      setErrEmail(true);
+      setCheck("Wpisz email!");
+    } else if (password == "") {
+      setErrPass(true);
+      setCheck("Wpisz hasło!");
+    } else {
+      try {
+        const url = "http://localhost:3001/api/auth";
+        const { data: res } = await axios.post(url, {
+          email: email,
+          password: password,
+        });
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("email", res.data.email);
+        localStorage.setItem("_id", res.data._id);
+        window.location.replace("/");
+      } catch (error) {
+        if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+          if (error.response.status == 400) {
+            setErrEmail(true);
+            setErrPass(true);
+            setCheck("Niepoprawne dane");
+          }
+          if (error.response.status == 401) {
+            if (error.response.data.message == "Błędny email") {
+              setErrEmail(true);
+            }
+            if (error.response.data.message == "Błędne hasło") {
+              setErrPass(true);
+            }
+            setCheck(error.response.data.message);
+          }
+        }
+      }
+    }
   };
 
   return (
     <div className="login">
       <img src={uni} alt="logo" className="img" />
-      <h1 style={{marginTop: "10px"}}>Logowanie</h1>
+      <h1 style={{ marginTop: "10px" }}>Logowanie</h1>
+      <br />
+      <p style={{ color: "red" }}>{check}</p>
       <Form.Control
         type="text"
         placeholder="Email"
         name="email"
-        onChange={handleChange}
+        onChange={(e) => setEmail(e.target.value)}
         className="input"
-        style={{ margin: "10px", width: "30vw", borderRadius: "20vh" }}
+        style={
+          errEmail
+            ? { borderColor: "red", borderWidth: 1, margin: "10px", width: "30vw", borderRadius: "20vh" }
+            : { margin: "10px", width: "30vw", borderRadius: "20vh" }
+        }
       />
       <Form.Control
         type="password"
         placeholder="Password"
         name="password"
-        onChange={handleChange}
+        onChange={(e) => setPassword(e.target.value)}
         className="input"
-        style={{ margin: "10px", width: "30vw", borderRadius: "20vh" }}
+        style={
+          errPass
+            ? { borderColor: "red", borderWidth: 1, margin: "10px", width: "30vw", borderRadius: "20vh" }
+            : { margin: "10px", width: "30vw", borderRadius: "20vh" }
+        }
       />
-      <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={handleSubmit}>
+      <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={handleLogin}>
         Zaloguj się
       </button>
       <Link to="/signup" className="">

@@ -31,6 +31,11 @@ const Profile = () => {
     setChecked2(checked2);
   };
 
+  const LogOut = () => {
+    localStorage.clear();
+    window.location.replace("/");
+  };
+
   return (
     <div>
       <div style={{ position: "fixed", zIndex: 3, height: "100vh", backgroundColor: "#979797", overflow: "hidden" }}>
@@ -208,7 +213,7 @@ const Profile = () => {
                 </Button>
               </Modal.Footer>
             </Modal>
-            <button className="button" onClick={toggleDeactivate}>Wyloguj się</button>
+            <button className="button" onClick={LogOut}>Wyloguj się</button>
           </div>
         </div>
       </div>
