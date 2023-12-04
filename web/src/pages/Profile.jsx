@@ -7,7 +7,6 @@ import "../styles/style.css";
 import { FaMap, FaRegMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { BsChevronRight } from "react-icons/bs";
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import { HiExclamationTriangle } from "react-icons/hi2";
 import Form from "react-bootstrap/Form";
 
@@ -17,15 +16,13 @@ const Profile = () => {
   const [password, setPassword] = useState("");
   const [newpassword, setNewPassword] = useState("");
   const [repeatpassword, setRepeatPassword] = useState("");
-  const [show, setShow] = useState(false);
-  const [show1, setShow1] = useState(false);
-  const [show2, setShow2] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
-  const handleClose1 = () => setShow1(false);
-  const handleShow1 = () => setShow1(true);
-  const handleClose2 = () => setShow2(false);
-  const handleShow2 = () => setShow2(true);
+  const [showDeactivate, setShowDeactivate] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
+  const toggleDeactivate = () => setShowDeactivate(!showDeactivate);
+  const toggleEmail = () => setShowEmail(!showEmail);
+  const togglePass = () => setShowPass(!showPass);
   
   const handleChange = (checked) => {
     setChecked(checked);
@@ -116,19 +113,19 @@ const Profile = () => {
           <hr />
           <div className="swi">
             <div>Zmień hasło</div>
-            <Button variant="link" color="gray" onClick={handleShow2}><BsChevronRight size={20} className="react-switch3" /></Button>
-            <Modal  show={show2} onHide={handleClose2}>
+            <Button variant="link" color="gray" onClick={togglePass}><BsChevronRight size={20} className="react-switch3" /></Button>
+            <Modal  show={showPass} onHide={togglePass}>
               <Modal.Header closeButton >
               </Modal.Header>
               <Modal.Title style={{display:"flex", justifyContent:"center"}} >Zmiana hasła</Modal.Title>
-              <Modal.Body style={{display:"flex", justifyContent:"center", flexDirection:"column"}}>
+              <Modal.Body style={{display:"flex", justifyContent:"center", flexDirection:"column", alignItems: "center"}}>
               <Form.Control
                 type="text"
                 placeholder="Stare hasło"
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               <Form.Control
                 type="text"
@@ -136,7 +133,7 @@ const Profile = () => {
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               <Form.Control
                 type="text"
@@ -144,11 +141,11 @@ const Profile = () => {
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               </Modal.Body>
               <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
-                <button className="button1" onClick={handleClose2} style={{display:"flex", justifyContent:"center"}}>
+                <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={togglePass}>
                   Zmień
                 </button>
               </Modal.Footer>
@@ -156,19 +153,19 @@ const Profile = () => {
           </div>
           <div className="swi">
             <div>Zmień e-mail</div>
-            <Button variant="link" onClick={handleShow1}><BsChevronRight size={20} className="react-switch2" /></Button>
-            <Modal  show={show1} onHide={handleClose1}>
+            <Button variant="link" onClick={toggleEmail}><BsChevronRight size={20} className="react-switch2" /></Button>
+            <Modal  show={showEmail} onHide={toggleEmail}>
               <Modal.Header closeButton >
               </Modal.Header>
               <Modal.Title style={{display:"flex", justifyContent:"center"}} >Zmiana adresu e-mial</Modal.Title>
-              <Modal.Body style={{display:"flex", justifyContent:"center", flexDirection:"column"}}>
+              <Modal.Body style={{display:"flex", justifyContent:"center", flexDirection:"column", alignItems: "center"}}>
               <Form.Control
                 type="text"
                 placeholder="Stary e-mail"
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               <Form.Control
                 type="text"
@@ -176,7 +173,7 @@ const Profile = () => {
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               <Form.Control
                 type="text"
@@ -184,34 +181,34 @@ const Profile = () => {
                 name="email"
                 onChange={handleChange}
                 className="input"
-                style={{ width: "60%", borderRadius: "20vh" }}
+                style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
               />
               </Modal.Body>
               <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
-                <button className="button1" onClick={handleClose1} style={{display:"flex", justifyContent:"center"}}>
+                <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={toggleEmail}>
                   Zmień
                 </button>
               </Modal.Footer>
             </Modal>
           </div>
           <div className="xd2 input-container">
-            <button className="button" onClick={handleShow}>Dezaktywuj konto</button>
-            <Modal show={show} onHide={handleClose}>
+            <button className="button" onClick={toggleDeactivate}>Dezaktywuj konto</button>
+            <Modal show={showDeactivate} onHide={toggleDeactivate}>
               <Modal.Header style={{display:"flex", flexDirection:"column"}}>
                 <HiExclamationTriangle size={150} color="red"/>
                 <Modal.Title>Dezaktywacja konta</Modal.Title>
               </Modal.Header>
               <Modal.Body style={{display:"flex", justifyContent:"center"}}>Czy na pewno chcesz dezaktywować konto?</Modal.Body>
               <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
-                <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center"}}>
+                <Button variant="link" onClick={toggleDeactivate} style={{display:"flex", justifyContent:"center", textDecoration: "none", color: "black"}}>
                   Nie
                 </Button>
-                <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center"}}>
+                <Button variant="link" onClick={toggleDeactivate} style={{display:"flex", justifyContent:"center", textDecoration: "none", color: "black"}}>
                   Tak
                 </Button>
               </Modal.Footer>
             </Modal>
-            <button className="button" onClick={handleShow}>Wyloguj się</button>
+            <button className="button" onClick={toggleDeactivate}>Wyloguj się</button>
           </div>
         </div>
       </div>

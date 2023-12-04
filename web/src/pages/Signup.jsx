@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/style.css"; // Import your custom styles if needed
 import Form from "react-bootstrap/Form";
 import axios from "axios";
@@ -10,7 +11,7 @@ const Register = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [passwordrepeat, setPasswordRepeat] = useState("");
-  const type = "xd";
+  const navigate = useNavigate();
 
   const [check, setCheck] = useState(null);
   const [errFname, setErrFname] = useState(false);
@@ -29,7 +30,7 @@ const Register = () => {
     setErrPass(false);
     setErrRPass(false);
     const namesRegex = /^[a-z ,.'-]+$/i;
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const emailRegex = /^[a-zA-Z0-9]+@(?:[a-zA-Z0-9]+\.)+[A-Za-z]+$/;
 
     if (!namesRegex.test(firstname)) {
       setErrFname(true);
@@ -52,17 +53,17 @@ const Register = () => {
       setCheck("Hasła nie są identyczne!");
     } else {
       try {
-        const url = "http://your-api-url/api/signup";
+        const url = "http://localhost:3001/api/signup";
         await axios.post(url, {
           password: password,
           email: email,
           firstname: firstname,
           lastname: lastname,
           isActive: true,
-          type: type,
+          type: "op",
           phoneNumber: phone,
         });
-        //history.push("/login");
+        navigate("/login")
       } catch (error) {
         if (error.response && error.response.status >= 400 && error.response.status <= 500) {
           if (error.response.status === 409) {

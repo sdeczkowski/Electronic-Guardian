@@ -86,133 +86,120 @@ function AreaScreen() {
   const resetCoordinates = () => {
     setCoordinates([]);
   };
-  
+
   const mapStyles = {
     height: "100vh",
     width: "100%",
   };
 
   const defaultCenter = {
-    lat: 40.748817,
-    lng: -73.985428,
+    lat: 51.237953,
+    lng: 22.529214,
   };
 
   return (
-    <div>
-      <div style={{ position: "absolute", zIndex: 3 }}>
-        <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div className="sidebar">
-            <Nav.Item>
-              <Nav.Link href="/profile">
-                <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="link-1" href="/">
-                <FaMap style={{ color: "#2699c7", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="link-2" href="/list">
-                <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="disabled" href="/chat">
-                <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
+    <div className="d-flex flex-row bd-highlight" style={{overflow: "hidden"}}>
+        <div
+          style={{
+            backgroundColor: "white",
+            height: "100vh",
+            width: "30%",
+            display: "flex",
+            flexDirection: "column",
+            padding: "10px",
+            alignItems: "center"
+          }}>
+          <div
+            style={{ display: "flex", justifyContent: "center", color: "black", fontSize: "50px", fontWeight: "bold" }}>
+            Nowy obszar
           </div>
-        </Nav>
-      </div>
-      <div className="d-flex flex-row bd-highlight" style={{ position: "relative", left: "120px" }}>
-        <LoadScript googleMapsApiKey={googleMapsApiKey}>
-          <div style={{ backgroundColor: "white", height: "100vh", width: "30%", display:"flex", flexDirection:"column", marginTop:"2%",marginRight:"2%" }}>
-          <div  style={{display:"flex", justifyContent:"center", color:"black", fontSize:"50px", fontWeight:"bold"}}>Nowy obszar</div>
-            <br/>
-            <Form.Control
-              type="text"
-              placeholder="Nazwa obszaru"
-              name="area_name"
-              className="input form-control"
-              value={areaname}
-              onChangeText={(text) => setAreaName(text)}
-              style={{ width: "100%", borderRadius: "20vh"}}
+          <br />
+          <Form.Control
+            type="text"
+            placeholder="Nazwa obszaru"
+            name="area_name"
+            className="input form-control"
+            value={areaname}
+            onChangeText={(text) => setAreaName(text)}
+            style={{ width: "70%", borderRadius: "20vh" }}
+          />
+          <br />
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <TimePicker
+              onChange={onChange}
+              value={value}
+              className="input"
+              style={{
+                width: "60%",
+                borderRadius: "20vh",
+                marginTop: "20%",
+                display: "flex",
+                justifyContent: "center",
+                margin: 10,
+              }}
             />
             <br />
-            <div style={{ display: "flex", flexDirection: "column"}}>
-              <TimePicker
-                onChange={onChange}
-                value={value}
-                className="input"
-                style={{
-                  width: "60%",
-                  borderRadius: "20vh",
-                  marginTop: "20%",
-                  display: "flex",
-                  justifyContent: "center",
-                  margin: 10,
-                }}
-              />
-              <br/>
-              <TimePicker
-                onChange={onChange2}
-                value={value2}
-                className="input "
-                style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
-              />
-              <br/>
-              <Dropdown className="input">
-                <Dropdown.Toggle
-                  variant="success"
-                  id="dropdown-basic"
-                  className="input form-control"
-                  style={{ backgroundColor: "deepskyblue", borderRadius: "20px", borderBlockColor:"deepskyblue" }}>
-                  Dropdown List
-                </Dropdown.Toggle>
+            <TimePicker
+              onChange={onChange2}
+              value={value2}
+              className="input "
+              style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
+            />
+            <br />
+            <Dropdown className="input">
+              <Dropdown.Toggle
+                variant="success"
+                id="dropdown-basic"
+                className="button"
+                style={{ backgroundColor: "deepskyblue", borderRadius: "20px", borderWidth: 0}}>
+                Dropdown List
+              </Dropdown.Toggle>
 
-                <Dropdown.Menu>
-                  <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                  <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                  <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-              <br/>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                className="react-time-picker__wrapper"
-                style={{ display: "flex", justifyContent: "center", borderRadius:"20px" }}
-              />
-              <br/>
-              {/* Checkboxes */}
-              <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
-                <label>
-                  <input type="checkbox" className="checkbox-round" />
-                  Codziennie
-                </label>
-                <label>
-                  <input type="checkbox" className="checkbox-round" />
-                  Co tydzień
-                </label>
-                <label>
-                  <input type="checkbox" className="checkbox-round" />
-                  Nigdy
-                </label>
-              </div>
-
-              {/* Button */}
-              <button
-                className="form-control"
-                style={{ width: "100%", display: "flex", justifyContent: "center", borderRadius:"20px", backgroundColor:"deepskyblue",color:"white" }}>
-                Zatwierdź
-              </button>
+              <Dropdown.Menu>
+                <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+                <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+                <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            <br />
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              className="react-time-picker__wrapper"
+              style={{ display: "flex", justifyContent: "center", borderRadius: "20px" }}
+            />
+            <br />
+            {/* Checkboxes */}
+            <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
+              <label>
+                <input type="checkbox" className="checkbox-round" />
+                Codziennie
+              </label>
+              <label>
+                <input type="checkbox" className="checkbox-round" />
+                Co tydzień
+              </label>
+              <label>
+                <input type="checkbox" className="checkbox-round" />
+                Nigdy
+              </label>
             </div>
-          </div>
 
-          <GoogleMap mapContainerStyle={mapStyles} zoom={13} center={defaultCenter} />
-        </LoadScript>
-      </div>
+            {/* Button */}
+            <button
+              className="button" style={{ backgroundColor: "deepskyblue" }}>
+              Zatwierdź
+            </button>
+          </div>
+        </div>
+        <LoadScript googleMapsApiKey={googleMapsApiKey}>      
+        <GoogleMap mapContainerStyle={mapStyles} zoom={13} center={defaultCenter} options={{
+                fullscreenControl: false,
+                streetViewControl: false,
+                mapTypeControl: false,
+                zoomControl: false,
+              }}/>
+      </LoadScript>
     </div>
   );
 }
