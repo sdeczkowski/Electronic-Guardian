@@ -17,6 +17,9 @@ const Profile = () => {
   const [password, setPassword] = useState("");
   const [newpassword, setNewPassword] = useState("");
   const [repeatpassword, setRepeatPassword] = useState("");
+  const [errPass, setErrPass] = useState(false);
+  const [errNewPass, setErrNewPass] = useState(false);
+  const [errRepeatPass, setErrRepeatPass] = useState(false);
   const [showDeactivate, setShowDeactivate] = useState(false);
   const [showEmail, setShowEmail] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -93,6 +96,61 @@ const Profile = () => {
       }
     }
   };
+
+    
+
+    const handlePass = async () => {
+      setCheck(null);
+      setErrRepeatPass(false);
+      setErrNewPass(false);
+      setErrPass(false);
+      if (password == "") {
+        setErrPass(true);
+        setCheck("Wpisz hasło!");
+      } else if (newpassword == "") {
+        setErrNewPass(true);
+        setCheck("Wpisz nowe hasło!");
+      } else if (repeatpassword == "") {
+        setErrRepeatPass(true);
+        setCheck("Wpisz ponownie nowe hasło!");
+      } else if (repeatpassword != newpassword) {
+        setErrNewPass(true);
+        setErrRepeatPass(true);
+        setCheck("Hasła nie są identyczne!");
+      } else if (password == newpassword) {
+        setErrPass(true);
+        setErrNewPass(true);
+        setErrRepeatPass(true);
+        setCheck("Nowe i stare hasło są identyczne!");
+      } else {
+        const _id = localStorage.getItem("_id");
+        try {
+          const url = "http://localhost:3001/api/user/updatepass";
+          await axios.post(url, {
+            _id: _id,
+            password: password,
+            new_password: newpassword,
+          });
+          togglePass();
+        } catch (error) {
+          if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+            if (error.response.status == 401) {
+              if (
+                error.response.data.message == "Nowe hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol"
+              ) {
+                setErrNewPass(true);
+                setErrRepeatPass(true);
+              }
+              if (error.response.data.message == "Błędne hasło") {
+                setErrPass(true);
+              }
+              setCheck(error.response.data.message);
+            }
+          }
+        }
+      }
+    };
+
 
   const LogOut = () => {
     localStorage.clear();
@@ -217,7 +275,7 @@ const Profile = () => {
                 />
               </Modal.Body>
               <Modal.Footer style={{ display: "flex", alignContent: "space-between", justifyContent: "center" }}>
-                <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={togglePass}>
+                <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={handlePass}>
                   Zmień
                 </button>
               </Modal.Footer>
