@@ -1,59 +1,83 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav } from "react-bootstrap";
+import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav, Card } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Check } from "react-bootstrap-icons";
+import uni from "../assets/uni.png";
 import "../styles/style.css";
-import { FaMap, FaRegMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
+import { Bell, QrCode } from "react-bootstrap-icons";
+import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { LoadScript, GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 
 function MapScreen() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
+
   const [path, setPath] = useState([
     { lat: 52.52549080781086, lng: 13.398118538856465 },
     { lat: 52.48578559055679, lng: 13.36653284549709 },
     { lat: 52.48871246221608, lng: 13.44618372440334 },
   ]);
-  const mapStyles = {
-    height: "100vh",
-    width: "100vw",
-  };
+  const [displayNoti, setDisplayNoti] = useState(false);
 
   const defaultCenter = {
     lat: 51.237953,
     lng: 22.529214,
   };
 
+  const ShowNoti = () => {
+    if (displayNoti) {
+      setDisplayNoti(false);
+    } else {
+      setDisplayNoti(true);
+    }
+  };
+
   return (
     <div>
       <div style={{ position: "absolute", zIndex: 3 }}>
-        <Nav className="sidebar">
-          <Nav.Item>
-            <Nav.Link href="/profile">
-              <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-1" href="/">
-              <FaMap style={{ color: "#2699c7", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="link-2" href="">
-              <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link eventKey="disabled" href="/chat">
-              <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
-            </Nav.Link>
-          </Nav.Item>
+        <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Button
+            className="rounded-circle roundbutton bg-light"
+            style={{ borderWidth: 0, borderColor: "#979797", backgroundColor: "white", width: "80px", height: "80px" }}>
+            <img src={uni} alt="logo" style={{ width: "50px", height: "50px" }} />
+          </Button>
+          <div className="sidebar">
+            <Nav.Item>
+              <Nav.Link href="/profile">
+                <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-1" href="/">
+                <FaMap style={{ color: "#2699c7", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-2" href="/list">
+                <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="disabled" href="/chat">
+                <FaMessage style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+          </div>
         </Nav>
       </div>
 
       <LoadScript id="script-loader" googleMapsApiKey={googleMapsApiKey} language="en" region="us">
         <div style={{ height: "100%", width: "100%", position: "relative" }}>
           <div className="map" style={{ zIndex: 1, position: "absolute" }}>
-            <GoogleMap mapContainerStyle={mapStyles} zoom={13} center={defaultCenter}>
+            <GoogleMap
+              mapContainerStyle={{ height: "100vh", width: "100vw" }}
+              zoom={13}
+              center={defaultCenter}
+              options={{
+                fullscreenControl: false,
+                streetViewControl: false,
+                mapTypeControl: false,
+                zoomControl: false,
+              }}>
               <Polygon
                 // Make the Polygon editable / draggable
                 editable
@@ -72,16 +96,25 @@ function MapScreen() {
               width: "100vw",
               height: "100vh",
             }}>
-            <div style={{ display: "flex", justifyContent: "flex-end", zIndex: 2 }}>
-              <Button className="rounded-circle roundbutton bg-light" style={{ color: "black", borderWidth: 0 }}>
-                xd
+            <div style={{ display: "flex", justifyContent: "flex-start", flexDirection: "row-reverse" }}>
+              <Button
+                className="rounded-circle roundbutton bg-light"
+                style={{ color: "black", zIndex: 2, borderWidth: 0 }}
+                onClick={ShowNoti}>
+                <Bell size={35} color="#979797" />
               </Button>
+              {displayNoti && (
+                <Card className="shadow noti">
+                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
+                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
+                </Card>
+              )}
             </div>
             <div
               className="d-flex flex-row-reverse bd-highlight"
               style={{ justifyContent: "space-between", zIndex: 2 }}>
               <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }}>
-                xd
+                <QrCode size={35} color="#979797" />
               </Button>
               <Dropdown as={ButtonGroup}>
                 <Dropdown.Toggle
@@ -90,7 +123,7 @@ function MapScreen() {
                   style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
                   Pow! Zoom!
                 </Dropdown.Toggle>
-                <Dropdown.Menu className="super-colors">
+                <Dropdown.Menu className="super-colors" style={{ width: "95%" }}>
                   <Dropdown.Item eventKey="1">Action</Dropdown.Item>
                   <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
                   <Dropdown.Item eventKey="3" active>
