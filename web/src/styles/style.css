@@ -261,15 +261,16 @@
 
 .noti{
   width: 35dvw;
-  height: 67dvh !important;
   margin: 10px;
   z-index: 2;
-  border-radius: 20px;
+  padding: 10px;
+  border-radius: 30px !important;
   display: flex !important;
   flex-direction: column !important;
-  justify-content: flex-start !important;
+  justify-content: space-between !important;
   align-items: center !important;
 }
+
 
 .login{
   display: flex;

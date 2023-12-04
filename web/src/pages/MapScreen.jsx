@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Button, DropdownButton, Dropdown, ButtonGroup, Nav, Card, Modal } from "react-bootstrap";
+import { Row, Col, Button, ListGroup, Dropdown, ButtonGroup, Nav, Card, Modal } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { Check } from "react-bootstrap-icons";
 import uni from "../assets/uni.png";
 import "../styles/style.css";
-import { Bell, QrCode } from "react-bootstrap-icons";
+import { Bell, QrCode, XLg } from "react-bootstrap-icons";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { LoadScript, GoogleMap, Marker, Polygon } from "@react-google-maps/api";
+import moment from "moment";
 
 function MapScreen() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
@@ -114,25 +115,45 @@ function MapScreen() {
                 <Bell size={35} color="#979797" />
               </Button>
               {displayNoti && (
-                <Card className="shadow noti">
-                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
-                  <Card style={{ width: "30vw", height: "15vh", backgroundColor: "#979797" }}></Card>
+                <Card className="shadow noti" style={{ height: "60vh", overflow: "auto" }}>
+                  <ListGroup variant="flush">
+                    <ListGroup.Item>
+                      <div style={{display: "flex", backgroundColor: "rgb(204, 204, 204)", width: "30vw", height:"15vh", borderRadius: "20px", padding: "10px", justifyContent: "space-between"}}>
+                        <div style={{display:"flex", flexDirection: "column", justifyContent: "space-between"}}>
+                          <div style={{display: "flex"}}>
+                          <div style={{backgroundColor: "rgb(88, 88, 88)", width: "30px", height:"30px", borderRadius: "5px", marginRight: "5px"}}></div>
+                          <b>Nazwa użytkownika</b>
+                          </div>
+                          <text>xddsdfs</text>
+                          <text>xddsdfs</text>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "space-around"}}>
+                        {moment(new Date()).fromNow()}
+                        <div style={{backgroundColor: "rgb(88, 88, 88)", width: "45px", height:"45px", borderRadius: "5px"}}></div>
+                        </div>
+                      </div>
+                    </ListGroup.Item>
+                  </ListGroup>
+                  <button className="roundbutton" style={{width: "30px", height: "30px"}}><XLg/></button>
                 </Card>
               )}
             </div>
             <div
               className="d-flex flex-row-reverse bd-highlight"
               style={{ justifyContent: "space-between", zIndex: 2 }}>
-              <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }}  onClick={handleShow}>
+              <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }} onClick={handleShow}>
                 <QrCode size={35} color="#979797" />
               </Button>
               <Modal show={show} onHide={handleClose}>
-                <Modal.Header style={{display:"flex", flexDirection:"column"}}>
+                <Modal.Header style={{ display: "flex", flexDirection: "column" }}>
                   <Modal.Title>Kod podopiecznego</Modal.Title>
                 </Modal.Header>
-                <Modal.Body style={{display:"flex", justifyContent:"center",fontSize:"100px"}}>{code}</Modal.Body>
-                <Modal.Footer style={{display:"flex", alignContent:"space-between", justifyContent:"center"}}>
-                  <Button variant="link" onClick={handleClose} style={{display:"flex", justifyContent:"center", textDecoration: "none", color: "black"}}>
+                <Modal.Body style={{ display: "flex", justifyContent: "center", fontSize: "100px" }}>{code}</Modal.Body>
+                <Modal.Footer style={{ display: "flex", alignContent: "space-between", justifyContent: "center" }}>
+                  <Button
+                    variant="link"
+                    onClick={handleClose}
+                    style={{ display: "flex", justifyContent: "center", textDecoration: "none", color: "black" }}>
                     Zamknij
                   </Button>
                 </Modal.Footer>
