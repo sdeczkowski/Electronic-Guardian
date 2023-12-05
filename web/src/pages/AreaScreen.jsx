@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { GoogleMap, LoadScript, Marker, Polygon  } from "@react-google-maps/api";
+import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api";
 import { Button, Nav } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import "react-time-picker/dist/TimePicker.css";
@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import TimePicker from "react-time-picker";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import axios from "axios";
+
 
 function AreaScreen({ addArea }) {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
@@ -36,50 +37,71 @@ function AreaScreen({ addArea }) {
   const [checkedOne, setCheckedOne] = React.useState(false);
   const [checkedTwo, setCheckedTwo] = React.useState(false);
   const [checkedThree, setCheckedThree] = React.useState(false);
-  
+
   const handleChangeOne = () => {
     setCheckedOne(true);
     setCheckedTwo(false);
     setCheckedThree(false);
   };
-  
+
   const handleChangeTwo = () => {
     setCheckedOne(false);
     setCheckedTwo(true);
     setCheckedThree(false);
   };
-  
+
   const handleChangeThree = () => {
     setCheckedOne(false);
     setCheckedTwo(false);
     setCheckedThree(true);
   };
-  
 
   const checkForIntersections = (newCoordinate) => {
     if (coordinates.length < 3) return false;
-
-    for (let i = 0; i < coordinates.length; i++) {
-      const point1 = coordinates[i];
-      const point2 = coordinates[(i + 1) % coordinates.length];
-      const nextPoint = coordinates[(i + 2) % coordinates.length];
-
-      if (
-        linesIntersect(
-          newCoordinate.latitude,
-          newCoordinate.longitude,
-          nextPoint.latitude,
-          nextPoint.longitude,
-          point1.latitude,
-          point1.longitude,
-          point2.latitude,
-          point2.longitude
-        )
-      ) {
-        return true;
+  
+    for (let i = 0; i < coordinates.length - 2; i++) {
+      const line1Start = coordinates[i];
+      const line1End = coordinates[i + 1];
+  
+      for (let j = i + 2; j < coordinates.length; j++) {
+        const line2Start = coordinates[j];
+        const line2End = coordinates[(j + 1) % coordinates.length];
+  
+        if (
+          linesIntersect(
+            line1Start.latitude,
+            line1Start.longitude,
+            line1End.latitude,
+            line1End.longitude,
+            line2Start.latitude,
+            line2Start.longitude,
+            line2End.latitude,
+            line2End.longitude
+          )
+        ) {
+          console.log('Intersection detected at lines', i, j);
+          return true;
+        }
       }
     }
+  
     return false;
+  };
+  
+
+  const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
+    const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+    const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
+    const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
+    const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
+
+    console.log('a:', a, 'b:', b, 'c:', c, 'd:', d);
+
+    const isIntersecting = a * b < 0 && c * d < 0;
+
+  console.log('Is Intersecting:', isIntersecting);
+
+  return isIntersecting;
   };
 
   const Checkbox = ({ label, checked, onChange }) => {
@@ -91,48 +113,36 @@ function AreaScreen({ addArea }) {
     );
   };
 
-  const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
-    const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    const b = (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4);
-    const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
-    const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
-
-    return a * b < 0 && c * d < 0;
-  };
-
-  const onEdit = useCallback(() => {
-    // Assuming 'coordinates' is the state variable representing your polygon's path
-    const editedCoordinates = coordinates.map(coord => ({
-      latitude: coord.latitude, // or whatever your coordinate property names are
-      longitude: coord.longitude,
-    }));
-
-    // Perform any additional logic with the edited coordinates
-    // For example, you might want to update state or perform some validation
-    console.log('Coordinates edited:', editedCoordinates);
-    // Update state or perform additional logic as needed
-  }, [coordinates]);
-
 
   const handleMapPress = useCallback((event) => {
+    
     const { latLng } = event;
     const coordinate = { latitude: latLng.lat(), longitude: latLng.lng() };
+    console.log('Current Coordinates:', coordinates);
     const hasIntersections = checkForIntersections(coordinate);
 
-    setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-
+    setCoordinates((prevCoordinates) => {
+      const updateCoordinates = [...prevCoordinates, coordinate]
+      const hasIntersections = checkForIntersections(updateCoordinates);
+      return hasIntersections ? [] : updateCoordinates;
+    }    
+      );
+  
     if (hasIntersections) {
       // Reset the entire polygon if intersections are found
+      console.log('Resetting coordinates due to intersections');
       setCoordinates([]);
       setSelectedCoordinate(null);
     } else {
       // Add the new point to the polygon if no intersections
+      console.log('Adding coordinate:', coordinate);
       setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
       setSelectedCoordinate(coordinate);
     }
 
-    onEdit(); // Call the function to handle editing
-  }, [onEdit, selectedCoordinate, checkForIntersections]);
+    console.log('Updated Coordinates:', coordinates);
+
+  }, [coordinates]);
 
 
   const opcje = [
@@ -153,7 +163,8 @@ function AreaScreen({ addArea }) {
     setErrName(false);
     setErrPicker(false);
     setCheck("");
-  
+    console.log(coordinates)
+
     // Validate form inputs
     if (!startDate) {
       setErrDate(true);
@@ -195,7 +206,7 @@ function AreaScreen({ addArea }) {
           time_t: value2.toString(),
           isActive: false,
         });
-  
+
         // Assuming you have a newArea object with relevant data
         const newArea = {
           name: areaname,
@@ -206,12 +217,12 @@ function AreaScreen({ addArea }) {
           repeat: option,
           coordinates: coordinates,
         };
-  
+
         // Call the addArea function passed from AreaList to update the areas list
         addArea(newArea);
-  
+
         // Reset form state or perform any additional logic as needed
-  
+
         // Navigation logic, if applicable
         // navigation.navigate("AreaSelect");
       } catch (error) {
@@ -220,7 +231,7 @@ function AreaScreen({ addArea }) {
       }
     }
   };
-  
+
 
   const Setup = async () => {
     const region = localStorage.getItem("location");
@@ -263,92 +274,93 @@ function AreaScreen({ addArea }) {
     lng: 22.529214,
   };
 
+
   return (
-    <div className="d-flex flex-row bd-highlight" style={{overflow: "hidden"}}>
+    <div className="d-flex flex-row bd-highlight" style={{ overflow: "hidden" }}>
+      <div
+        style={{
+          backgroundColor: "white",
+          height: "100vh",
+          width: "30%",
+          display: "flex",
+          flexDirection: "column",
+          padding: "10px",
+          alignItems: "center"
+        }}>
         <div
-          style={{
-            backgroundColor: "white",
-            height: "100vh",
-            width: "30%",
-            display: "flex",
-            flexDirection: "column",
-            padding: "10px",
-            alignItems: "center"
-          }}>
-          <div
-            style={{ display: "flex", justifyContent: "center", color: "black", fontSize: "50px", fontWeight: "bold" }}>
-            Nowy obszar
-          </div>
-          <br />
-          <Form.Control
-            type="text"
-            placeholder="Nazwa obszaru"
-            name="area_name"
-            className="input form-control"
-            onChange={(e) => setAreaName(e.target.value)}
-            value={areaname}
-            style={{ width: "70%", borderRadius: "20vh" }}
-          />
-
-          <br />
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <TimePicker
-              onChange={onChange}
-              value={value}
-              className="input"
-              style={{
-                width: "60%",
-                borderRadius: "20vh",
-                marginTop: "20%",
-                display: "flex",
-                justifyContent: "center",
-                margin: 10,
-              }}
-            />
-            <br />
-            <TimePicker
-              onChange={onChange2}
-              value={value2}
-              className="input "
-              style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
-            />
-            <br />
-            <Dropdown className="input">
-              <Dropdown.Toggle
-                variant="success"
-                id="dropdown-basic"
-                className="button"
-                style={{ backgroundColor: "deepskyblue", borderRadius: "20px", borderWidth: 0}}>
-                Dropdown List
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-            <br />
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              className="react-time-picker__wrapper"
-              style={{ display: "flex", justifyContent: "center", borderRadius: "20px" }}
-            />
-            <br />
-            {/* Checkboxes */}
-            <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
-              <Checkbox label="Codziennie" checked={checkedOne} onChange={handleChangeOne} />
-              <Checkbox label="Co tydzień" checked={checkedTwo} onChange={handleChangeTwo} />
-              <Checkbox label="Nigdy" checked={checkedThree} onChange={handleChangeThree} />
-            </div>
-            <button
-              className="button" style={{ backgroundColor: "deepskyblue" }} onClick={onSubmit}>
-              Zatwierdź
-            </button>
-          </div>
+          style={{ display: "flex", justifyContent: "center", color: "black", fontSize: "50px", fontWeight: "bold" }}>
+          Nowy obszar
         </div>
-        <LoadScript googleMapsApiKey={googleMapsApiKey}>      
+        <br />
+        <Form.Control
+          type="text"
+          placeholder="Nazwa obszaru"
+          name="area_name"
+          className="input form-control"
+          onChange={(e) => setAreaName(e.target.value)}
+          value={areaname}
+          style={{ width: "70%", borderRadius: "20vh" }}
+        />
+
+        <br />
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <TimePicker
+            onChange={onChange}
+            value={value}
+            className="input"
+            style={{
+              width: "60%",
+              borderRadius: "20vh",
+              marginTop: "20%",
+              display: "flex",
+              justifyContent: "center",
+              margin: 10,
+            }}
+          />
+          <br />
+          <TimePicker
+            onChange={onChange2}
+            value={value2}
+            className="input "
+            style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
+          />
+          <br />
+          <Dropdown className="input">
+            <Dropdown.Toggle
+              variant="success"
+              id="dropdown-basic"
+              className="button"
+              style={{ backgroundColor: "deepskyblue", borderRadius: "20px", borderWidth: 0 }}>
+              Dropdown List
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+          <br />
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            className="react-time-picker__wrapper"
+            style={{ display: "flex", justifyContent: "center", borderRadius: "20px" }}
+          />
+          <br />
+          {/* Checkboxes */}
+          <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
+            <Checkbox label="Codziennie" checked={checkedOne} onChange={handleChangeOne} />
+            <Checkbox label="Co tydzień" checked={checkedTwo} onChange={handleChangeTwo} />
+            <Checkbox label="Nigdy" checked={checkedThree} onChange={handleChangeThree} />
+          </div>
+          <button
+            className="button" style={{ backgroundColor: "deepskyblue" }} onClick={onSubmit}>
+            Zatwierdź
+          </button>
+        </div>
+      </div>
+      <LoadScript googleMapsApiKey={googleMapsApiKey}>
         <GoogleMap
           mapContainerStyle={mapStyles}
           zoom={13}
@@ -387,10 +399,12 @@ function AreaScreen({ addArea }) {
             >
             </Marker>
           ))}
-          {coordinates.length > 2 && (
+
+          {coordinates.length > 0 && (
             <Polygon
-              editable
-              draggable
+
+              
+              
               paths={coordinates.map((coord) => ({ lat: coord.latitude, lng: coord.longitude }))}
               strokeColor="blue"
               fillColor="rgba(109, 147, 253, 0.4)"

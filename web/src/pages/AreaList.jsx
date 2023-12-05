@@ -159,7 +159,7 @@ function AreaList() {
               </Card>)})}
             <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} onClick={() => {
               console.log(data)
-              //navigate("/area")
+              navigate("/area")
             }}>
               <Card.Body
                 style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
