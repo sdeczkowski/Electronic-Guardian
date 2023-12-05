@@ -21,7 +21,6 @@ function AreaList() {
   const [data, setData] = useState([]);
   const [error, setErr] = useState();
   const mapRef = React.useRef(null);
-  //let areaData = route.params.data;
 
   const mapStyles = {
     height: "100vh",
