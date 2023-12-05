@@ -1,5 +1,11 @@
-// Chat.jsx
 import React, { useState } from "react";
+import { FaSearch } from "react-icons/fa";
+import { IoMdSend } from "react-icons/io";
+import { Nav, Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import uni from "../assets/uni.png";
+import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
+import { FaRegUserCircle } from "react-icons/fa";
 
 const Chat = () => {
   const [messages, setMessages] = useState([
@@ -21,8 +27,8 @@ const Chat = () => {
   };
 
   const [conversations, setConversations] = useState([
-    { id: 1, name: "Anna Nowak" },
-    { id: 2, name: "Maria Maria" },
+    { id: 1, name: "Anna Nowak", select: false },
+    { id: 2, name: "Maria Maria", select: false },
     // ... dodaj więcej osób
   ]);
 
@@ -40,62 +46,112 @@ const Chat = () => {
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      <div style={{ flex: 3, borderRight: "1px solid #ccc", padding: "10px", borderRadius: "10px" }}>
-        <div>
-          <input
+      <div
+        style={{
+          flex: "0 0 100px",
+          zIndex: 1,
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflowY: "auto",
+          backgroundColor: "#B3B1B1",
+        }}>
+        {/* Navbar */}
+        <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Button
+            className="rounded-circle roundbutton bg-light"
+            style={{ borderWidth: 0, borderColor: "#979797", backgroundColor: "white", width: "80px", height: "80px" }}>
+            <img src={uni} alt="logo" style={{ width: "50px", height: "50px" }} />
+          </Button>
+          <div className="sidebar">
+            <Nav.Item>
+              <Nav.Link href="/profile">
+                <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-1" href="/">
+                <FaMap style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-2" href="/list">
+                <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="disabled" href="/chat">
+                <FaMessage style={{ color: "#2699c7", fontSize: "4vh" }} />
+              </Nav.Link>
+            </Nav.Item>
+          </div>
+        </Nav>
+      </div>
+
+      {/* Lewa sekcja i Navbar (2:8) */}
+      <div style={{ flex: 2, display: "flex", flexDirection: "column", padding: "10px" }}>
+        <div style={{ display: "flex", marginBottom: "10px" }}>
+          <Form.Control
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Wyszukaj..."
-            style={{ borderRadius: "5px", marginRight: "5px" }}
+            className="shadow"
+            style={{ borderRadius: "20px", marginRight: "5px", flex: 1, height: "4vh", borderWidth: 0 }}
           />
-          <button onClick={handleSearch} style={{ borderRadius: "5px", backgroundColor: "#007AFF" }}>
-            Szukaj
+          <button
+            className="roundbutton"
+            style={{width: "40px", height: "40px", margin: 0}}
+            onClick={handleSearch}>
+            <FaSearch />
           </button>
         </div>
 
         {/* Lista osób */}
-        <div style={{ overflowY: "scroll", marginTop: "10px" }}>
-          {conversations.map((person) => (
-            <div
+        <div style={{ overflowY: "scroll", marginTop: "10px", flex: 1 }}>
+          {conversations.map((person) => {
+            let select = false;
+            return(
+              <div
               key={person.id}
-              style={{ cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }}>
-              {person.name}
+              onClick={() => {select = !select; console.log(select)}}
+              style={select ? { cursor: "pointer", marginBottom: "5px", backgroundColor: "grey", borderRadius: "5px", padding: "5px" }:{ cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }}>
+              <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
+              <Form.Text>{person.name}</Form.Text>
             </div>
-          ))}
-        </div>
-
-        {/* Przycisk do utworzenia nowej wiadomości */}
-        <div style={{ marginTop: "10px" }}>
-          <button
-            onClick={handleNewConversation}
-            style={{ borderRadius: "20px", padding: "10px", backgroundColor: "#007AFF" }}>
-            Utwórz nową wiadomość
-          </button>
+            )
+            })}
         </div>
       </div>
 
       {/* Prawa sekcja (3:7) */}
-      <div style={{ flex: 7, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
         <div
           style={{
             height: "400px",
             overflowY: "scroll",
+            overflowX: "hidden",
             border: "1px solid #ccc",
             padding: "10px",
             borderRadius: "10px",
             flex: 1,
+            display: "flex",
+            flexDirection: "column",
           }}>
           {messages.map((msg) => (
             <div
               key={msg.id}
               style={{
+                display: "flex",
                 textAlign: msg.isMe ? "right" : "left",
-                marginBottom: "10px",
-                borderRadius: "5px",
+                borderRadius: "40px",
                 padding: "10px",
+                backgroundColor: msg.isMe ? "#007AFF" : "#ccc",
+                color: msg.isMe ? "white" : "black",
+                margin: msg.isMe ? "0 0 5px auto " : "0 auto 5px 0",
+                maxWidth: "70%",
               }}>
-              <strong>{msg.user}:</strong> {msg.text}
+              {msg.text}
             </div>
           ))}
         </div>
@@ -108,17 +164,18 @@ const Chat = () => {
             borderTop: "1px solid #ccc",
             borderRadius: "10px",
           }}>
-          <input
+          <Form.Control
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Wpisz wiadomość..."
-            style={{ borderRadius: "5px", marginRight: "5px", padding: "5px" }}
+            style={{ borderRadius: "20px", marginRight: "5px", padding: "5px", flex: 1 }}
           />
           <button
             onClick={handleSendMessage}
-            style={{ borderRadius: "20px", padding: "10px", backgroundColor: "#007AFF" }}>
-            Wyślij
+            className="roundbutton"
+            style={{ borderRadius: "50%", padding: "10px", backgroundColor: "white", width: "50px", height: "50px" }}>
+            <IoMdSend size={25} />
           </button>
         </div>
       </div>

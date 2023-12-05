@@ -97,60 +97,57 @@ const Profile = () => {
     }
   };
 
-    
-
-    const handlePass = async () => {
-      setCheck(null);
-      setErrRepeatPass(false);
-      setErrNewPass(false);
-      setErrPass(false);
-      if (password == "") {
-        setErrPass(true);
-        setCheck("Wpisz hasło!");
-      } else if (newpassword == "") {
-        setErrNewPass(true);
-        setCheck("Wpisz nowe hasło!");
-      } else if (repeatpassword == "") {
-        setErrRepeatPass(true);
-        setCheck("Wpisz ponownie nowe hasło!");
-      } else if (repeatpassword != newpassword) {
-        setErrNewPass(true);
-        setErrRepeatPass(true);
-        setCheck("Hasła nie są identyczne!");
-      } else if (password == newpassword) {
-        setErrPass(true);
-        setErrNewPass(true);
-        setErrRepeatPass(true);
-        setCheck("Nowe i stare hasło są identyczne!");
-      } else {
-        const _id = localStorage.getItem("_id");
-        try {
-          const url = "http://localhost:3001/api/user/updatepass";
-          await axios.post(url, {
-            _id: _id,
-            password: password,
-            new_password: newpassword,
-          });
-          togglePass();
-        } catch (error) {
-          if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-            if (error.response.status == 401) {
-              if (
-                error.response.data.message == "Nowe hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol"
-              ) {
-                setErrNewPass(true);
-                setErrRepeatPass(true);
-              }
-              if (error.response.data.message == "Błędne hasło") {
-                setErrPass(true);
-              }
-              setCheck(error.response.data.message);
+  const handlePass = async () => {
+    setCheck(null);
+    setErrRepeatPass(false);
+    setErrNewPass(false);
+    setErrPass(false);
+    if (password === "") {
+      setErrPass(true);
+      setCheck("Wpisz hasło!");
+    } else if (newpassword === "") {
+      setErrNewPass(true);
+      setCheck("Wpisz nowe hasło!");
+    } else if (repeatpassword === "") {
+      setErrRepeatPass(true);
+      setCheck("Wpisz ponownie nowe hasło!");
+    } else if (repeatpassword !== newpassword) {
+      setErrNewPass(true);
+      setErrRepeatPass(true);
+      setCheck("Hasła nie są identyczne!");
+    } else if (password === newpassword) {
+      setErrPass(true);
+      setErrNewPass(true);
+      setErrRepeatPass(true);
+      setCheck("Nowe i stare hasło są identyczne!");
+    } else {
+      const _id = localStorage.getItem("_id");
+      try {
+        const url = "http://localhost:3001/api/user/updatepass";
+        await axios.post(url, {
+          _id: _id,
+          password: password,
+          new_password: newpassword,
+        });
+        togglePass();
+      } catch (error) {
+        if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+          if (error.response.status === 401) {
+            if (
+              error.response.data.message === "Nowe hasło powinno mieć min. 8 znaków, cyfrę, dużą litere oraz symbol"
+            ) {
+              setErrNewPass(true);
+              setErrRepeatPass(true);
             }
+            if (error.response.data.message === "Błędne hasło") {
+              setErrPass(true);
+            }
+            setCheck(error.response.data.message);
           }
         }
       }
-    };
-
+    }
+  };
 
   const LogOut = () => {
     localStorage.clear();
@@ -249,29 +246,42 @@ const Profile = () => {
               <Modal.Title style={{ display: "flex", justifyContent: "center" }}>Zmiana hasła</Modal.Title>
               <Modal.Body
                 style={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+                <p style={{ color: "red" }}>{check}</p>
                 <Form.Control
-                  type="text"
+                  type="password"
                   placeholder="Stare hasło"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errPass
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
                 <Form.Control
-                  type="text"
+                  type="password"
                   placeholder="Nowy hasło"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errNewPass
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
                 <Form.Control
-                  type="text"
+                  type="password"
                   placeholder="Powtórz nowe hasło"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setRepeatPassword(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errRepeatPass
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
               </Modal.Body>
               <Modal.Footer style={{ display: "flex", alignContent: "space-between", justifyContent: "center" }}>
@@ -291,29 +301,42 @@ const Profile = () => {
               <Modal.Title style={{ display: "flex", justifyContent: "center" }}>Zmiana adresu email</Modal.Title>
               <Modal.Body
                 style={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+                <p style={{ color: "red" }}>{check}</p>
                 <Form.Control
                   type="text"
                   placeholder="Stary e-mail"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errEmail
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
                 <Form.Control
                   type="text"
                   placeholder="Nowy e-mail"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setNewEmail(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errNewEmail
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
                 <Form.Control
                   type="text"
                   placeholder="Powtórz nowy e-mail"
                   name="email"
-                  onChange={handleChange}
+                  onChange={(e) => setRepeatEmail(e.target.value)}
                   className="input"
-                  style={{ width: "60%", borderRadius: "20vh", marginTop: "10px" }}
+                  style={
+                    errRepeatEmail
+                      ? { borderColor: "red", borderWidth: 1, width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                      : { width: "60%", borderRadius: "20vh", marginTop: "10px" }
+                  }
                 />
               </Modal.Body>
               <Modal.Footer style={{ display: "flex", alignContent: "space-between", justifyContent: "center" }}>
@@ -350,7 +373,9 @@ const Profile = () => {
                 </Button>
               </Modal.Footer>
             </Modal>
-            <button className="button" onClick={LogOut}>Wyloguj się</button>
+            <button className="button" onClick={LogOut}>
+              Wyloguj się
+            </button>
           </div>
         </div>
       </div>
