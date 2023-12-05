@@ -109,15 +109,18 @@ const Chat = () => {
 
         {/* Lista osób */}
         <div style={{ overflowY: "scroll", marginTop: "10px", flex: 1 }}>
-          {conversations.map((person) => (
-            <div
+          {conversations.map((person) => {
+            let select = false;
+            return(
+              <div
               key={person.id}
-              onClick={() => {person.select = !person.select; console.log(person.select)}}
-              style={person.select ? { cursor: "pointer", marginBottom: "5px", backgroundColor: "grey", borderRadius: "5px", padding: "5px" }:{ cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }}>
+              onClick={() => {select = !select; console.log(select)}}
+              style={select ? { cursor: "pointer", marginBottom: "5px", backgroundColor: "grey", borderRadius: "5px", padding: "5px" }:{ cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }}>
               <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
               <Form.Text>{person.name}</Form.Text>
             </div>
-          ))}
+            )
+            })}
         </div>
       </div>
 
