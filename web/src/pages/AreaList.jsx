@@ -110,11 +110,10 @@ function AreaList() {
               height: "97vh",
             }}>
             {data.map((item) => {
-              const path = [item.cords.map((point) => ({
-                Lat: point.latitude,
-                Lng: point.longitude,
-              }))]
-              console.log(path)
+              const path = item.cords.map((point) => ({
+                lat: parseFloat(point.latitude),
+                lng:  parseFloat(point.longitude),
+              }))
               return(
               <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} key={item._id}>
                 <LoadScript googleMapsApiKey={googleMapsApiKey}>
@@ -147,7 +146,7 @@ function AreaList() {
                     <br />
                     Cykliczność
                   </Card.Text>
-                  <Button variant="primary">
+                  <Button variant="primary" onClick={() => {console.log(path)}}>
                     Check
                   </Button>
                 </Card.Body>
