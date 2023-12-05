@@ -391,23 +391,36 @@ function MapScreen() {
                     </Button>
                   </Modal.Footer>
                 </Modal>
-                <Dropdown as={ButtonGroup}>
-                  <Dropdown.Toggle
-                    id="dropdown-custom-1"
-                    className="dropdownmap"
-                    style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
-                    Pow! Zoom!
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu className="super-colors" style={{ width: "95%" }}>
-                    <Dropdown.Item eventKey="1">Action</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
-                    <Dropdown.Item eventKey="3" active>
-                      Active Item
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
+                {pods.length != 0 ? (
+                  <Dropdown as={ButtonGroup}>
+                    <Dropdown.Toggle
+                      id="dropdown-custom-1"
+                      className="dropdownmap"
+                      style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
+                      Wybierz podopiecznego!
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu style={{ width: "95%" }}>
+                      <Dropdown.Item eventKey="1">Action</Dropdown.Item>
+                      <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
+                      <Dropdown.Item eventKey="3" active>
+                        Active Item
+                      </Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                ) : (
+                  <Dropdown as={ButtonGroup}>
+                    <Dropdown.Toggle
+                      id="dropdown-custom-1"
+                      className="dropdownmap"
+                      style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
+                      Brak podopiecznych!
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu className="super-colors" style={{ width: "95%" }}>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                )}
               </div>
             </div>
           </div>

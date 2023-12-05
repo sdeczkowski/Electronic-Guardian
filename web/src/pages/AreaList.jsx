@@ -18,7 +18,7 @@ function AreaList() {
   const [pod, setPod] = useState();
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState();
   const [error, setErr] = useState();
   const mapRef = React.useRef(null);
   //let areaData = route.params.data;
@@ -44,7 +44,7 @@ function AreaList() {
         }
       });
     } catch (error) {
-      if (error.response.status == 404) {
+      if (error.response.status === 404) {
         setErr(error.response.data.message);
       }
     }
@@ -53,10 +53,6 @@ function AreaList() {
   useEffect(() => {
     AreaSetup();
   }, []);
-
-  useEffect(() => {
-    console.log("Mapa:", mapRef.current);
-  }, [mapRef]);
 
   if (loading) {
     return (
@@ -67,6 +63,7 @@ function AreaList() {
   } else {
     return (
       <div>
+        <LoadScript googleMapsApiKey={googleMapsApiKey}>
         <div style={{ position: "fixed", zIndex: 3, height: "100vh", backgroundColor: "#979797", overflow: "hidden" }}>
           <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Button
@@ -115,16 +112,19 @@ function AreaList() {
               height: "97vh",
             }}>
             {data.map((item) => {
-              const path = item.cords.flat().map((point) => ({
-                lat: parseFloat(point.latitude),
-                lng: parseFloat(point.longitude),
-              }))
+              const path = []
+              item.cords.flat().forEach(element => {
+                path.push({
+                  lat: parseFloat(element.latitude),
+                  lng: parseFloat(element.longitude),
+                })
+              })
               console.log(path)
               return(
               <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} key={item._id}>
-                <LoadScript googleMapsApiKey={googleMapsApiKey}>
                   <GoogleMap
                     ref={mapRef}
+                    key={item._id}
                     mapContainerStyle={{ height: "300px", width: "100%" }}
                     zoom={13}
                     center={{ lat: item.initialRegion.latitude, lng: item.initialRegion.longitude }}
@@ -137,11 +137,10 @@ function AreaList() {
                       fullscreenControl: false,
                     }}>
                     <Polygon
-                      key={item._id}
+                      
                       path={path}></Polygon>
                   </GoogleMap>
-                </LoadScript>
-                <Card.Body>
+                <Card.Body >
                   <Card.Title>{item.name}</Card.Title>
                   <Card.Text>
                     Podopieczny
@@ -158,9 +157,11 @@ function AreaList() {
                     Check
                   </Button>
                 </Card.Body>
-              </Card>
-            )})}
-            <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} onClick={() => navigate("/area")}>
+              </Card>)})}
+            <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} onClick={() => {
+              console.log(data)
+              //navigate("/area")
+            }}>
               <Card.Body
                 style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                 <Button
@@ -172,6 +173,7 @@ function AreaList() {
             </Card>
           </div>
         </div>
+        </LoadScript>
       </div>
     );
   }
