@@ -7,11 +7,19 @@ import { useNavigate } from "react-router-dom";
 import { VscAdd } from "react-icons/vsc";
 import { Nav } from "react-bootstrap";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
+import AreaScreen from "./AreaScreen"; 
 
 function AreaList() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
+  const [areas, setAreas] = useState([]);  // State to store the list of areas
+
+  // Function to add a new area to the list
+  const addArea = (newArea) => {
+    setAreas((prevAreas) => [...prevAreas, newArea]);
+  };
+
   const mapStyles = {
     height: "100vh",
     width: "100%",
