@@ -7,11 +7,21 @@ import { useNavigate } from "react-router-dom";
 import { VscAdd } from "react-icons/vsc";
 import { Nav } from "react-bootstrap";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
+import { useEffect } from "react";
 
 function AreaList() {
   const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
+  const [pod, setPod] = useState();
+  const [loading, setLoading] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [data, setData] = useState([]);
+  const [error, setErr] = useState();
+  //let areaData = route.params.data;
+  
+
+
   const mapStyles = {
     height: "100vh",
     width: "100%",
@@ -21,6 +31,79 @@ function AreaList() {
     lat: 40.748817,
     lng: -73.985428,
   };
+/*
+  const podData = async () => {
+    try {
+      const url =
+        "http://10.0.2.2:3001/api/area/get/" +
+        route.params._opid +
+        "/" +
+        route.params._podid +
+        "/" +
+        route.params.name;
+
+      const response = await axios.get(url);
+
+      if (response && response.data) {
+        setPod(response.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+*/
+  const deleteArea = async () => {
+    try {
+      const url = "http://10.0.2.2:3001/api/area/delete";
+      await axios.post(url, {
+       // _opid: route.params._opid,
+        //_podid: route.params._podid,
+       // name: route.params.name,
+      });
+      navigation.navigate("AreaSelect");
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+   // podData();
+  }, []);
+
+  const opcje = [
+    { id: 1, label: "Codziennie" },
+    { id: 2, label: "Co tydzień" },
+    { id: 3, label: "Nigdy" },
+  ];
+
+  const AreaSetup = async () => {
+    try {
+      const id = await AsyncStorage.getItem("_id");
+      const url = "http://10.0.2.2:3001/api/area/getall/" + id;
+
+      
+      const response = await axios.get(url);
+
+      if (response && response.data) {
+        setData(response.data);
+        setLoading(false);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setErr(error.response.data.message);
+      }
+    }
+  };
+
+  const AreaSelect = async (_podid, name) => {
+    const id = await AsyncStorage.getItem("_id");
+    
+  };
+
+  useEffect(() => {
+    AreaSetup();
+  }, []);
 
   return (
     <div>
