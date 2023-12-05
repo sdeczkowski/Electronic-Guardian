@@ -140,7 +140,7 @@ router.get("/getall/:_id", async (req, res) => {
   try {
     const user = await User.findOne({_id: req.params._id})
     if(user.type == "pod") return res.status(403).send({ message: "Forbidden" })
-    const area = await AreaDetails.find({ _opid: req.params._id }, { _podid: 1, name: 1, cords: 1 ,initialRegion: 1});
+    const area = await AreaDetails.find({ _opid: req.params._id });
     if (area) {
       res.status(201).send(area);
     } else {

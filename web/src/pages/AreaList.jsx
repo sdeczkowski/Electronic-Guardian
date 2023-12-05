@@ -55,6 +55,7 @@ function AreaList() {
           </div>
         </Nav>
       </div>
+      <h1 style={{ position: "fixed", left: "120px" }}>Lista</h1>
       <div style={{ position: "relative", left: "120px" }}>
         <div
           style={{
