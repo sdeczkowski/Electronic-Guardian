@@ -36,6 +36,7 @@
     "react-timeit": "^1.2.12",
     "styled-components": "^6.1.1",
     "talkjs": "^0.18.0",
+    "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

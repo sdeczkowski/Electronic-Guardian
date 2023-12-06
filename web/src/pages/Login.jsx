@@ -19,10 +19,10 @@ const Signup = () => {
     setCheck(null);
     setErrEmail(false);
     setErrPass(false);
-    if (email == "") {
+    if (email === "") {
       setErrEmail(true);
       setCheck("Wpisz email!");
-    } else if (password == "") {
+    } else if (password === "") {
       setErrPass(true);
       setCheck("Wpisz hasło!");
     } else {
@@ -31,6 +31,7 @@ const Signup = () => {
         const { data: res } = await axios.post(url, {
           email: email,
           password: password,
+          platform: "web"
         });
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("email", res.data.email);
@@ -38,16 +39,20 @@ const Signup = () => {
         window.location.replace("/");
       } catch (error) {
         if (error.response && error.response.status >= 400 && error.response.status <= 500) {
-          if (error.response.status == 400) {
+          if (error.response.status === 400) {
             setErrEmail(true);
             setErrPass(true);
             setCheck("Niepoprawne dane");
           }
-          if (error.response.status == 401) {
-            if (error.response.data.message == "Błędny email") {
+          if (error.response.status === 401) {
+            if (error.response.data.message === "Błędny email") {
               setErrEmail(true);
             }
-            if (error.response.data.message == "Błędne hasło") {
+            if (error.response.data.message === "Błędne hasło") {
+              setErrPass(true);
+            }
+            else {
+              setErrEmail(true);
               setErrPass(true);
             }
             setCheck(error.response.data.message);
@@ -63,6 +68,7 @@ const Signup = () => {
       <h1 style={{ marginTop: "10px" }}>Logowanie</h1>
       <br />
       <p style={{ color: "red" }}>{check}</p>
+      <form onSubmit={handleLogin} style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
       <Form.Control
         type="text"
         placeholder="Email"
@@ -87,9 +93,10 @@ const Signup = () => {
             : { margin: "10px", width: "30vw", borderRadius: "20vh" }
         }
       />
-      <button className="button" style={{ backgroundColor: "deepskyblue" }} onClick={handleLogin}>
+      <button type="submit" className="button" style={{ backgroundColor: "deepskyblue" }}>
         Zaloguj się
       </button>
+      </form>
       <Link to="/signup" className="">
         Nie masz konta?
       </Link>

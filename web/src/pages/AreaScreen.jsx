@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker, Polygon, useJsApiLoader } from "@react-google-maps/api";
-import { Button, Nav, ButtonGroup, DropdownButton } from "react-bootstrap";
+import { GoogleMap, Marker, Polygon } from "@react-google-maps/api";
+import { ButtonGroup } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
@@ -8,7 +8,6 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import TimePicker from "react-time-picker";
-import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import axios from "axios";
 import { FallingLines } from "react-loader-spinner";
 import { BiArrowBack } from "react-icons/bi";
@@ -19,29 +18,31 @@ function AreaScreen() {
   const [startDate, setStartDate] = useState(new Date());
   const [timeFrom, setTime] = useState("10:00");
   const [timeTo, setTime2] = useState("10:00");
-  const [location, setLocation] = useState();
   const [selectedName, setSelectedName] = useState("Wybierz podopiecznego!");
   const [selectedValue, setSelectedValue] = useState("Wybierz podopiecznego!");
   const [coordinates, setCoordinates] = useState([]);
   const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-  const [mapRegionComplete, setRegionComplete] = useState([]);
   const [areaname, setAreaName] = useState("");
   const [pods, setPods] = useState([]);
-  const [errDate, setErrDate] = useState(false);
-  const [errTime, setErrTime] = useState(false);
-  const [errTime2, setErrTime2] = useState(false);
   const [check, setCheck] = useState(null);
   const [checkBox, setCheckBox] = useState(null);
   const [errName, setErrName] = useState(false);
-  const [checkArea, setCheckArea] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [option, setOption] = useState(null);
-  const [checked, setChecked] = React.useState(false);
-  const [errPicker, setErrPicker] = useState(false);
   const [checkedOne, setCheckedOne] = React.useState(false);
   const [checkedTwo, setCheckedTwo] = React.useState(false);
   const [checkedThree, setCheckedThree] = React.useState(false);
-  const [map, setMap] = useState(/** @type google.maps.Map */ (null));
+  const [map, setMap] = useState(null);
+  const [defaultCenter, setCenter] = useState({
+    lat: 51.237953,
+    lng: 22.529214,
+  });
+
+  const onLoad = React.useCallback(function callback(map) {
+    const bounds = new window.google.maps.LatLngBounds(defaultCenter);
+    map.fitBounds(bounds);
+
+    setMap(map);
+  }, []);
 
   const handleChangeOne = () => {
     setCheckedOne(true);
@@ -139,11 +140,9 @@ function AreaScreen() {
   };
 
   const onSubmit = async () => {
-    setErrTime(false);
-    setErrDate(false);
     setCheck(null);
     setErrName(false);
-    setErrPicker(false);
+
     setCheck("");
 
     const [hourF, minutesF] = timeFrom.split(":");
@@ -161,19 +160,14 @@ function AreaScreen() {
       setErrName(true);
       setCheck("Podaj nazwę obszaru!");
     } else if (!startDate) {
-      setErrDate(true);
       setCheck("Wybierz datę!");
     } else if (!dayFrom) {
-      setErrTime(true);
       setCheck("Wybierz czas rozpoczęcia!");
     } else if (!dayTo) {
-      setErrTime2(true);
       setCheck("Wybierz czas zakończenia!");
     } else if (dayFrom >= dayTo) {
-      setErrTime2(true);
       setCheck("Czas zakończenia musi być późniejszy od czasu rozpoczęcia!");
     } else if (selectedValue === "Wybierz podopiecznego!") {
-      setErrPicker(true);
       setCheck("Wybierz podopiecznego!");
     } else if (checkBox === null) {
       setCheck("Wybierz cykliczność!");
@@ -190,9 +184,9 @@ function AreaScreen() {
           name: areaname,
           cords: coordinates,
           initialRegion: {
-            latitude: 51.2334710481964,
+            latitude: defaultCenter.lat,
             latitudeDelta: 0.050928177383966045,
-            longitude: 22.555865552276373,
+            longitude: defaultCenter.lng,
             longitudeDelta: 0.042099617421627045,
           },
           date: startDate.toString(),
@@ -209,9 +203,6 @@ function AreaScreen() {
   };
 
   const Setup = async () => {
-    const region = localStorage.getItem("location");
-    setLocation(JSON.parse(region));
-    setRegionComplete(JSON.parse(region));
     const id = localStorage.getItem("_id");
     try {
       const url = "http://localhost:3001/api/user/getpods/" + id;
@@ -242,11 +233,6 @@ function AreaScreen() {
   const mapStyles = {
     height: "100vh",
     width: "100%",
-  };
-
-  const defaultCenter = {
-    lat: 51.237953,
-    lng: 22.529214,
   };
 
   useEffect(() => {
@@ -329,7 +315,11 @@ function AreaScreen() {
             />
             <br />
             {pods.length != 0 ? (
-              <Dropdown as={ButtonGroup} onSelect={handleSelect}>
+              <Dropdown
+                as={ButtonGroup}
+                onSelect={(itemValue) => {
+                  handleSelect(itemValue);
+                }}>
                 <Dropdown.Toggle
                   id="dropdown-custom-1"
                   className="dropdownmap"
@@ -349,12 +339,7 @@ function AreaScreen() {
                 <Dropdown.Toggle
                   id="dropdown-custom-1"
                   className="dropdownmap"
-                  onSelect={handleSelect}
-                  style={
-                    errPicker
-                      ? { backgroundColor: "white", borderColor: "red", borderWidth: 1, color: "black" }
-                      : { backgroundColor: "white", borderWidth: 0, color: "black" }
-                  }>
+                  style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
                   Brak podopiecznych!
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="super-colors" style={{ width: "95%" }}></Dropdown.Menu>
@@ -407,9 +392,14 @@ function AreaScreen() {
         <GoogleMap
           mapContainerStyle={mapStyles}
           zoom={13}
-          ref={mapRef}
           center={defaultCenter}
-          mapContainerClassName="xd"
+          onLoad={(map) => onLoad(map)}
+          onCenterChanged={() => {
+            if (mapRef.current != null) {
+              setCenter(mapRef.current.props.center);
+            }
+          }}
+          ref={mapRef}
           options={{
             disableDefaultUI: true,
             zoomControl: false,
@@ -419,7 +409,6 @@ function AreaScreen() {
             rotateControl: false,
             fullscreenControl: false,
           }}
-          onLoad={(map) => setMap(map)}
           onClick={handleMapPress}>
           {coordinates.map((coordinate, index) => (
             <Marker

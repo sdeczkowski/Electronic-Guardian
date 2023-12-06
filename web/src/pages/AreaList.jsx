@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GoogleMap, LoadScript, Polygon } from "@react-google-maps/api";
+import { GoogleMap, Polygon } from "@react-google-maps/api";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import uni from "../assets/uni.png";
@@ -13,12 +13,8 @@ import { FallingLines } from "react-loader-spinner";
 
 function AreaList() {
   const navigate = useNavigate();
-  const [startDate, setStartDate] = useState(new Date());
-  const [pod, setPod] = useState();
   const [loading, setLoading] = useState(true);
-  const [isModalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState();
-  const [error, setErr] = useState();
   const mapRef = React.useRef(null);
 
   const opcje = [
@@ -39,7 +35,7 @@ function AreaList() {
       });
     } catch (error) {
       if (error.response.status === 404) {
-        setErr(error.response.data.message);
+        console.log(error.response.data.message);
       }
     }
   };
@@ -105,13 +101,6 @@ function AreaList() {
               height: "97vh",
             }}>
             {data.map((item) => {
-              const path = [];
-              item.cords.flat().forEach((element) => {
-                path.push({
-                  lat: parseFloat(element.latitude),
-                  lng: parseFloat(element.longitude),
-                });
-              });
               return (
                 <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} key={item._id}>
                   <GoogleMap
@@ -127,7 +116,15 @@ function AreaList() {
                       rotateControl: false,
                       fullscreenControl: false,
                     }}>
-                    <Polygon visible={true} key={item._id} path={path}></Polygon>
+                    <Polygon
+                      visible={true}
+                      key={item._id}
+                      paths={item.cords.flat().map((point) => {
+                        return {
+                          lat: parseFloat(point.latitude),
+                          lng: parseFloat(point.longitude),
+                        };
+                      })}></Polygon>
                   </GoogleMap>
                   <Card.Body>
                     <Card.Title>{item.name}</Card.Title>
@@ -142,7 +139,7 @@ function AreaList() {
                       <br />
                       Cykliczność: {opcje[item.repeat - 1].label}
                     </Card.Text>
-                    <Button variant="primary">Check</Button>
+                    <Button variant="danger">Usuń</Button>
                   </Card.Body>
                 </Card>
               );

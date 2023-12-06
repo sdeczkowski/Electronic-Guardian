@@ -34,6 +34,7 @@ const login = ({ navigation }) => {
         const { data: res } = await axios.post(url, {
           email: email,
           password: password,
+          platform: "mobile"
         });
 
         dispatch(Login(res.data));

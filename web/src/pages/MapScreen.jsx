@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Button, ListGroup, Dropdown, ButtonGroup, Nav, Card, Modal } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
-import { Check } from "react-bootstrap-icons";
+import {  Button, ListGroup, Dropdown, ButtonGroup, Nav, Card, Modal } from "react-bootstrap";
 import uni from "../assets/uni.png";
 import "../styles/style.css";
 import { Bell, QrCode, XLg } from "react-bootstrap-icons";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
-import { LoadScript, GoogleMap, Marker, Polygon } from "@react-google-maps/api";
+import { GoogleMap, Marker, Polygon } from "@react-google-maps/api";
 import moment from "moment";
 import axios from "axios";
 import { FallingLines } from "react-loader-spinner";
+import { HiExclamationTriangle } from "react-icons/hi2";
 
 function MapScreen() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  const [path, setPath] = useState([
-    { lat: 52.52549080781086, lng: 13.398118538856465 },
-    { lat: 52.48578559055679, lng: 13.36653284549709 },
-    { lat: 52.48871246221608, lng: 13.44618372440334 },
-  ]);
+  const mapRef = React.useRef(null);
+  const [podloc, setPodLoc] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [code, setCode] = useState();
+  const [pods, setPods] = useState([]);
+  const [podArea, setPodArea] = useState([]);
+  const [freshLocation, setFreshLoc] = useState(false);
+  const [map, setMap] = useState(null);
+  const [selectedName, setSelectedName] = useState("Wybierz podpopiecznego!");
+  const [isPodOutArea, setIsPodOutArea] = useState(false);
+  const [notiData, setData] = useState([]);
   const [displayNoti, setDisplayNoti] = useState(false);
-
-  const defaultCenter = {
+  const [defaultCenter, setCenter] = useState({
     lat: 51.237953,
     lng: 22.529214,
-  };
+  });
 
   const ShowNoti = () => {
     if (displayNoti) {
@@ -36,23 +39,55 @@ function MapScreen() {
     }
   };
 
-  const [mapRegion, setMapRegion] = useState({});
-  const [location, setLocation] = useState();
-  const [podloc, setPodLoc] = useState(null);
-  const [coordinates, setCoordinates] = useState([]);
-  const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
-  const [loading, setLoading] = useState(true);
-  const [newNoti, setNewNoti] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [type, setType] = useState("");
-  const [selectedValue, setSelectedValue] = useState("Podopieczny");
-  const [isVisible, setIsVisible] = useState(true);
-  const [modalInput, setModalInput] = useState("");
-  const [code, setCode] = useState();
-  const [pods, setPods] = useState([]);
-  const [podArea, setPodArea] = useState([]);
-  const [freshLocation, setFreshLoc] = useState(false);
-  const [check, setCheck] = useState("");
+  
+
+  const NotiSetup = async () => {
+    try {
+      const id = localStorage.getItem("_id");
+      const url = "http://localhost:3001/api/noti/get/" + id;
+      axios.get(url).then((response) => {
+        if (response && response.data) {
+          setData(response.data.notifications);
+        }
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const deleteNoti = async () => {
+    const id = localStorage.getItem("_id");
+    try {
+      const url = "http://localhost:3001/api/noti/delete";
+      axios.post(url, { _opid: id });
+      setData(null);
+      ShowNoti();
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const sendSeen = async () => {
+    const id = localStorage.getItem("_id");
+    try {
+      const url = "http://localhost:3001/api/noti/seen";
+      axios.post(url, { _opid: id });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const onLoad = React.useCallback(function callback(map) {
+    const bounds = new window.google.maps.LatLngBounds(defaultCenter);
+    //map.fitBounds(bounds);
+    map.setZoom(30);
+
+    setMap(map);
+  }, []);
+
+  const onUnmount = React.useCallback(function callback(map) {
+    setMap(null);
+  }, []);
 
   const Setup = async () => {
     const id = localStorage.getItem("_id");
@@ -62,7 +97,7 @@ function MapScreen() {
         if (response && response.data) {
           response.data.notifications.map((item) => {
             if (!item.seen) {
-              setNewNoti(true);
+              //setNewNoti(true);
             }
           });
           console.log("powiadomienia - odebrane");
@@ -93,6 +128,7 @@ function MapScreen() {
     } catch (error) {
       console.log(error.response.data.message);
     }
+    console.log(mapRef);
     setLoading(false);
   };
 
@@ -159,6 +195,7 @@ function MapScreen() {
     } else {
       if (item.loc_status) {
         console.log("Jesteś poza obszarem");
+        setIsPodOutArea(true);
         await NotiSend(item._podid, item.name);
         item.loc_status = false;
       }
@@ -184,7 +221,7 @@ function MapScreen() {
   };
 
   const GetPodArea = async (_podid) => {
-    if (_podid == "") {
+    if (_podid === "") {
       setPodArea([]);
       setPodLoc(null);
     } else {
@@ -194,6 +231,7 @@ function MapScreen() {
         axios.get(url).then((response) => {
           if (response && response.data) {
             setPodArea(response.data);
+            setSelectedName(response.data[0].pod_firstname + " " + response.data[0].pod_lastname);
           }
         });
       } catch (error) {
@@ -223,13 +261,14 @@ function MapScreen() {
           isPodinArea(item);
         });
       }
-    }, 10000);
+      NotiSetup();
+    }, 1000);
     return () => {
       clearInterval(intId);
     };
   }, [podArea]);
 
-  if (loading) {
+  if (loading && !mapRef) {
     return (
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100vw", height: "100vh" }}>
         <FallingLines color="deepskyblue" width="100" visible={true} ariaLabel="falling-lines-loading" />
@@ -280,21 +319,43 @@ function MapScreen() {
           <div className="map" style={{ zIndex: 1, position: "absolute" }}>
             <GoogleMap
               mapContainerStyle={{ height: "100vh", width: "100vw" }}
-              zoom={13}
               center={defaultCenter}
+              zoom={30}
+              onLoad={(map) => onLoad(map)}
+              onCenterChanged={() => {
+                if (mapRef.current !== null) {
+                  setCenter(mapRef.current.props.center);
+                }
+              }}
+              ref={mapRef}
               options={{
                 fullscreenControl: false,
                 streetViewControl: false,
                 mapTypeControl: false,
                 zoomControl: false,
               }}>
-              <Polygon
-                // Make the Polygon editable / draggable
-                editable
-                draggable
-                path={path}
-              />
-              <Marker position={defaultCenter} />
+              {podArea.length > 0 ? (
+                podArea.map((item) => (
+                  <Polygon
+                    key={item.name}
+                    options={
+                      item.isActive
+                        ? { strokeColor: "blue", fillColor: "blue" }
+                        : { strokeColor: "grey", fillColor: "#ccc" }
+                    }
+                    strokeWidth={2}
+                    paths={item.cords.flat().map((point) => {
+                      return {
+                        lat: parseFloat(point.latitude),
+                        lng: parseFloat(point.longitude),
+                      };
+                    })}
+                  />
+                ))
+              ) : (
+                <></>
+              )}
+              {podloc !== null ? <Marker position={{ lat: podloc.latitude, lng: podloc.longitude }}></Marker> : <></>}
             </GoogleMap>
           </div>
           <div
@@ -316,52 +377,58 @@ function MapScreen() {
               {displayNoti && (
                 <Card className="shadow noti" style={{ height: "60vh", overflow: "auto" }}>
                   <ListGroup variant="flush">
-                    <ListGroup.Item>
-                      <div
-                        style={{
-                          display: "flex",
-                          backgroundColor: "rgb(204, 204, 204)",
-                          width: "30vw",
-                          height: "15vh",
-                          borderRadius: "20px",
-                          padding: "10px",
-                          justifyContent: "space-between",
-                        }}>
-                        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                          <div style={{ display: "flex" }}>
-                            <div
-                              style={{
-                                backgroundColor: "rgb(88, 88, 88)",
-                                width: "30px",
-                                height: "30px",
-                                borderRadius: "5px",
-                                marginRight: "5px",
-                              }}></div>
-                            <b>Nazwa użytkownika</b>
-                          </div>
-                          <text>xddsdfs</text>
-                          <text>xddsdfs</text>
-                        </div>
+                    {notiData.map((item) => (
+                      <ListGroup.Item>
                         <div
                           style={{
                             display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-end",
-                            justifyContent: "space-around",
+                            backgroundColor: "rgb(204, 204, 204)",
+                            width: "30vw",
+                            height: "15vh",
+                            borderRadius: "20px",
+                            padding: "10px",
+                            justifyContent: "space-between",
                           }}>
-                          {moment(new Date()).fromNow()}
+                          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex" }}>
+                              <div
+                                style={{
+                                  backgroundColor: "rgb(88, 88, 88)",
+                                  width: "30px",
+                                  height: "30px",
+                                  borderRadius: "5px",
+                                  marginRight: "5px",
+                                }}></div>
+                              <b>{item.firstname + " " + item.lastname}</b>
+                            </div>
+                            <text>{item.title}</text>
+                            <text>{item.areaname}</text>
+                            <text>{item.details}</text>
+                          </div>
                           <div
                             style={{
-                              backgroundColor: "rgb(88, 88, 88)",
-                              width: "45px",
-                              height: "45px",
-                              borderRadius: "5px",
-                            }}></div>
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "flex-end",
+                              justifyContent: "space-around",
+                            }}>
+                            {moment(new Date(item.date)).fromNow()}
+                            <div
+                              style={{
+                                backgroundColor: "rgb(88, 88, 88)",
+                                width: "45px",
+                                height: "45px",
+                                borderRadius: "5px",
+                              }}></div>
+                          </div>
                         </div>
-                      </div>
-                    </ListGroup.Item>
+                      </ListGroup.Item>
+                    ))}
                   </ListGroup>
-                  <button className="roundbutton" style={{ width: "30px", height: "30px" }}>
+                  <button
+                    className="roundbutton"
+                    onClick={() => deleteNoti()}
+                    style={{ width: "30px", height: "30px" }}>
                     <XLg />
                   </button>
                 </Card>
@@ -373,6 +440,23 @@ function MapScreen() {
               <Button className="rounded-circle roundbutton bg-light" style={{ borderWidth: 0 }} onClick={handleShow}>
                 <QrCode size={35} color="#979797" />
               </Button>
+              <Modal show={isPodOutArea} onHide={() => setIsPodOutArea(!isPodOutArea)}>
+                <Modal.Header style={{ display: "flex", flexDirection: "column" }}>
+                  <HiExclamationTriangle size={150} color="red" />
+                  <Modal.Title>Podopieczny opuścił obszar</Modal.Title>
+                </Modal.Header>
+                <Modal.Body style={{ display: "flex", justifyContent: "center" }}>
+                  Obserowany podopieczny właśnie opuścił obszar!
+                </Modal.Body>
+                <Modal.Footer style={{ display: "flex", alignContent: "space-between", justifyContent: "center" }}>
+                  <Button
+                    variant="link"
+                    onClick={() => setIsPodOutArea(!isPodOutArea)}
+                    style={{ display: "flex", justifyContent: "center", textDecoration: "none", color: "black" }}>
+                    Zamknij
+                  </Button>
+                </Modal.Footer>
+              </Modal>
               <Modal show={show} onHide={handleClose}>
                 <Modal.Header style={{ display: "flex", flexDirection: "column" }}>
                   <Modal.Title>Kod podopiecznego</Modal.Title>
@@ -387,22 +471,24 @@ function MapScreen() {
                   </Button>
                 </Modal.Footer>
               </Modal>
-              {pods.length != 0 ? (
-                <Dropdown as={ButtonGroup}>
+              {pods.length !== 0 ? (
+                <Dropdown
+                  as={ButtonGroup}
+                  onSelect={(itemValue) => {
+                    GetPodArea(itemValue);
+                  }}>
                   <Dropdown.Toggle
                     id="dropdown-custom-1"
                     className="dropdownmap"
                     style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
-                    Wybierz podopiecznego!
+                    {selectedName}
                   </Dropdown.Toggle>
-                  <Dropdown.Menu style={{ width: "95%" }}>
-                    <Dropdown.Item eventKey="1">Action</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
-                    <Dropdown.Item eventKey="3" active>
-                      Active Item
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+                  <Dropdown.Menu className="super-colors" style={{ width: "95%" }}>
+                    {pods.map((item) => (
+                      <Dropdown.Item eventKey={item._id} key={item._id}>
+                        {item.firstname + " " + item.lastname}
+                      </Dropdown.Item>
+                    ))}
                   </Dropdown.Menu>
                 </Dropdown>
               ) : (

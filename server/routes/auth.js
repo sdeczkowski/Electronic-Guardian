@@ -8,6 +8,7 @@ const validateLogin = (data) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    platform: Joi.string().required(),
   });
   return schema.validate(data);
 };
@@ -23,9 +24,11 @@ router.post("/", async (req, res) => {
   try {
     const { error } = validateLogin(req.body);
     if (error) return res.status(400).send({ message: error.details[0].message });
-    
+
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(401).send({ message: "Błędny email" });
+
+    if (user.type == "pod" && req.body.platform == "web") return res.status(401).send({ message: "Aby zalogować się jako podopieczny użyj aplikacji mobilnej!" });
     
     if (!user.isActive) return res.status(401).send({ message: "Konto zostało zdezaktywowane" });
     

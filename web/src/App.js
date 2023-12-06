@@ -17,7 +17,7 @@ function App() {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: googleMapsApiKey,
     id: "script-loader",
-    libraries: ["places"],
+    libraries: ["places", "maps", "marker"],
     language: "en",
     region: "us",
   });

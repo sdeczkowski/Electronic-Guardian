@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { FaSearch } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
 import { Nav, Form } from "react-bootstrap";
@@ -7,32 +7,74 @@ import uni from "../assets/uni.png";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
 import { FallingLines } from "react-loader-spinner";
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 const Chat = () => {
   const [loading, setLoading] = useState(true);
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Cześć, jak mogę Ci dzisiaj pomóc?",
-      user: "React Native",
-      isMe: false,
-    },
-  ]);
+  const [loadingChat, setLoadingChat] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [data, setData] = useState([]);
+  const [_id1, setID1] = useState();
+  const [_id2, setID2] = useState();
+  const [name, setName] = useState();
+
+  const Setup = async () => {
+    const id = localStorage.getItem("_id");
+    setID1(id);
+    try {
+      const url = "http://localhost:3001/api/chat/getpods/" + id + "/op";
+      axios.get(url).then((response) => {
+        if (response && response.data) {
+          setData(response.data);
+          setLoading(false);
+        }
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const GetChat = async () => {
+    try {
+      const url = "http://localhost:3001/api/chat/set/" + _id1 + "/" + _id2;
+      await axios.get(url).then((response) => {
+        if (response && response.data) {
+          setMessages(response.data);
+          setLoadingChat(false);
+        }
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const Send = async (messages) => {
+    try {
+      const url = "http://localhost:3001/api/chat/send";
+      await axios.post(url, {
+        _id1: _id1,
+        _id2: _id2,
+        _id: uuidv4(),
+        text: messages,
+        createdAt: new Date(),
+        user: {
+          _id: _id1,
+        },
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
 
   const [newMessage, setNewMessage] = useState("");
 
   const handleSendMessage = () => {
     if (newMessage.trim() !== "") {
-      setMessages([...messages, { id: messages.length + 1, text: newMessage, user: "Me", isMe: true }]);
+      Send(newMessage);
       setNewMessage("");
     }
   };
-
-  const [conversations, setConversations] = useState([
-    { id: 1, name: "Anna Nowak", select: false },
-    { id: 2, name: "Maria Maria", select: false },
-    // ... dodaj więcej osób
-  ]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -45,6 +87,19 @@ const Chat = () => {
     // Tutaj możesz dodać logikę tworzenia nowej konwersacji
     console.log("Utwórz nową konwersację");
   };
+
+  useEffect(() => {
+    const intId = setInterval(() => {
+      GetChat();
+    }, 2000);
+    return () => {
+      clearInterval(intId);
+    };
+  }, [messages]);
+
+  useEffect(() => {
+    Setup();
+  }, []);
 
   if (loading) {
     return (
@@ -121,14 +176,16 @@ const Chat = () => {
 
           {/* Lista osób */}
           <div style={{ overflowY: "scroll", marginTop: "10px", flex: 1 }}>
-            {conversations.map((person) => {
+            {data.map((person) => {
               let select = false;
               return (
                 <div
-                  key={person.id}
+                  key={person._id}
                   onClick={() => {
-                    select = !select;
-                    console.log(select);
+                    setID2(person._id);
+                    setName(person.firstname + " " + person.lastname);
+                    setLoadingChat(true);
+                    GetChat();
                   }}
                   style={
                     select
@@ -142,7 +199,7 @@ const Chat = () => {
                       : { cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }
                   }>
                   <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
-                  <Form.Text>{person.name}</Form.Text>
+                  <Form.Text>{person.firstname + " " + person.lastname}</Form.Text>
                 </div>
               );
             })}
@@ -150,60 +207,78 @@ const Chat = () => {
         </div>
 
         {/* Prawa sekcja (3:7) */}
-        <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+        {loadingChat ? (
           <div
             style={{
-              height: "400px",
-              overflowY: "scroll",
-              overflowX: "hidden",
-              border: "1px solid #ccc",
-              padding: "10px",
-              borderRadius: "10px",
-              flex: 1,
+              flex: 8,
               display: "flex",
-              flexDirection: "column",
-            }}>
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                style={{
-                  display: "flex",
-                  textAlign: msg.isMe ? "right" : "left",
-                  borderRadius: "40px",
-                  padding: "10px",
-                  backgroundColor: msg.isMe ? "#007AFF" : "#ccc",
-                  color: msg.isMe ? "white" : "black",
-                  margin: msg.isMe ? "0 0 5px auto " : "0 auto 5px 0",
-                  maxWidth: "70%",
-                }}>
-                {msg.text}
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              display: "flex",
+              justifyContent: "center",
               alignItems: "center",
-              justifyContent: "space-between",
-              padding: "10px",
-              borderTop: "1px solid #ccc",
-              borderRadius: "10px",
             }}>
-            <Form.Control
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Wpisz wiadomość..."
-              style={{ borderRadius: "20px", marginRight: "5px", padding: "5px", flex: 1 }}
-            />
-            <button
-              onClick={handleSendMessage}
-              className="roundbutton"
-              style={{ borderRadius: "50%", padding: "10px", backgroundColor: "white", width: "50px", height: "50px" }}>
-              <IoMdSend size={25} />
-            </button>
+            <FallingLines color="deepskyblue" width="100" visible={true} ariaLabel="falling-lines-loading" />
           </div>
-        </div>
+        ) : (
+          <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                height: "400px",
+                overflowY: "scroll",
+                overflowX: "hidden",
+                border: "1px solid #ccc",
+                padding: "10px",
+                borderRadius: "10px",
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+              }}>
+              {messages.map((msg) => (
+                <div
+                  key={msg._id}
+                  style={{
+                    display: "flex",
+                    textAlign: _id1 === msg.user._id ? "right" : "left",
+                    borderRadius: "40px",
+                    padding: "10px",
+                    backgroundColor: _id1 === msg.user._id ? "#007AFF" : "#ccc",
+                    color: _id1 === msg.user._id ? "white" : "black",
+                    margin: _id1 === msg.user._id ? "0 0 5px auto " : "0 auto 5px 0",
+                    maxWidth: "70%",
+                  }}>
+                  {msg.text}
+                </div>
+              ))}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "10px",
+                borderTop: "1px solid #ccc",
+                borderRadius: "10px",
+              }}>
+              <Form.Control
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Wpisz wiadomość..."
+                style={{ borderRadius: "20px", marginRight: "5px", padding: "5px", flex: 1 }}
+              />
+              <button
+                onClick={handleSendMessage}
+                className="roundbutton"
+                style={{
+                  borderRadius: "50%",
+                  padding: "10px",
+                  backgroundColor: "white",
+                  width: "50px",
+                  height: "50px",
+                }}>
+                <IoMdSend size={25} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
