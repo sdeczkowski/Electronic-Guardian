@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker, Polygon, useJsApiLoader } from "@react-google-maps/api";
 import { Button, Nav, ButtonGroup, DropdownButton } from "react-bootstrap";
@@ -40,10 +41,9 @@ function AreaScreen() {
   const [checkedOne, setCheckedOne] = React.useState(false);
   const [checkedTwo, setCheckedTwo] = React.useState(false);
   const [checkedThree, setCheckedThree] = React.useState(false);
-
   const [map, setMap] = useState(/** @type google.maps.Map */ (null));
 
-  const handleChange = () => {
+  const handleChangeOne = () => {
     setCheckedOne(true);
     setCheckedTwo(false);
     setCheckedThree(false);
@@ -61,40 +61,38 @@ function AreaScreen() {
     setCheckedThree(true);
   };
 
-  const checkForIntersections = (newCoordinate) => {
+const checkForIntersections = (newCoordinate) => {
     if (coordinates.length < 3) return false;
-
-    for (let i = 0; i < coordinates.length; i++) {
-      const point1 = coordinates[i];
-      const point2 = coordinates[(i + 1) % coordinates.length];
-      const nextPoint = coordinates[(i + 2) % coordinates.length];
-
-      if (
-        linesIntersect(
-          newCoordinate.latitude,
-          newCoordinate.longitude,
-          nextPoint.latitude,
-          nextPoint.longitude,
-          point1.latitude,
-          point1.longitude,
-          point2.latitude,
-          point2.longitude
-        )
-      ) {
-        return true;
+  
+    for (let i = 0; i < coordinates.length - 2; i++) {
+      const line1Start = coordinates[i];
+      const line1End = coordinates[i + 1];
+  
+      for (let j = i + 2; j < coordinates.length; j++) {
+        const line2Start = coordinates[j];
+        const line2End = coordinates[(j + 1) % coordinates.length];
+  
+        if (
+          linesIntersect(
+            line1Start.latitude,
+            line1Start.longitude,
+            line1End.latitude,
+            line1End.longitude,
+            line2Start.latitude,
+            line2Start.longitude,
+            line2End.latitude,
+            line2End.longitude
+          )
+        ) {
+          console.log('Intersection detected at lines', i, j);
+          return true;
+        }
       }
     }
+  
     return false;
   };
-
-  const Checkbox = ({ label, checked, onChange }) => {
-    return (
-      <label>
-        <input style={{margin: "0 10px 10px 0"}} type="radio" checked={checked} onChange={onChange} />
-        {label}
-      </label>
-    );
-  };
+  
 
   const linesIntersect = (x1, y1, x2, y2, x3, y3, x4, y4) => {
     const a = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
@@ -102,38 +100,14 @@ function AreaScreen() {
     const c = (x2 - x3) * (y1 - y3) - (y2 - y3) * (x1 - x3);
     const d = (x2 - x4) * (y1 - y3) - (y2 - y4) * (x1 - x3);
 
-    return a * b < 0 && c * d < 0;
+    console.log('a:', a, 'b:', b, 'c:', c, 'd:', d);
+
+    const isIntersecting = a * b < 0 && c * d < 0;
+
+  console.log('Is Intersecting:', isIntersecting);
+
+  return isIntersecting;
   };
-
-  const onEdit = useCallback(() => {
-    const editedCoordinates = coordinates.map((coord) => ({
-      latitude: coord.latitude,
-      longitude: coord.longitude,
-    }));
-
-    console.log("Coordinates edited:", editedCoordinates);
-  }, [coordinates]);
-
-  const handleMapPress = useCallback(
-    (event) => {
-      const { latLng } = event;
-      const coordinate = { latitude: latLng.lat(), longitude: latLng.lng() };
-      const hasIntersections = checkForIntersections(coordinate);
-
-      setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-
-      if (hasIntersections) {
-        setCoordinates([]);
-        setSelectedCoordinate(null);
-      } else {
-        setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-        setSelectedCoordinate(coordinate);
-      }
-
-      onEdit();
-    },
-    [onEdit, selectedCoordinate, checkForIntersections]
-  );
 
   const opcje = [
     { id: 1, label: "Codziennie" },
@@ -242,6 +216,15 @@ function AreaScreen() {
     }
   };
 
+  const Checkbox = ({ label, checked, onChange }) => {
+    return (
+      <label>
+        <input style={{margin: "0 10px 10px 0"}} type="radio" checked={checked} onChange={onChange} />
+        {label}
+      </label>
+    );
+  };
+  
   const resetCoordinates = () => {
     setCoordinates([]);
   };
@@ -261,7 +244,7 @@ function AreaScreen() {
   }, []);
 
   return (
-    <div className="d-flex flex-row bd-highlight" style={{ overflow: "hidden" }}>
+<div className="d-flex flex-row bd-highlight" style={{ overflow: "hidden" }}>
       <div
         style={{
           backgroundColor: "white",
@@ -356,7 +339,7 @@ function AreaScreen() {
               checked={checkedOne}
               onChange={() => {
                 setCheckBox(1);
-                handleChange();
+                handleChangeOne();
               }}
             />
             <Checkbox
@@ -399,35 +382,35 @@ function AreaScreen() {
         }}
         onLoad={(map) => setMap(map)}
         onClick={handleMapPress}>
-        {coordinates.map((coordinate, index) => (
-          <Marker
-            key={index}
-            coordinate={coordinate}
-            onPress={() => {
-              if (
-                selectedCoordinate &&
-                selectedCoordinate.latitude === coordinate.latitude &&
-                selectedCoordinate.longitude === coordinate.longitude
-              ) {
-                setCoordinates((prevCoordinates) =>
-                  prevCoordinates.filter(
-                    (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
-                  )
-                );
-                setSelectedCoordinate(null);
-              }
-            }}></Marker>
-        ))}
-        {coordinates.length > 2 && (
-          <Polygon
-            editable
-            draggable
-            paths={coordinates.map((coord) => ({ lat: coord.latitude, lng: coord.longitude }))}
-            strokeColor="blue"
-            fillColor="rgba(109, 147, 253, 0.4)"
-            strokeWidth={2}
-          />
-        )}
+         {coordinates.map((coordinate, index) => (
+            <Marker
+              key={index}
+              coordinate={coordinate}
+              onPress={() => {
+                if (
+                  selectedCoordinate &&
+                  selectedCoordinate.latitude === coordinate.latitude &&
+                  selectedCoordinate.longitude === coordinate.longitude
+                ) {
+                  setCoordinates((prevCoordinates) =>
+                    prevCoordinates.filter(
+                      (coord) => coord.latitude !== coordinate.latitude || coord.longitude !== coordinate.longitude
+                    )
+                  );
+                  setSelectedCoordinate(null);
+                }
+              }}
+            >
+            </Marker>
+          ))}
+          {coordinates.length > 0 && (
+            <Polygon
+              paths={coordinates.map((coord) => ({ lat: coord.latitude, lng: coord.longitude }))}
+              strokeColor="blue"
+              fillColor="rgba(109, 147, 253, 0.4)"
+              strokeWidth={2}
+            />
+          )}
       </GoogleMap>
     </div>
   );
