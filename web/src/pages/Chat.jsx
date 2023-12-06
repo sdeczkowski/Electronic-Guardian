@@ -6,8 +6,10 @@ import Button from "react-bootstrap/Button";
 import uni from "../assets/uni.png";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
+import { FallingLines } from "react-loader-spinner";
 
 const Chat = () => {
+  const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -44,143 +46,167 @@ const Chat = () => {
     console.log("Utwórz nową konwersację");
   };
 
-  return (
-    <div style={{ display: "flex", height: "100vh" }}>
-      <div
-        style={{
-          flex: "0 0 100px",
-          zIndex: 1,
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          overflowY: "auto",
-          backgroundColor: "#B3B1B1",
-        }}>
-        {/* Navbar */}
-        <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Button
-            className="rounded-circle roundbutton bg-light"
-            style={{ borderWidth: 0, borderColor: "#979797", backgroundColor: "white", width: "80px", height: "80px" }}>
-            <img src={uni} alt="logo" style={{ width: "50px", height: "50px" }} />
-          </Button>
-          <div className="sidebar">
-            <Nav.Item>
-              <Nav.Link href="/profile">
-                <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="link-1" href="/">
-                <FaMap style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="link-2" href="/list">
-                <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="disabled" href="/chat">
-                <FaMessage style={{ color: "#2699c7", fontSize: "4vh" }} />
-              </Nav.Link>
-            </Nav.Item>
-          </div>
-        </Nav>
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100vw", height: "100vh" }}>
+        <FallingLines color="deepskyblue" width="100" visible={true} ariaLabel="falling-lines-loading" />
       </div>
-
-      {/* Lewa sekcja i Navbar (2:8) */}
-      <div style={{ flex: 2, display: "flex", flexDirection: "column", padding: "10px" }}>
-        <div style={{ display: "flex", marginBottom: "10px" }}>
-          <Form.Control
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Wyszukaj..."
-            className="shadow"
-            style={{ borderRadius: "20px", marginRight: "5px", flex: 1, height: "4vh", borderWidth: 0 }}
-          />
-          <button
-            className="roundbutton"
-            style={{width: "40px", height: "40px", margin: 0}}
-            onClick={handleSearch}>
-            <FaSearch />
-          </button>
-        </div>
-
-        {/* Lista osób */}
-        <div style={{ overflowY: "scroll", marginTop: "10px", flex: 1 }}>
-          {conversations.map((person) => {
-            let select = false;
-            return(
-              <div
-              key={person.id}
-              onClick={() => {select = !select; console.log(select)}}
-              style={select ? { cursor: "pointer", marginBottom: "5px", backgroundColor: "grey", borderRadius: "5px", padding: "5px" }:{ cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }}>
-              <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
-              <Form.Text>{person.name}</Form.Text>
-            </div>
-            )
-            })}
-        </div>
-      </div>
-
-      {/* Prawa sekcja (3:7) */}
-      <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+    );
+  } else {
+    return (
+      <div style={{ display: "flex", height: "100vh" }}>
         <div
           style={{
-            height: "400px",
-            overflowY: "scroll",
-            overflowX: "hidden",
-            border: "1px solid #ccc",
-            padding: "10px",
-            borderRadius: "10px",
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
+            flex: "0 0 100px",
+            zIndex: 1,
+            position: "sticky",
+            top: 0,
+            height: "100vh",
+            overflowY: "auto",
+            backgroundColor: "#B3B1B1",
           }}>
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
+          {/* Navbar */}
+          <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Button
+              className="rounded-circle roundbutton bg-light"
               style={{
-                display: "flex",
-                textAlign: msg.isMe ? "right" : "left",
-                borderRadius: "40px",
-                padding: "10px",
-                backgroundColor: msg.isMe ? "#007AFF" : "#ccc",
-                color: msg.isMe ? "white" : "black",
-                margin: msg.isMe ? "0 0 5px auto " : "0 auto 5px 0",
-                maxWidth: "70%",
+                borderWidth: 0,
+                borderColor: "#979797",
+                backgroundColor: "white",
+                width: "80px",
+                height: "80px",
               }}>
-              {msg.text}
+              <img src={uni} alt="logo" style={{ width: "50px", height: "50px" }} />
+            </Button>
+            <div className="sidebar">
+              <Nav.Item>
+                <Nav.Link href="/profile">
+                  <FaRegCircleUser style={{ color: "#979797", fontSize: "4vh" }} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="link-1" href="/">
+                  <FaMap style={{ color: "#979797", fontSize: "4vh" }} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="link-2" href="/list">
+                  <FaLocationDot style={{ color: "#979797", fontSize: "4vh" }} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link eventKey="disabled" href="/chat">
+                  <FaMessage style={{ color: "#2699c7", fontSize: "4vh" }} />
+                </Nav.Link>
+              </Nav.Item>
             </div>
-          ))}
+          </Nav>
         </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px",
-            borderTop: "1px solid #ccc",
-            borderRadius: "10px",
-          }}>
-          <Form.Control
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Wpisz wiadomość..."
-            style={{ borderRadius: "20px", marginRight: "5px", padding: "5px", flex: 1 }}
-          />
-          <button
-            onClick={handleSendMessage}
-            className="roundbutton"
-            style={{ borderRadius: "50%", padding: "10px", backgroundColor: "white", width: "50px", height: "50px" }}>
-            <IoMdSend size={25} />
-          </button>
+
+        {/* Lewa sekcja i Navbar (2:8) */}
+        <div style={{ flex: 2, display: "flex", flexDirection: "column", padding: "10px" }}>
+          <div style={{ display: "flex", marginBottom: "10px" }}>
+            <Form.Control
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Wyszukaj..."
+              className="shadow"
+              style={{ borderRadius: "20px", marginRight: "5px", flex: 1, height: "4vh", borderWidth: 0 }}
+            />
+            <button className="roundbutton" style={{ width: "40px", height: "40px", margin: 0 }} onClick={handleSearch}>
+              <FaSearch />
+            </button>
+          </div>
+
+          {/* Lista osób */}
+          <div style={{ overflowY: "scroll", marginTop: "10px", flex: 1 }}>
+            {conversations.map((person) => {
+              let select = false;
+              return (
+                <div
+                  key={person.id}
+                  onClick={() => {
+                    select = !select;
+                    console.log(select);
+                  }}
+                  style={
+                    select
+                      ? {
+                          cursor: "pointer",
+                          marginBottom: "5px",
+                          backgroundColor: "grey",
+                          borderRadius: "5px",
+                          padding: "5px",
+                        }
+                      : { cursor: "pointer", marginBottom: "5px", borderRadius: "5px", padding: "5px" }
+                  }>
+                  <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
+                  <Form.Text>{person.name}</Form.Text>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Prawa sekcja (3:7) */}
+        <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+          <div
+            style={{
+              height: "400px",
+              overflowY: "scroll",
+              overflowX: "hidden",
+              border: "1px solid #ccc",
+              padding: "10px",
+              borderRadius: "10px",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+            }}>
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                style={{
+                  display: "flex",
+                  textAlign: msg.isMe ? "right" : "left",
+                  borderRadius: "40px",
+                  padding: "10px",
+                  backgroundColor: msg.isMe ? "#007AFF" : "#ccc",
+                  color: msg.isMe ? "white" : "black",
+                  margin: msg.isMe ? "0 0 5px auto " : "0 auto 5px 0",
+                  maxWidth: "70%",
+                }}>
+                {msg.text}
+              </div>
+            ))}
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "10px",
+              borderTop: "1px solid #ccc",
+              borderRadius: "10px",
+            }}>
+            <Form.Control
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Wpisz wiadomość..."
+              style={{ borderRadius: "20px", marginRight: "5px", padding: "5px", flex: 1 }}
+            />
+            <button
+              onClick={handleSendMessage}
+              className="roundbutton"
+              style={{ borderRadius: "50%", padding: "10px", backgroundColor: "white", width: "50px", height: "50px" }}>
+              <IoMdSend size={25} />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default Chat;
