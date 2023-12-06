@@ -50,7 +50,7 @@ function AreaList() {
 
   if (loading) {
     return (
-      <div style={{ flex: 1, justifyContent: "center" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100vw", height: "100vh" }}>
         <FallingLines color="deepskyblue" width="100" visible={true} ariaLabel="falling-lines-loading" />
       </div>
     );

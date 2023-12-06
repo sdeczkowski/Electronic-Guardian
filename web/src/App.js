@@ -18,8 +18,8 @@ function App() {
     googleMapsApiKey: googleMapsApiKey,
     id: "script-loader",
     libraries: ["places"],
-    language:"en",
-    region:"us"
+    language: "en",
+    region: "us",
   });
 
   if (!isLoaded) {
@@ -29,20 +29,20 @@ function App() {
       </div>
     );
   } else {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {token && <Route path="/" element={<MapScreen />} />}
-        {token &&<Route path="/profile" element={<Profile />} />}
-        {token &&<Route path="/area" element={<AreaScreen />} />}
-        {token &&<Route path="/list" element={<AreaList />} />}
-        {token &&<Route path="/chat" element={<Chat />} />}
-        
-        <Route path="/" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+      <BrowserRouter>
+        <Routes>
+          {token && <Route path="/" element={<MapScreen />} />}
+          {token && <Route path="/profile" element={<Profile />} />}
+          {token && <Route path="/area" element={<AreaScreen />} />}
+          {token && <Route path="/list" element={<AreaList />} />}
+          {token && <Route path="/chat" element={<Chat />} />}
+
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+      </BrowserRouter>
+    );
   }
 }
 
