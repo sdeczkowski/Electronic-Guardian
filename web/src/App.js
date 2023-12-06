@@ -8,9 +8,27 @@ import AreaScreen from "./pages/AreaScreen";
 import AreaList from "./pages/AreaList";
 import "./styles/style.css";
 import "./App.css";
+import { FallingLines } from "react-loader-spinner";
+import { useJsApiLoader } from "@react-google-maps/api";
 
 function App() {
+  const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const token = localStorage.getItem("token");
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: googleMapsApiKey,
+    id: "script-loader",
+    libraries: ["places"],
+    language:"en",
+    region:"us"
+  });
+
+  if (!isLoaded) {
+    return (
+      <div style={{ flex: 1, justifyContent: "center" }}>
+        <FallingLines color="deepskyblue" width="100" visible={true} ariaLabel="falling-lines-loading" />
+      </div>
+    );
+  } else {
   return (
     <BrowserRouter>
       <Routes>
@@ -25,6 +43,7 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+  }
 }
 
 export default App;
