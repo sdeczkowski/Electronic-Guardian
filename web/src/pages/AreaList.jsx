@@ -12,7 +12,6 @@ import axios from "axios";
 import { FallingLines } from "react-loader-spinner";
 
 function AreaList() {
-  const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
   const [pod, setPod] = useState();
@@ -22,15 +21,11 @@ function AreaList() {
   const [error, setErr] = useState();
   const mapRef = React.useRef(null);
 
-  const mapStyles = {
-    height: "100vh",
-    width: "100%",
-  };
-
-  const defaultCenter = {
-    lat: 40.748817,
-    lng: -73.985428,
-  };
+  const opcje = [
+    { id: 1, label: "Codziennie" },
+    { id: 2, label: "Co tydzień" },
+    { id: 3, label: "Nigdy" },
+  ];
 
   const AreaSetup = async () => {
     try {
@@ -62,7 +57,6 @@ function AreaList() {
   } else {
     return (
       <div>
-        <LoadScript googleMapsApiKey={googleMapsApiKey}>
         <div style={{ position: "fixed", zIndex: 3, height: "100vh", backgroundColor: "#979797", overflow: "hidden" }}>
           <Nav style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <Button
@@ -111,19 +105,17 @@ function AreaList() {
               height: "97vh",
             }}>
             {data.map((item) => {
-              const path = []
-              item.cords.flat().forEach(element => {
+              const path = [];
+              item.cords.flat().forEach((element) => {
                 path.push({
                   lat: parseFloat(element.latitude),
                   lng: parseFloat(element.longitude),
-                })
-              })
-              console.log(path)
-              return(
-              <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} key={item._id}>
+                });
+              });
+              return (
+                <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} key={item._id}>
                   <GoogleMap
                     ref={mapRef}
-                    key={item._id}
                     mapContainerStyle={{ height: "300px", width: "100%" }}
                     zoom={13}
                     center={{ lat: item.initialRegion.latitude, lng: item.initialRegion.longitude }}
@@ -135,32 +127,31 @@ function AreaList() {
                       rotateControl: false,
                       fullscreenControl: false,
                     }}>
-                    <Polygon
-                      
-                      path={path}></Polygon>
+                    <Polygon visible={true} key={item._id} path={path}></Polygon>
                   </GoogleMap>
-                <Card.Body >
-                  <Card.Title>{item.name}</Card.Title>
-                  <Card.Text>
-                    Podopieczny
-                    <br />
-                    Data
-                    <br />
-                    Czas
-                    <br />
-                    Współrzędne
-                    <br />
-                    Cykliczność
-                  </Card.Text>
-                  <Button variant="primary">
-                    Check
-                  </Button>
-                </Card.Body>
-              </Card>)})}
-            <Card style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }} onClick={() => {
-              console.log(data)
-              navigate("/area")
-            }}>
+                  <Card.Body>
+                    <Card.Title>{item.name}</Card.Title>
+                    <Card.Text>
+                      Podopieczny: {item.pod_firstname + " " + item.pod_lastname}
+                      <br />
+                      Data: {item.date}
+                      <br />
+                      Czas od: {item.time_from}
+                      <br />
+                      Czas do: {item.time_to}
+                      <br />
+                      Cykliczność: {opcje[item.repeat - 1].label}
+                    </Card.Text>
+                    <Button variant="primary">Check</Button>
+                  </Card.Body>
+                </Card>
+              );
+            })}
+            <Card
+              style={{ width: "20dvw", height: "65dvh", marginRight: "20px" }}
+              onClick={() => {
+                navigate("/area");
+              }}>
               <Card.Body
                 style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                 <Button
@@ -172,7 +163,6 @@ function AreaList() {
             </Card>
           </div>
         </div>
-        </LoadScript>
       </div>
     );
   }

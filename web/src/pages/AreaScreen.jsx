@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
-import { GoogleMap, LoadScript, Marker, Polygon } from "@react-google-maps/api";
-import { Button, Nav } from "react-bootstrap";
+
+import React, { useState, useCallback, useEffect } from "react";
+import { GoogleMap, LoadScript, Marker, Polygon, useJsApiLoader } from "@react-google-maps/api";
+import { Button, Nav, ButtonGroup, DropdownButton } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import "react-time-picker/dist/TimePicker.css";
 import "react-clock/dist/Clock.css";
@@ -10,15 +11,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import TimePicker from "react-time-picker";
 import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
 import axios from "axios";
+import { FallingLines } from "react-loader-spinner";
 
+function AreaScreen() {
+  const mapRef = React.useRef(null);
 
-function AreaScreen({ addArea }) {
-  const googleMapsApiKey = "AIzaSyBO9ngwlK0mOR2jLp4kJk-2FxRC7ncM0oo";
   const [startDate, setStartDate] = useState(new Date());
-  const [value, onChange] = useState("10:00");
-  const [value2, onChange2] = useState("10:00");
+  const [timeFrom, setTime] = useState("10:00");
+  const [timeTo, setTime2] = useState("10:00");
   const [location, setLocation] = useState();
-  const [selectedValue, setSelectedValue] = useState();
+  const [selectedName, setSelectedName] = useState("Wybierz podopiecznego!");
+  const [selectedValue, setSelectedValue] = useState("Wybierz podopiecznego!");
   const [coordinates, setCoordinates] = useState([]);
   const [selectedCoordinate, setSelectedCoordinate] = useState(null); // Dodaj nowy stan
   const [mapRegionComplete, setRegionComplete] = useState([]);
@@ -28,6 +31,7 @@ function AreaScreen({ addArea }) {
   const [errTime, setErrTime] = useState(false);
   const [errTime2, setErrTime2] = useState(false);
   const [check, setCheck] = useState(null);
+  const [checkBox, setCheckBox] = useState(null);
   const [errName, setErrName] = useState(false);
   const [checkArea, setCheckArea] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -37,6 +41,7 @@ function AreaScreen({ addArea }) {
   const [checkedOne, setCheckedOne] = React.useState(false);
   const [checkedTwo, setCheckedTwo] = React.useState(false);
   const [checkedThree, setCheckedThree] = React.useState(false);
+  const [map, setMap] = useState(/** @type google.maps.Map */ (null));
 
   const handleChangeOne = () => {
     setCheckedOne(true);
@@ -56,7 +61,7 @@ function AreaScreen({ addArea }) {
     setCheckedThree(true);
   };
 
-  const checkForIntersections = (newCoordinate) => {
+const checkForIntersections = (newCoordinate) => {
     if (coordinates.length < 3) return false;
   
     for (let i = 0; i < coordinates.length - 2; i++) {
@@ -104,134 +109,85 @@ function AreaScreen({ addArea }) {
   return isIntersecting;
   };
 
-  const Checkbox = ({ label, checked, onChange }) => {
-    return (
-      <label>
-        <input type="radio" checked={checked} onChange={onChange} />
-        {label}
-      </label>
-    );
-  };
-
-
-  const handleMapPress = useCallback((event) => {
-    
-    const { latLng } = event;
-    const coordinate = { latitude: latLng.lat(), longitude: latLng.lng() };
-    console.log('Current Coordinates:', coordinates);
-    const hasIntersections = checkForIntersections(coordinate);
-
-    setCoordinates((prevCoordinates) => {
-      const updateCoordinates = [...prevCoordinates, coordinate]
-      const hasIntersections = checkForIntersections(updateCoordinates);
-      return hasIntersections ? [] : updateCoordinates;
-    }    
-      );
-  
-    if (hasIntersections) {
-      // Reset the entire polygon if intersections are found
-      console.log('Resetting coordinates due to intersections');
-      setCoordinates([]);
-      setSelectedCoordinate(null);
-    } else {
-      // Add the new point to the polygon if no intersections
-      console.log('Adding coordinate:', coordinate);
-      setCoordinates((prevCoordinates) => [...prevCoordinates, coordinate]);
-      setSelectedCoordinate(coordinate);
-    }
-
-    console.log('Updated Coordinates:', coordinates);
-
-  }, [coordinates]);
-
-
   const opcje = [
     { id: 1, label: "Codziennie" },
     { id: 2, label: "Co tydzień" },
     { id: 3, label: "Nigdy" },
   ];
 
-  const selectOptions = (optionId) => {
-    setOption(optionId);
+  const handleSelect = (e) => {
+    setSelectedValue(e);
   };
 
   const onSubmit = async () => {
-    // Reset error states and checks
     setErrTime(false);
     setErrDate(false);
     setCheck(null);
     setErrName(false);
     setErrPicker(false);
     setCheck("");
-    console.log(coordinates)
+    
+    const [hourF, minutesF] = timeFrom.split(":");
+    const [hourT, minutesT] = timeTo.split(":");
 
-    // Validate form inputs
-    if (!startDate) {
-      setErrDate(true);
-      setCheck("Wybierz datę!");
-    } else if (!value) {
-      setErrTime(true);
-      setCheck("Wybierz czas rozpoczęcia!");
-    } else if (!value2) {
-      setErrTime2(true);
-      setCheck("Wybierz czas zakończenia!");
-    } else if (value >= value2) {
-      setErrTime2(true);
-      setCheck("Czas zakończenia musi być późniejszy od czasu rozpoczęcia!");
-    } else if (option === null) {
-      setCheck("Wybierz cykliczność!");
-    } else if (!areaname.trim()) {
+    let dayFrom = new Date();
+    let dayTo = new Date();
+
+    dayFrom.setHours(hourF);
+    dayFrom.setMinutes(minutesF);
+    dayTo.setHours(hourT);
+    dayTo.setMinutes(minutesT);
+
+    if (!areaname.trim()) {
       setErrName(true);
       setCheck("Podaj nazwę obszaru!");
-    } else if (!selectedValue) {
+    } else if (!startDate) {
+      setErrDate(true);
+      setCheck("Wybierz datę!");
+    } else if (!dayFrom) {
+      setErrTime(true);
+      setCheck("Wybierz czas rozpoczęcia!");
+    } else if (!dayTo) {
+      setErrTime2(true);
+      setCheck("Wybierz czas zakończenia!");
+    } else if (dayFrom >= dayTo) {
+      setErrTime2(true);
+      setCheck("Czas zakończenia musi być późniejszy od czasu rozpoczęcia!");
+    } else if (selectedValue === "Wybierz podopiecznego!") {
       setErrPicker(true);
       setCheck("Wybierz podopiecznego!");
+    } else if (checkBox === null) {
+      setCheck("Wybierz cykliczność!");
     } else if (coordinates.length === 0) {
       setCheck("Nie wybrano obszaru!");
     } else {
-      // All inputs are valid, proceed with adding the area
       const id = localStorage.getItem("_id");
       try {
-        // API call to add the area
-        const url = "http://localhost:3001/api/area";
+        console.log("xdd")
+        const url = "http://localhost:3001/api/area/add";
         await axios.post(url, {
           _opid: id,
           _podid: selectedValue,
           name: areaname,
           cords: coordinates,
-          initialRegion: mapRegionComplete,
+          initialRegion: {
+            latitude: 51.2334710481964,
+            latitudeDelta: 0.050928177383966045,
+            longitude: 22.555865552276373,
+            longitudeDelta: 0.042099617421627045,
+            },
           date: startDate.toString(),
-          repeat: option,
-          time_f: value.toString(),
-          time_t: value2.toString(),
+          repeat: checkBox,
+          time_f: dayFrom.toString(),
+          time_t: dayTo.toString(),
           isActive: false,
         });
-
-        // Assuming you have a newArea object with relevant data
-        const newArea = {
-          name: areaname,
-          // ... other relevant data ...
-          date: startDate,
-          timeFrom: value,
-          timeTo: value2,
-          repeat: option,
-          coordinates: coordinates,
-        };
-
-        // Call the addArea function passed from AreaList to update the areas list
-        addArea(newArea);
-
-        // Reset form state or perform any additional logic as needed
-
-        // Navigation logic, if applicable
-        // navigation.navigate("AreaSelect");
       } catch (error) {
-        // Handle API call errors
         console.error("Błąd podczas zapisywania danych:", error);
       }
+      window.location.replace("/list")
     }
   };
-
 
   const Setup = async () => {
     const region = localStorage.getItem("location");
@@ -260,6 +216,15 @@ function AreaScreen({ addArea }) {
     }
   };
 
+  const Checkbox = ({ label, checked, onChange }) => {
+    return (
+      <label>
+        <input style={{margin: "0 10px 10px 0"}} type="radio" checked={checked} onChange={onChange} />
+        {label}
+      </label>
+    );
+  };
+  
   const resetCoordinates = () => {
     setCoordinates([]);
   };
@@ -274,9 +239,12 @@ function AreaScreen({ addArea }) {
     lng: 22.529214,
   };
 
+  useEffect(() => {
+    Setup();
+  }, []);
 
   return (
-    <div className="d-flex flex-row bd-highlight" style={{ overflow: "hidden" }}>
+<div className="d-flex flex-row bd-highlight" style={{ overflow: "hidden" }}>
       <div
         style={{
           backgroundColor: "white",
@@ -285,7 +253,7 @@ function AreaScreen({ addArea }) {
           display: "flex",
           flexDirection: "column",
           padding: "10px",
-          alignItems: "center"
+          alignItems: "center",
         }}>
         <div
           style={{ display: "flex", justifyContent: "center", color: "black", fontSize: "50px", fontWeight: "bold" }}>
@@ -299,14 +267,15 @@ function AreaScreen({ addArea }) {
           className="input form-control"
           onChange={(e) => setAreaName(e.target.value)}
           value={areaname}
-          style={{ width: "70%", borderRadius: "20vh" }}
+          style={errName ? { width: "100%", borderRadius: "20vh", alignItems:"center", borderColor: "red" }:{ width: "100%", borderRadius: "20vh", alignItems:"center" }}
         />
 
         <br />
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", width: "26vw" }}>
           <TimePicker
-            onChange={onChange}
-            value={value}
+            onChange={setTime}
+            value={timeFrom}
+            disableClock={true}
             className="input"
             style={{
               width: "60%",
@@ -319,27 +288,42 @@ function AreaScreen({ addArea }) {
           />
           <br />
           <TimePicker
-            onChange={onChange2}
-            value={value2}
+            onChange={setTime2}
+            value={timeTo}
+            disableClock={true}
             className="input "
             style={{ width: "60%", borderRadius: "20vh", marginTop: "20%", justifyContent: "center", margin: 10 }}
           />
           <br />
-          <Dropdown className="input">
+          {pods.length != 0 ? (
+            <Dropdown as={ButtonGroup} onSelect={handleSelect}>
             <Dropdown.Toggle
-              variant="success"
-              id="dropdown-basic"
-              className="button"
-              style={{ backgroundColor: "deepskyblue", borderRadius: "20px", borderWidth: 0 }}>
-              Dropdown List
+              id="dropdown-custom-1"
+              className="dropdownmap"
+              style={{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
+              {selectedName}
             </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+            <Dropdown.Menu className="super-colors" style={{ width: "95%" }}>
+            {pods.map((item) => (
+                <Dropdown.Item eventKey={item._id} key={item._id}>
+                  {item.firstname + " " + item.lastname}
+                </Dropdown.Item>
+              ))}
             </Dropdown.Menu>
           </Dropdown>
+            
+          ) : (
+            <Dropdown as={ButtonGroup}>
+              <Dropdown.Toggle
+                id="dropdown-custom-1"
+                className="dropdownmap"
+                onSelect={handleSelect}
+                style={errPicker ? { backgroundColor: "white", borderColor:"red", borderWidth: 1, color: "black" }:{ backgroundColor: "white", borderWidth: 0, color: "black" }}>
+                Brak podopiecznych!
+              </Dropdown.Toggle>
+              <Dropdown.Menu className="super-colors" style={{ width: "95%" }}></Dropdown.Menu>
+            </Dropdown>
+          )}
           <br />
           <DatePicker
             selected={startDate}
@@ -350,35 +334,55 @@ function AreaScreen({ addArea }) {
           <br />
           {/* Checkboxes */}
           <div style={{ display: "flex", flexDirection: "column", margin: "2%", justifyContent: "center" }}>
-            <Checkbox label="Codziennie" checked={checkedOne} onChange={handleChangeOne} />
-            <Checkbox label="Co tydzień" checked={checkedTwo} onChange={handleChangeTwo} />
-            <Checkbox label="Nigdy" checked={checkedThree} onChange={handleChangeThree} />
+            <Checkbox
+              label="Codziennie"
+              checked={checkedOne}
+              onChange={() => {
+                setCheckBox(1);
+                handleChangeOne();
+              }}
+            />
+            <Checkbox
+              label="Co tydzień"
+              checked={checkedTwo}
+              onChange={() => {
+                setCheckBox(2);
+                handleChangeTwo();
+              }}
+            />
+            <Checkbox
+              label="Nigdy"
+              checked={checkedThree}
+              onChange={() => {
+                setCheckBox(3);
+                handleChangeThree();
+              }}
+            />
           </div>
-          <button
-            className="button" style={{ backgroundColor: "deepskyblue" }} onClick={onSubmit}>
+          <button className="button" style={{ backgroundColor: "deepskyblue", alignSelf: "center" }} onClick={onSubmit}>
             Zatwierdź
           </button>
+          <p style={{ color: "red", alignSelf: "center" }}>{check}</p>
         </div>
       </div>
-      <LoadScript googleMapsApiKey={googleMapsApiKey}>
-        <GoogleMap
-          mapContainerStyle={mapStyles}
-          zoom={13}
-          center={defaultCenter}
-          options={{
-            // ... (other options)
-          }}
-          onClick={handleMapPress}
-          onRegionChangeComplete={(region) => {
-            setRegionComplete({
-              latitude: region.latitude,
-              longitude: region.longitude,
-              latitudeDelta: region.latitudeDelta,
-              longitudeDelta: region.longitudeDelta,
-            });
-          }}
-        >
-          {coordinates.map((coordinate, index) => (
+      <GoogleMap
+        mapContainerStyle={mapStyles}
+        zoom={13}
+        ref={mapRef}
+        center={defaultCenter}
+        mapContainerClassName="xd"
+        options={{
+          disableDefaultUI: true,
+          zoomControl: false,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: false,
+        }}
+        onLoad={(map) => setMap(map)}
+        onClick={handleMapPress}>
+         {coordinates.map((coordinate, index) => (
             <Marker
               key={index}
               coordinate={coordinate}
@@ -399,20 +403,15 @@ function AreaScreen({ addArea }) {
             >
             </Marker>
           ))}
-
           {coordinates.length > 0 && (
             <Polygon
-
-              
-              
               paths={coordinates.map((coord) => ({ lat: coord.latitude, lng: coord.longitude }))}
               strokeColor="blue"
               fillColor="rgba(109, 147, 253, 0.4)"
               strokeWidth={2}
             />
           )}
-        </GoogleMap>
-      </LoadScript>
+      </GoogleMap>
     </div>
   );
 }

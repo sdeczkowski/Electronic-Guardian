@@ -142,6 +142,13 @@ router.get("/getall/:_id", async (req, res) => {
     if(user.type == "pod") return res.status(403).send({ message: "Forbidden" })
     const area = await AreaDetails.find({ _opid: req.params._id });
     if (area) {
+      area.map(async(item) => {
+        var dateObject = new Date(item.date);
+        var timefObject = new Date(item.time_from)
+        var timetObject = new Date(item.time_to)
+        item.date = `${dateObject.getDate()}.${dateObject.getMonth() + 1}.${dateObject.getFullYear()}`;
+        item.time_from = `${timefObject.getHours()}:${timefObject.getMinutes() < 10 ? '0' : ''}${timefObject.getMinutes()}`;
+        item.time_to = `${timetObject.getHours()}:${timetObject.getMinutes() < 10 ? '0' : ''}${timetObject.getMinutes()}`;})
       res.status(201).send(area);
     } else {
       res.status(404).send({ message: "Not found" });
