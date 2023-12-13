@@ -459,7 +459,7 @@ export default function MapScreen() {
         } else {
           SendArea(location);
         }
-      }, 10000);
+      }, 1000);
       return () => {
         clearInterval(intId);
       };

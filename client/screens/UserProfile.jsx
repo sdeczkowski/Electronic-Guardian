@@ -248,6 +248,8 @@ export default function ProfileScreen() {
     const [isModalVisible, setModalVisible] = useState(false);
     const [isEnabled1, setIsEnabled1] = useState(false);
     const [isEnabled2, setIsEnabled2] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [name, setName] = useState("");
     const toggleSwitch1 = () => setIsEnabled1((previousState) => !previousState);
     const toggleSwitch2 = () => setIsEnabled2((previousState) => !previousState);
 
@@ -276,6 +278,31 @@ export default function ProfileScreen() {
       }
     };
 
+    const Setup = async () => {
+      const id = localStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/user/getuser/" + id;
+        await axios.get(url).then((response) => {
+          setName(response.data.firstname + " " + response.data.lastname);
+          setLoading(false);
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
+    const Deactivate = async () => {
+      const id = await AsyncStorage.getItem("_id");
+      try {
+        const url = "http://10.0.2.2:3001/api/user/deactivate/" + id;
+        await axios.put(url).then(() => {
+          Logout();
+        });
+      } catch (error) {
+        console.log(error.response.data.message);
+      }
+    };
+
     const toggleModal = () => {
       setModalVisible(!isModalVisible);
     };
@@ -286,183 +313,197 @@ export default function ProfileScreen() {
       ]);
     };
 
-    return (
-      <View>
-        <View style={[styles.index, { marginTop: 20 }]}>
-          <Text>Nazwa uzytkownika</Text>
-          <TouchableOpacity style={{ margin: 10 }}>
-            <AntIcon name="infocirlceo" size={20} color="black" />
-          </TouchableOpacity>
+    useEffect(() => {
+      Setup();
+    }, []);
+
+    if (loading) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" />
         </View>
-        <ScrollView style={{}}>
-          <View>
-            <View style={{ padding: 5 }}>
-              <TouchableOpacity style={{ alignItems: "center" }} onPress={pickImage}>
-                {image ? (
-                  <Image source={{ uri: image }} style={{ width: 120, height: 120, borderRadius: 60 }} />
-                ) : (
-                  <FontIcon name="user-circle-o" size={120} color="black" style={{ height: 120 }} />
-                )}
-              </TouchableOpacity>
-            </View>
-            <Divider />
-            <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>Profile</Text>
-            <Divider />
-            <View style={{ alignItems: "flex-start", margin: 5 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}>
-                <Text style={{ marginLeft: 10 }}>Powiadomienia </Text>
-                <TouchableOpacity style={{ flexDirection: "row" }}>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={isEnabled1 ? "#f4f3f4" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={toggleSwitch1}
-                    value={isEnabled1}
-                    style={{
-                      marginLeft: 60,
-                      transform: [{ scaleX: 1 }, { scaleY: 1 }],
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 10,
-                }}>
-                <Text style={{ marginLeft: 10 }}>Tryb ciemny </Text>
-                <TouchableOpacity style={{ flexDirection: "row" }}>
-                  <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
-                    thumbColor={isEnabled2 ? "#f4f3f4" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={toggleSwitch2}
-                    value={isEnabled2}
-                    style={{
-                      marginLeft: 80,
-                      transform: [{ scaleX: 1 }, { scaleY: 1 }],
-                    }}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <Divider />
-            <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>Account</Text>
-            <Divider />
-            <View style={{ margin: 5 }}>
-              <TouchableOpacity
-                style={{ flexDirection: "row", padding: 10 }}
-                onPress={() => {
-                  navigation.navigate("ChangePassword");
-                }}>
-                <Text style={{ marginLeft: 5 }}>Zmień hasło</Text>
-                <AntIcon name="right" size={20} color="black" style={{ marginLeft: 70 }} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ flexDirection: "row", padding: 10 }}
-                onPress={() => {
-                  navigation.navigate("ChangeEmail");
-                }}>
-                <Text style={{ marginLeft: 5 }}>Zmień e-mail</Text>
-                <AntIcon name="right" size={20} color="black" style={{ marginLeft: 64 }} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={{ alignItems: "center" }}>
-            <Modal
-              isVisible={isModalVisible}
-              transparent={true}
-              onRequestClose={() => {
-                setModalVisible(!isModalVisible);
-              }}>
-              <View
-                style={[
-                  styles.box,
-                  {
-                    color: "white",
-                    height: "50%",
-                    flexDirection: "column",
-                    alignItem: "center",
-                    margin: 0,
-                    padding: 0,
-                  },
-                ]}>
-                <View
-                  style={{
-                    flexDirection: "column",
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                    height: "70%",
-                  }}>
-                  <Text style={[styles.title, { justifyContent: "center" }]}>Dezaktywacja konta użytkownika</Text>
-                  <MaterialIcon
-                    name="progress-alert"
-                    size={130}
-                    color="rgb(212, 43, 43)"
-                    style={{
-                      alignContent: "center",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  />
-                  <Text style={[styles.title, { justifyContent: "center", color: "grey", fontSize: 15 }]}>
-                    Czy na pewno chesz dezaktywować swoje konto?
-                  </Text>
-                </View>
-                <View style={{ height: "20%" }}>
-                  <Divider bold={true} />
-                  <View style={{ flexDirection: "row", justifyContent: "space-around", height: "100%" }}>
-                    <Pressable
-                      style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "50%",
-                      }}
-                      onPress={() => {
-                        setModalVisible(false);
-                      }}>
-                      <Text style={{ fontSize: 20 }}>Nie</Text>
-                    </Pressable>
-                    <Divider style={{ width: 1, height: "99%" }} />
-                    <Pressable
-                      style={{
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "50%",
-                      }}
-                      onPress={() => {}}>
-                      <Text style={{ fontSize: 20 }}>Tak</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              </View>
-            </Modal>
-            <Pressable
-              style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
-              //onPress={()=>delete_acc()}
-              onPress={() => {
-                setModalVisible(true);
-              }}>
-              <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
-            </Pressable>
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
-              onPress={() => {
-                LogOut();
-              }}>
-              <Text style={{ color: "white" }}>Wyloguj się</Text>
+      );
+    } else {
+      return (
+        <View>
+          <View style={[styles.index, { marginTop: 20 }]}>
+            <Text>{name}</Text>
+            <TouchableOpacity style={{ margin: 10 }}>
+              <AntIcon name="infocirlceo" size={20} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={{ height: 150 }} />
-        </ScrollView>
-      </View>
-    );
+          <ScrollView style={{}}>
+            <View>
+              <View style={{ padding: 5 }}>
+                <TouchableOpacity style={{ alignItems: "center" }} onPress={pickImage}>
+                  {image ? (
+                    <Image source={{ uri: image }} style={{ width: 120, height: 120, borderRadius: 60 }} />
+                  ) : (
+                    <FontIcon name="user-circle-o" size={120} color="black" style={{ height: 120 }} />
+                  )}
+                </TouchableOpacity>
+              </View>
+              <Divider />
+              <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>Profile</Text>
+              <Divider />
+              <View style={{ alignItems: "flex-start", margin: 5 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}>
+                  <Text style={{ marginLeft: 10 }}>Powiadomienia </Text>
+                  <TouchableOpacity style={{ flexDirection: "row" }}>
+                    <Switch
+                      trackColor={{ false: "#767577", true: "#81b0ff" }}
+                      thumbColor={isEnabled1 ? "#f4f3f4" : "#f4f3f4"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleSwitch1}
+                      value={isEnabled1}
+                      style={{
+                        marginLeft: 60,
+                        transform: [{ scaleX: 1 }, { scaleY: 1 }],
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginBottom: 10,
+                  }}>
+                  <Text style={{ marginLeft: 10 }}>Tryb ciemny </Text>
+                  <TouchableOpacity style={{ flexDirection: "row" }}>
+                    <Switch
+                      trackColor={{ false: "#767577", true: "#81b0ff" }}
+                      thumbColor={isEnabled2 ? "#f4f3f4" : "#f4f3f4"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleSwitch2}
+                      value={isEnabled2}
+                      style={{
+                        marginLeft: 80,
+                        transform: [{ scaleX: 1 }, { scaleY: 1 }],
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <Divider />
+              <Text style={[styles.acc_titles, { marginLeft: 10, marginTop: 10 }]}>Account</Text>
+              <Divider />
+              <View style={{ margin: 5 }}>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", padding: 10 }}
+                  onPress={() => {
+                    navigation.navigate("ChangePassword");
+                  }}>
+                  <Text style={{ marginLeft: 5 }}>Zmień hasło</Text>
+                  <AntIcon name="right" size={20} color="black" style={{ marginLeft: 70 }} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flexDirection: "row", padding: 10 }}
+                  onPress={() => {
+                    navigation.navigate("ChangeEmail");
+                  }}>
+                  <Text style={{ marginLeft: 5 }}>Zmień e-mail</Text>
+                  <AntIcon name="right" size={20} color="black" style={{ marginLeft: 64 }} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Modal
+                isVisible={isModalVisible}
+                transparent={true}
+                onRequestClose={() => {
+                  setModalVisible(!isModalVisible);
+                }}>
+                <View
+                  style={[
+                    styles.box,
+                    {
+                      color: "white",
+                      height: "50%",
+                      flexDirection: "column",
+                      alignItem: "center",
+                      margin: 0,
+                      padding: 0,
+                    },
+                  ]}>
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      justifyContent: "space-around",
+                      alignItems: "center",
+                      height: "70%",
+                    }}>
+                    <Text style={[styles.title, { justifyContent: "center" }]}>Dezaktywacja konta użytkownika</Text>
+                    <MaterialIcon
+                      name="progress-alert"
+                      size={130}
+                      color="rgb(212, 43, 43)"
+                      style={{
+                        alignContent: "center",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    />
+                    <Text style={[styles.title, { justifyContent: "center", color: "grey", fontSize: 15 }]}>
+                      Czy na pewno chesz dezaktywować swoje konto?
+                    </Text>
+                  </View>
+                  <View style={{ height: "20%" }}>
+                    <Divider bold={true} />
+                    <View style={{ flexDirection: "row", justifyContent: "space-around", height: "100%" }}>
+                      <Pressable
+                        style={{
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "50%",
+                        }}
+                        onPress={() => {
+                          setModalVisible(false);
+                        }}>
+                        <Text style={{ fontSize: 20 }}>Nie</Text>
+                      </Pressable>
+                      <Divider style={{ width: 1, height: "99%" }} />
+                      <Pressable
+                        style={{
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "50%",
+                        }}
+                        onPress={() => {
+                          Deactivate();
+                        }}>
+                        <Text style={{ fontSize: 20 }}>Tak</Text>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
+              </Modal>
+              <Pressable
+                style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
+                //onPress={()=>delete_acc()}
+                onPress={() => {
+                  setModalVisible(true);
+                }}>
+                <Text style={{ color: "white" }}>Dezaktywacja konta</Text>
+              </Pressable>
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: "rgb(212, 43, 43)", alignItems: "center" }]}
+                onPress={() => {
+                  LogOut();
+                }}>
+                <Text style={{ color: "white" }}>Wyloguj się</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ height: 150 }} />
+          </ScrollView>
+        </View>
+      );
+    }
   };
 
   return (

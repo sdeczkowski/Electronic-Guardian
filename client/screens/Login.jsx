@@ -46,6 +46,9 @@ const login = ({ navigation }) => {
             }
             if (error.response.data.message == "Błędne hasło") {
               setErrPass(true);
+            } else {
+              setErrEmail(true);
+              setErrPass(true);
             }
             setCheck(error.response.data.message);
           }
