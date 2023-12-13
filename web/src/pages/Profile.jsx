@@ -10,8 +10,10 @@ import Modal from "react-bootstrap/Modal";
 import { HiExclamationTriangle } from "react-icons/hi2";
 import Form from "react-bootstrap/Form";
 import axios from "axios";
+import { useEffect } from "react";
 
 const Profile = () => {
+  const [name, setName] = useState("");
   const [checked, setChecked] = useState(false);
   const [checked2, setChecked2] = useState(false);
   const [password, setPassword] = useState("");
@@ -41,6 +43,18 @@ const Profile = () => {
   const handleChange2 = (checked2) => {
     setChecked2(checked2);
   };
+
+  const Setup = async () => {
+    const id = localStorage.getItem("_id");
+    try {
+      const url = "http://localhost:3001/api/user/getuser/" + id;
+      await axios.get(url).then((response) => {
+        setName(response.data.firstname + " " + response.data.lastname);
+      })
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  }
 
   const handleEmail = async () => {
     setCheck(null);
@@ -149,10 +163,26 @@ const Profile = () => {
     }
   };
 
+  const Deactivate = async () => {
+    const id = localStorage.getItem("_id")
+    try {
+      const url = "http://localhost:3001/api/user/deactivate/" + id;
+      await axios.put(url).then(() => {
+        LogOut();
+      })
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
   const LogOut = () => {
     localStorage.clear();
     window.location.replace("/");
   };
+
+  useEffect(() => {
+    Setup();
+  }, [])
 
   return (
     <div>
@@ -192,11 +222,10 @@ const Profile = () => {
           <FaRegUserCircle size={300} />
         </div>
         <div className="xd3">
+          <div><b>{name}</b></div> 
           <hr />
           <h6>Profile</h6>
           <hr />
-          <div>Imie</div>
-          <div>Nazwisko</div>
           <div className="swi">
             <div>Powiadomienia</div>
             <Switch
@@ -239,7 +268,7 @@ const Profile = () => {
           <div className="swi">
             <div>Zmień hasło</div>
             <Button variant="link" color="gray" onClick={togglePass}>
-              <BsChevronRight size={20} className="react-switch3" />
+              <BsChevronRight size={20} className="react-switch2" />
             </Button>
             <Modal show={showPass} onHide={togglePass}>
               <Modal.Header closeButton></Modal.Header>
@@ -367,7 +396,7 @@ const Profile = () => {
                 </Button>
                 <Button
                   variant="link"
-                  onClick={toggleDeactivate}
+                  onClick={() => {Deactivate()}}
                   style={{ display: "flex", justifyContent: "center", textDecoration: "none", color: "black" }}>
                   Tak
                 </Button>
