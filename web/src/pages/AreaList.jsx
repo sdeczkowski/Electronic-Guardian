@@ -23,6 +23,20 @@ function AreaList() {
     { id: 3, label: "Nigdy" },
   ];
 
+  const deleteArea = async (_opid, _podid, name) => {
+    try {
+      const url = "http://localhost:3001/api/area/delete";
+      await axios.post(url, {
+        _opid: _opid,
+        _podid: _podid,
+        name: name,
+      });
+      AreaSetup()
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
   const AreaSetup = async () => {
     try {
       const id = localStorage.getItem("_id");
@@ -139,7 +153,7 @@ function AreaList() {
                       <br />
                       Cykliczność: {opcje[item.repeat - 1].label}
                     </Card.Text>
-                    <Button variant="danger">Usuń</Button>
+                    <Button variant="danger" onClick={() => {deleteArea(item._opid, item._podid, item.name)}}>Usuń</Button>
                   </Card.Body>
                 </Card>
               );

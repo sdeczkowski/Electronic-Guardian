@@ -402,7 +402,6 @@ function MapScreen() {
                               <b>{item.firstname + " " + item.lastname}</b>
                             </div>
                             <text>{item.title}</text>
-                            <text>{item.areaname}</text>
                             <text>{item.details}</text>
                           </div>
                           <div
