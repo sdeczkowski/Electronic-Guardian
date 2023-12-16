@@ -47,7 +47,7 @@ router.post("/send", async (req, res) => {
             _id: req.body._id,
             text: req.body.text,
             createdAt: req.body.createdAt,
-            user: req.body.user
+            user: req.body.user,
           },
         },
       }
@@ -70,7 +70,6 @@ router.get("/set/:_id1/:_id2", async (req, res) => {
     });
     if (chat) {
       res.status(201).send(chat.message);
-      console.log("Serwer: Wysłano chat 🤪");
     } else {
       await new Chat({
         _id1: req.params._id1,
@@ -78,7 +77,6 @@ router.get("/set/:_id1/:_id2", async (req, res) => {
         message: [],
       }).save();
       res.status(201).send([]);
-      console.log("Baza: Stworzono chat 🫢");
     }
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
