@@ -222,6 +222,23 @@ router.post("/updatemail", async (req, res) => {
   }
 });
 
+router.put("/deletepod/:_id/:_podid", async (req, res) => {
+  try {
+    await User.updateOne({ _id: req.params._id }, { $pull: { pods: { _id: req.params._podid } } });
+    await Chat.deleteOne({
+      $or: [
+        { _id1: req.params._id, _id2: req.params._podid },
+        { _id1: req.params._podid, _id2: req.params._id },
+      ],
+    });
+    await AreaDetails.deleteMany({ _opid: req.params._id, _podid: req.params._podid });
+    res.status(201).send({ message: "Pod deleted successfuly" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
 router.put("/deactivate/:_id", async (req, res) => {
   try {
     await User.updateOne(
@@ -236,10 +253,7 @@ router.put("/deactivate/:_id", async (req, res) => {
     await AreaDetails.deleteMany({ $or: [{ _opid: req.params._id }, { _podid: req.params._id }] });
     await Chat.deleteMany({ $or: [{ _id1: req.params._id }, { _id2: req.params._id }] });
     if (type === "pod") {
-      await User.updateManyupdateMany(
-        { "pods._id": "655400ad19b63200912b468e" },
-        { $pull: { pods: { _id: "655400ad19b63200912b468e" } } }
-      );
+      await User.updateManyupdateMany({ "pods._id": req.params._id }, { $pull: { pods: { _id: req.params._id } } });
     }
     res.status(201).send({ message: "Account deactivated successfuly" });
   } catch (error) {

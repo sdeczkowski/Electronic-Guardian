@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useId } from "react";
 import { FaSearch } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
-import { Nav, Form } from "react-bootstrap";
+import { Nav, Form, Modal } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import uni from "../assets/uni.png";
-import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage } from "react-icons/fa6";
+import { FaMap, FaRegCircleUser, FaLocationDot, FaMessage, FaList, FaX } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
 import { FallingLines } from "react-loader-spinner";
 import axios from "axios";
@@ -17,7 +17,12 @@ const Chat = () => {
   const [data, setData] = useState([]);
   const [_id1, setID1] = useState();
   const [_id2, setID2] = useState();
-  const [name, setName] = useState();
+  const [name, setName] = useState("Wybierz użytkownika");
+  const [showModal, setShowModal] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+
+  const toggleDelete = () => setDeleteMode(!deleteMode);
+  const toggleModal = () => setShowModal(!showModal);
 
   const Setup = async () => {
     const id = localStorage.getItem("_id");
@@ -42,6 +47,20 @@ const Chat = () => {
         if (response && response.data) {
           setMessages(response.data);
           setLoadingChat(false);
+        }
+      });
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  };
+
+  const DeletePod = async (pod_id) => {
+    const id = localStorage.getItem("_id");
+    try {
+      const url = "http://localhost:3001/api/user/deletepod/" + id + "/" + pod_id;
+      await axios.put(url).then((response) => {
+        if (response && response.data) {
+          window.location.reload();
         }
       });
     } catch (error) {
@@ -81,11 +100,6 @@ const Chat = () => {
   const handleSearch = () => {
     // Tutaj możesz dodać logikę przeszukiwania listy osób
     console.log("Szukaj:", searchQuery);
-  };
-
-  const handleNewConversation = () => {
-    // Tutaj możesz dodać logikę tworzenia nowej konwersacji
-    console.log("Utwórz nową konwersację");
   };
 
   useEffect(() => {
@@ -184,6 +198,7 @@ const Chat = () => {
                   onClick={() => {
                     setID2(person._id);
                     setName(person.firstname + " " + person.lastname);
+                    setMessages([]);
                     setLoadingChat(true);
                     GetChat();
                   }}
@@ -204,6 +219,49 @@ const Chat = () => {
               );
             })}
           </div>
+
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <button className="roundbutton" style={{ width: "40px", height: "40px", margin: 0 }} onClick={toggleModal}>
+              <FaList />
+            </button>
+          </div>
+          <Modal show={showModal} onHide={toggleModal}>
+            <Modal.Header closeButton></Modal.Header>
+            <Modal.Title style={{ display: "flex", justifyContent: "center" }}>Usuwanie podopiecznego</Modal.Title>
+            <Modal.Body style={{ display: "flex", justifyContent: "flex-start", flexDirection: "column" }}>
+              {data.map((person) => {
+                let select = false;
+                return (
+                  <div
+                    key={person._id}
+                    style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+                    <div
+                      style={
+                        select
+                          ? {
+                              marginBottom: "5px",
+                              backgroundColor: "grey",
+                              borderRadius: "5px",
+                              padding: "5px",
+                            }
+                          : { marginBottom: "5px", borderRadius: "5px", padding: "5px" }
+                      }>
+                      <FaRegUserCircle size={40} style={{ marginRight: "15px" }} />
+                      <Form.Text>{person.firstname + " " + person.lastname}</Form.Text>
+                    </div>
+                    <button
+                      className="roundbutton"
+                      style={{ width: "40px", height: "40px", margin: 0 }}
+                      onClick={() => {
+                        DeletePod(person._id);
+                      }}>
+                      <FaX />
+                    </button>
+                  </div>
+                );
+              })}
+            </Modal.Body>
+          </Modal>
         </div>
 
         {/* Prawa sekcja (3:7) */}
@@ -219,6 +277,7 @@ const Chat = () => {
           </div>
         ) : (
           <div style={{ flex: 8, borderRadius: "10px", display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 30, padding: 10 }}>{name}</div>
             <div
               style={{
                 height: "400px",

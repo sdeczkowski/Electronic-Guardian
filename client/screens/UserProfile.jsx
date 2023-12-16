@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Switch, TextInput, ScrollView, Alert, Pressable } from "react-native";
+import { View, Text, Image, Switch, TextInput, ActivityIndicator, ScrollView, Alert, Pressable } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Divider } from "react-native-paper";
@@ -279,7 +279,7 @@ export default function ProfileScreen() {
     };
 
     const Setup = async () => {
-      const id = localStorage.getItem("_id");
+      const id = await AsyncStorage.getItem("_id");
       try {
         const url = "http://10.0.2.2:3001/api/user/getuser/" + id;
         await axios.get(url).then((response) => {
