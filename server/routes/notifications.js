@@ -47,7 +47,7 @@ router.post("/delete", async (req, res) => {
     });
     if (notifications) {
       await Notifications.findOneAndUpdate({ _opid: req.body._opid }, { $set: { notifications: [] } });
-      res.status(201).send({ message: "Notifications deleted successfully 😬" });
+      res.status(201).send({ message: "Notifications deleted successfully " });
     } else {
       res.status(404).send({ message: "Not found" });
     }
@@ -71,7 +71,7 @@ router.post("/seen", async (req, res) => {
         { multi: true }
       );
       res.status(201).send({ message: "Notifications marked as seen" });
-      console.log("Baza: Powiadomienia oznaczone jako przeczytane 👀");
+      console.log("Baza: Powiadomienia oznaczone jako przeczytane ");
     } else {
       res.status(404).send({ message: "Not found" });
     }
@@ -109,7 +109,7 @@ router.post("/add", async (req, res) => {
         }
       );
       res.status(201).send({ message: "Notification added successfully" });
-      console.log("Baza: Dodano powiadomienie do dokumentu 💫");
+      console.log("Baza: Dodano powiadomienie do dokumentu ");
     } else {
       await new Notifications({
         _opid: req.body._opid,
@@ -126,7 +126,7 @@ router.post("/add", async (req, res) => {
         ],
       }).save();
       res.status(201).send({ message: "Notification created successfully" });
-      console.log("Baza: Dodano powiadomienie 🚩");
+      console.log("Baza: Dodano powiadomienie ");
     }
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });

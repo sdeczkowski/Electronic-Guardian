@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
     }
     
     res.status(201).send({ message: "User created successfully" });
-    console.log("Baza: Dodano użytkownika 😋");
+    console.log("Baza: Dodano użytkownika ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
   }

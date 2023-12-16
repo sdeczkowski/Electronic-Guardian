@@ -6,9 +6,9 @@ const connectDB = async () => {
             dbName: 'Inz',
         }
         await mongoose.connect("mongodb+srv://szymondeczkowski1:pqOTOqmMjL0iRjRr@reactcluster.pz9kwmk.mongodb.net/", DB_OPTIONS);
-        console.log("Baza: Zapierdala 😎");
+        console.log("Baza: Połączono");
     } catch (error){
-        console.log("Baza: Cosik sie odjebalo 🥶");
+        console.log("Baza: Błąd");
         console.log(error)
     }
 }

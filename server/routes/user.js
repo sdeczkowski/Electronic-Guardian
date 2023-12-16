@@ -137,7 +137,7 @@ router.post("/addpod", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Pod added successfully" });
-    console.log("Baza: Dodano Podopiecznego do Opiekuna 😇");
+    console.log("Baza: Dodano Podopiecznego do Opiekuna ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -160,7 +160,6 @@ router.post("/updateloc", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Notification added successfully" });
-    console.log("Baza: Zakutalizowano lokalizacje 💫");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -191,7 +190,7 @@ router.post("/updatepass", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Password updated successfully" });
-    console.log("Baza: Zakutalizowano hasło 😐");
+    console.log("Baza: Zakutalizowano hasło ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -215,7 +214,7 @@ router.post("/updatemail", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Email updated successfully" });
-    console.log("Baza: Zakutalizowano email 😐");
+    console.log("Baza: Zakutalizowano email ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
