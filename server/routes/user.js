@@ -137,7 +137,7 @@ router.post("/addpod", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Pod added successfully" });
-    console.log("Baza: Dodano Podopiecznego do Opiekuna 😇");
+    console.log("Baza: Dodano Podopiecznego do Opiekuna ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -160,7 +160,6 @@ router.post("/updateloc", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Notification added successfully" });
-    console.log("Baza: Zakutalizowano lokalizacje 💫");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -191,7 +190,7 @@ router.post("/updatepass", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Password updated successfully" });
-    console.log("Baza: Zakutalizowano hasło 😐");
+    console.log("Baza: Zakutalizowano hasło ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
@@ -215,7 +214,24 @@ router.post("/updatemail", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Email updated successfully" });
-    console.log("Baza: Zakutalizowano email 😐");
+    console.log("Baza: Zakutalizowano email ");
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+    console.log(error);
+  }
+});
+
+router.put("/deletepod/:_id/:_podid", async (req, res) => {
+  try {
+    await User.updateOne({ _id: req.params._id }, { $pull: { pods: { _id: req.params._podid } } });
+    await Chat.deleteOne({
+      $or: [
+        { _id1: req.params._id, _id2: req.params._podid },
+        { _id1: req.params._podid, _id2: req.params._id },
+      ],
+    });
+    await AreaDetails.deleteMany({ _opid: req.params._id, _podid: req.params._podid });
+    res.status(201).send({ message: "Pod deleted successfuly" });
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);

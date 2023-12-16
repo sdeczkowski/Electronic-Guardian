@@ -45,7 +45,7 @@ router.post("/", async (req, res) => {
       },
       message: "Logged in successfully",
     });
-    console.log("Serwer: Wysłano token 🤠");
+    console.log("Serwer: Wysłano token ");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
   }

@@ -53,7 +53,7 @@ router.post("/send", async (req, res) => {
       }
     );
     res.status(201).send({ message: "Message added successfully" });
-    console.log("Baza: Dodano wiadomość 🫨");
+    console.log("Baza: Dodano wiadomość");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);

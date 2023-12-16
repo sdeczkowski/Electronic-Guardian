@@ -200,7 +200,7 @@ router.post("/add", async (req, res) => {
       loc_status: false
     }).save();
     res.status(201).send({ message: "Area created successfully" });
-    console.log("Baza: Dodano Obszar 🗺️");
+    console.log("Baza: Dodano Obsza");
   } catch (error) {
     res.status(500).send({ message: "Internal Server Error" });
     console.log(error);
